@@ -143,7 +143,6 @@
     .icon-inline { width: 12px; height: 12px; }
     .tech-id { font-family: var(--font-mono); font-size: 0.58rem; color: var(--accent-cyan); font-weight: 700; }
 
-    /* RATIO 1:1 STRICT (POCHETTE CARRÉE SANS DÉFORMATION) */
     .hero-cover-frame {
       width: 100%;
       aspect-ratio: 1 / 1;
@@ -355,8 +354,8 @@
                 </div>
 
                 <div class="mini-tracklist">
-                  <div class="mini-track-item" data-track="Saigon Bound" data-sub="Track 1 • Love Letters from Saigon" data-audio="audio/saigon-bound.mp3" data-cover="assets/saigon-bound.jpeg">1. Saigon Bound</div>
-                  <div class="mini-track-item" data-track="Tình Bolero Cho Trân" data-sub="Track 2 • Love Letters from Saigon" data-audio="audio/tinh-bolero-cho-tran.mp3" data-cover="assets/tinh-bolero-cho-tran.jpeg">2. Tình Bolero Cho Trân</div>
+                  <div class="mini-track-item" data-track="Saigon Bound" data-sub="Track 1 • Love Letters from Saigon" data-audio="audio/saigon-bound.mp3" data-cover="assets/saigon-bound.png">1. Saigon Bound</div>
+                  <div class="mini-track-item" data-track="Tình Bolero Cho Trân" data-sub="Track 2 • Love Letters from Saigon" data-audio="audio/tinh-bolero-cho-tran.mp3" data-cover="assets/tinh-bolero-cho-tran.png">2. Tình Bolero Cho Trân</div>
                   <div class="mini-track-item" data-track="Jusqu'au Dernier Souffle" data-sub="Track 3 • Love Letters from Saigon" data-audio="audio/jusquau-dernier-souffle.mp3" data-cover="assets/jusquau-dernier-souffle.jpeg">3. Jusqu'au Dernier Souffle</div>
                 </div>
               </div>
@@ -411,8 +410,8 @@
             <h3><i data-lucide="disc" class="icon-green"></i> Top Discography Player</h3>
             <span class="badge-tech">SPOTIFY LIVE</span>
           </div>
-          <div class="spotify-wrapper-fixed">
-            <iframe src="https://open.spotify.com/embed/artist/6W08IttKpZns5zG7BYTz8e?utm_source=generator&theme=0" width="100%" height="100%" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+          <div class="spotify-wrapper-fixed" id="spotify-container">
+            <iframe id="spotify-iframe" src="https://open.spotify.com/embed/artist/6W08IttKpZns5zG7BYTz8e?utm_source=generator&theme=0" width="100%" height="100%" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
           </div>
         </div>
       </section>
