@@ -1,119 +1,4 @@
-<!DOCTYPE html>
-<html lang="en" class="dark">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SHINOBIWAN — Official Artist Launchpad</title>
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/lucide@latest"></script>
-  
-  <link rel="stylesheet" href="css/style.css" />
-</head>
-<body>
-
-  <div class="glow-bg"></div>
-  <div class="cyber-grid"></div>
-
-  <div class="app-viewport">
-    
-    <!-- TOPBAR -->
-    <header class="topbar">
-      <div class="brand-zone">
-        <span class="live-dot"></span>
-        <strong class="brand-title">SHINOBIWAN</strong>
-        <span class="badge-ep">SYSTEM LAUNCHPAD v2.0</span>
-      </div>
-
-      <div class="title-zone">
-        <h1>CYBERPUNK • MIDTEMPO BASS • DARK SYNTHWAVE</h1>
-      </div>
-
-      <div class="hosts-zone">
-        <div class="host-pill"><i data-lucide="zap" class="icon-green"></i> DAW ENGINE ACTIVE</div>
-        <div class="host-pill"><i data-lucide="shield-check" class="icon-cyan"></i> VERIFIED ARTIST</div>
-      </div>
-    </header>
-
-    <!-- WORKSPACE 3 COLUMNS -->
-    <main class="dashboard-grid">
-      
-      <!-- COLONNE 1 : PLAYER PRINCIPAL -->
-      <section class="dash-col">
-        
-        <div class="glass-card main-player">
-          <div class="card-head-compact">
-            <span class="badge-tag"><i data-lucide="disc" class="icon-inline"></i> ACTIVE PLAYBACK</span>
-            <span class="tech-id" id="active-ep-code">NH-EP #01</span>
-          </div>
-
-          <!-- COVER PLAYER PRINCIPAL DYNAMIQUE (.jpeg) -->
-          <div class="hero-cover-frame">
-            <img id="player-cover-img" src="assets/neon-heartbreaks.jpeg" alt="Active Cover" class="player-cover-img" />
-            <div class="hero-logo-overlay">
-              <img src="assets/logo.png" alt="SHINOBIWAN Logo" class="official-logo-img" />
-            </div>
-          </div>
-
-          <div class="track-meta">
-            <h2 id="current-track-title">Before the Noise</h2>
-            <p class="subtitle" id="current-track-sub">Lead Track • Neon Heartbreaks EP</p>
-          </div>
-
-          <!-- AUDIO INITIAL -->
-          <audio id="audio-element" src="audio/before-the-noise.mp3" preload="metadata"></audio>
-
-          <div class="waveform-box">
-            <div class="waveform-container" id="waveform-click-area">
-              <div class="bars-flex" id="bars-flex"></div>
-            </div>
-            <div class="time-display">
-              <span id="current-time">00:00</span>
-              <span id="total-duration">--:--</span>
-            </div>
-          </div>
-
-          <div class="controls-row">
-            <button class="btn-secondary" id="btn-rewind"><i data-lucide="rotate-ccw"></i> -10s</button>
-            <button class="btn-play" id="btn-play-pause"><i data-lucide="play" id="play-icon"></i></button>
-            <button class="btn-secondary" id="btn-forward"><i data-lucide="rotate-cw"></i> +10s</button>
-          </div>
-        </div>
-
-        <div class="glass-card direct-links">
-          <div class="card-head">
-            <h3><i data-lucide="share-2" class="icon-cyan"></i> Official Streaming Hubs</h3>
-          </div>
-          
-          <div class="platform-grid">
-            <a href="https://open.spotify.com/artist/6W08IttKpZns5zG7BYTz8e" target="_blank" rel="noopener" class="profile-item spotify">
-              <i data-lucide="music" class="p-icon"></i>
-              <div>
-                <strong>Spotify Catalog</strong>
-                <span>Direct Discography & Top Tracks</span>
-              </div>
-              <i data-lucide="external-link" class="ext-icon"></i>
-            </a>
-
-            <a href="https://soundcloud.com/shinobiwan-1" target="_blank" rel="noopener" class="profile-item soundcloud">
-              <i data-lucide="cloud" class="p-icon"></i>
-              <div>
-                <strong>SoundCloud HQ Lab</strong>
-                <span>Demos, Edits & VIP Masters</span>
-              </div>
-              <i data-lucide="external-link" class="ext-icon"></i>
-            </a>
-          </div>
-        </div>
-
-      </section>
-
-      <!-- COLONNE 2 : CARTS EP INTERACTIVES (.jpeg) -->
-      <section class="dash-col">
-        
-        <div class="glass-card catalog-showcase-card">
+<div class="glass-card catalog-showcase-card">
           <div class="card-head">
             <h3><i data-lucide="layers" class="icon-cyan"></i> Discography & EP Universe</h3>
             <span class="badge-tech">CLICK CARD TO LOAD</span>
@@ -135,9 +20,13 @@
                 <span class="ep-tag-mini">PRIMARY EP</span>
               </div>
               <div class="ep-details">
-                <h4>NEON HEARTBREAKS</h4>
-                <p>Rain-soaked synthwave cityscape. Incisive analog basslines & cyber hooks.</p>
-                <div class="ep-tracks-highlight">Track: <strong>Before the Noise</strong></div>
+                <div class="ep-info-head">
+                  <h4>NEON HEARTBREAKS</h4>
+                  <p class="ep-desc">Rain-soaked synthwave cityscape. Incisive analog basslines & cyber hooks.</p>
+                </div>
+                <div class="ep-tracks-highlight">
+                  <span>Track Focus:</span> <strong>Before the Noise</strong>
+                </div>
               </div>
             </div>
 
@@ -155,9 +44,13 @@
                 <span class="ep-tag-mini">CONCEPT</span>
               </div>
               <div class="ep-details">
-                <h4>LOVE LETTERS FROM SAIGON</h4>
-                <p>Trilingual narrative synthpop, organic lofi textures & tropical neon warmth.</p>
-                <div class="ep-tracks-highlight">Track: <strong>Saigon Bound</strong></div>
+                <div class="ep-info-head">
+                  <h4>LOVE LETTERS FROM SAIGON</h4>
+                  <p class="ep-desc">Trilingual narrative synthpop, organic lofi textures & tropical neon warmth.</p>
+                </div>
+                <div class="ep-tracks-highlight">
+                  <span>Track Focus:</span> <strong>Saigon Bound</strong>
+                </div>
               </div>
             </div>
 
@@ -175,111 +68,15 @@
                 <span class="ep-tag-mini">INDUSTRIAL</span>
               </div>
               <div class="ep-details">
-                <h4>COAL TO DIAMOND</h4>
-                <p>Obsidian sharp design, Blade Cut industrial bass, brutal distortion dynamics.</p>
-                <div class="ep-tracks-highlight">Track: <strong>THICK</strong></div>
+                <div class="ep-info-head">
+                  <h4>COAL TO DIAMOND</h4>
+                  <p class="ep-desc">Obsidian sharp design, Blade Cut industrial bass, brutal distortion dynamics.</p>
+                </div>
+                <div class="ep-tracks-highlight">
+                  <span>Track Focus:</span> <strong>THICK</strong>
+                </div>
               </div>
             </div>
 
           </div>
         </div>
-
-        <!-- SPECTRUM CANVAS -->
-        <div class="glass-card dsp-card">
-          <div class="card-head">
-            <h3><i data-lucide="activity" class="icon-green"></i> Real-Time DAW Canvas RTA Spectrum</h3>
-            <span class="badge-tech">LIVE DSP 60 FPS</span>
-          </div>
-
-          <div class="rta-spectrum-container">
-            <canvas id="rta-canvas" width="600" height="90"></canvas>
-            <div class="rta-labels">
-              <span>20Hz (Sub)</span>
-              <span>250Hz (Low-Mid)</span>
-              <span>2kHz (Mid)</span>
-              <span>8kHz (Presence)</span>
-              <span>20kHz (Air)</span>
-            </div>
-          </div>
-
-          <div class="metrics-grid-4">
-            <div class="metric-tile">
-              <span class="m-label">LOUDNESS TARGET</span>
-              <strong class="m-val green" id="metric-lufs">-13.8 LUFS</strong>
-              <span class="m-sub">Streaming Calibrated</span>
-            </div>
-            <div class="metric-tile">
-              <span class="m-label">STEREO PHASE</span>
-              <strong class="m-val cyan">138% / +0.92</strong>
-              <span class="m-sub">Mono-Coherent Low</span>
-            </div>
-            <div class="metric-tile">
-              <span class="m-label">TRUE PEAK</span>
-              <strong class="m-val purple">-0.8 dBTP</strong>
-              <span class="m-sub">No Clipping</span>
-            </div>
-            <div class="metric-tile">
-              <span class="m-label">DYNAMIC RANGE</span>
-              <strong class="m-val green" id="metric-dr">DR 8.2 dB</strong>
-              <span class="m-sub">Punch Preserved</span>
-            </div>
-          </div>
-        </div>
-
-      </section>
-
-      <!-- COLONNE 3 : SPOTIFY XXL & EPK -->
-      <section class="dash-col">
-        
-        <div class="glass-card embed-card-full">
-          <div class="card-head">
-            <h3><i data-lucide="disc" class="icon-green"></i> Top Discography Player</h3>
-            <span class="badge-tech">SPOTIFY LIVE</span>
-          </div>
-          <div class="spotify-wrapper-fixed">
-            <iframe 
-              src="https://open.spotify.com/embed/artist/6W08IttKpZns5zG7BYTz8e?utm_source=generator&theme=0" 
-              width="100%" 
-              height="380" 
-              frameBorder="0" 
-              allowfullscreen="" 
-              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-              loading="lazy">
-            </iframe>
-          </div>
-        </div>
-
-        <div class="glass-card epk-card">
-          <div class="card-head">
-            <h3><i data-lucide="cpu" class="icon-cyan"></i> Curator & Sync Specification</h3>
-          </div>
-          
-          <div class="epk-details-box">
-            <div class="epk-row">
-              <i data-lucide="radio" class="icon-green"></i>
-              <div>
-                <strong>Algorithmic Target</strong>
-                <p>Engineered for Cyberpunk, Darksynth & Synthwave official playlists.</p>
-              </div>
-            </div>
-
-            <div class="epk-row">
-              <i data-lucide="clapperboard" class="icon-cyan"></i>
-              <div>
-                <strong>Sync Licensing</strong>
-                <p>Mastered stems & instrumental versions available for trailers & gaming sync.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </section>
-
-    </main>
-  </div>
-
-  <!-- CHARGING UNIFIÉ -->
-  <script src="js/app-engine.js"></script>
-  <script>lucide.createIcons();</script>
-</body>
-</html>
