@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SHINOBIWAN — Executive Audio Spotlight</title>
+  <title>SHINOBIWAN — Neural Audio Architecture & Diagnosis</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
   
   <link rel="stylesheet" href="css/style.css" />
@@ -16,9 +16,9 @@
 
   <div class="glow-bg"></div>
 
-  <div class="app-layout">
+  <div class="app-viewport">
     
-    <!-- TOPBAR -->
+    <!-- EXECUTIVE TOPBAR -->
     <header class="topbar">
       <div class="brand-zone">
         <span class="live-dot"></span>
@@ -36,12 +36,19 @@
       </div>
     </header>
 
-    <!-- DASHBOARD GRID 3 COLUMNS -->
-    <main class="dashboard-3col">
+    <!-- DASHBOARD WORKSPACE 3 COLUMNS -->
+    <main class="dashboard-grid">
       
-      <!-- COL 1: PODCAST & LINKS -->
+      <!-- COL 1: MASTER PLAYER & PLATFORMS -->
       <section class="dash-col">
+        
+        <!-- PLAYER PRINCIPAL -->
         <div class="glass-card main-player">
+          <div class="card-head-compact">
+            <span class="badge-tag">AUDIO REVIEW ENGINE</span>
+            <span class="tech-id">CORE v5.5</span>
+          </div>
+
           <div class="cover-art">
             <div class="artist-brand-overlay">
               <img src="assets/logo.png" alt="SHINOBIWAN Logo" class="official-logo-img" />
@@ -50,20 +57,20 @@
           </div>
 
           <div class="track-meta">
-            <span class="category-tag">DEEP DIVE REVIEW</span>
             <h2>Catalog & Sound Breakdown</h2>
-            <p>LMNotebook Voice Core v5.5</p>
+            <p>SHINOBIWAN Executive Diagnosis</p>
           </div>
 
           <audio id="audio-element" src="audio/review-shinobiwan.mp3" preload="metadata"></audio>
 
-          <div class="waveform-container" id="waveform-click-area">
-            <div class="bars-flex" id="bars-flex"></div>
-          </div>
-
-          <div class="time-display">
-            <span id="current-time">00:00</span>
-            <span id="total-duration">--:--</span>
+          <div class="waveform-box">
+            <div class="waveform-container" id="waveform-click-area">
+              <div class="bars-flex" id="bars-flex"></div>
+            </div>
+            <div class="time-display">
+              <span id="current-time">00:00</span>
+              <span id="total-duration">--:--</span>
+            </div>
           </div>
 
           <div class="controls-row">
@@ -73,94 +80,145 @@
           </div>
         </div>
 
+        <!-- EXTERNAL PLATFORMS HUBS -->
         <div class="glass-card direct-links">
-          <h3><i data-lucide="share-2"></i> External Platforms</h3>
-          <a href="https://open.spotify.com/artist/6W08IttKpZns5zG7BYTz8e" target="_blank" rel="noopener" class="profile-item spotify">
-            <i data-lucide="music"></i>
-            <div>
-              <strong>Spotify Artist Profile</strong>
-              <span>Verified Creator Page</span>
-            </div>
-            <i data-lucide="external-link" class="ext-icon"></i>
-          </a>
+          <div class="card-head">
+            <h3><i data-lucide="share-2" class="icon-cyan"></i> Streaming Ecosystem</h3>
+          </div>
+          
+          <div class="platform-grid">
+            <a href="https://open.spotify.com/artist/6W08IttKpZns5zG7BYTz8e" target="_blank" rel="noopener" class="profile-item spotify">
+              <i data-lucide="music" class="p-icon"></i>
+              <div>
+                <strong>Spotify Profile</strong>
+                <span>Verified Artist</span>
+              </div>
+              <i data-lucide="external-link" class="ext-icon"></i>
+            </a>
 
-          <a href="https://soundcloud.com/shinobiwan-1" target="_blank" rel="noopener" class="profile-item soundcloud">
-            <i data-lucide="cloud"></i>
-            <div>
-              <strong>SoundCloud HQ Catalog</strong>
-              <span>Direct Uploads & Demos</span>
-            </div>
-            <i data-lucide="external-link" class="ext-icon"></i>
-          </a>
+            <a href="https://soundcloud.com/shinobiwan-1" target="_blank" rel="noopener" class="profile-item soundcloud">
+              <i data-lucide="cloud" class="p-icon"></i>
+              <div>
+                <strong>SoundCloud HQ Catalog</strong>
+                <span>Masters & Demos</span>
+              </div>
+              <i data-lucide="external-link" class="ext-icon"></i>
+            </a>
+          </div>
         </div>
+
       </section>
 
-      <!-- COL 2: DSP METRICS & SPECTRUM -->
+      <!-- COL 2: DSP SPECTRUM & DIAGNOSTIC MATRIX -->
       <section class="dash-col">
-        <div class="glass-card spectrum-box">
+        
+        <!-- DSP METRICS & FREQUENCY SPECTRUM -->
+        <div class="glass-card dsp-card">
           <div class="card-head">
-            <h3><i data-lucide="activity" class="icon-cyan"></i> DSP Audio Metrics</h3>
-            <span class="badge-tech">LIVE ANALYZER</span>
+            <h3><i data-lucide="activity" class="icon-cyan"></i> Real-Time Spectrum & DSP Audio Metrics</h3>
+            <span class="badge-tech">LIVE DSP MATRIX</span>
           </div>
 
+          <!-- ANALYSEUR VISUEL DSP (8 BANDES STYLE DAW) -->
+          <div class="eq-spectrum-grid">
+            <div class="eq-bar-wrap"><div class="eq-fill purple" style="height: 75%;"></div><span>30Hz</span></div>
+            <div class="eq-bar-wrap"><div class="eq-fill purple" style="height: 88%;"></div><span>60Hz</span></div>
+            <div class="eq-bar-wrap"><div class="eq-fill cyan" style="height: 62%;"></div><span>120Hz</span></div>
+            <div class="eq-bar-wrap"><div class="eq-fill cyan" style="height: 45%;"></div><span>500Hz</span></div>
+            <div class="eq-bar-wrap"><div class="eq-fill green" style="height: 58%;"></div><span>1kHz</span></div>
+            <div class="eq-bar-wrap"><div class="eq-fill green" style="height: 72%;"></div><span>4kHz</span></div>
+            <div class="eq-bar-wrap"><div class="eq-fill yellow" style="height: 65%;"></div><span>10kHz</span></div>
+            <div class="eq-bar-wrap"><div class="eq-fill yellow" style="height: 80%;"></div><span>16kHz</span></div>
+          </div>
+
+          <!-- MÉTRIQUES CLÉS -->
           <div class="metrics-grid-2x2">
             <div class="metric-tile">
-              <span class="m-label">DYNAMIC RANGE (LUFS)</span>
+              <span class="m-label">INTEGRATED LOUDNESS</span>
               <strong class="m-val green">-11.4 LUFS</strong>
-              <div class="meter-bar"><div class="fill green" style="width: 75%;"></div></div>
+              <div class="meter-bar"><div class="fill green" style="width: 78%;"></div></div>
+              <span class="m-sub">Target: Spotify Editorial (-14 LUFS)</span>
             </div>
+
             <div class="metric-tile">
               <span class="m-label">STEREO IMAGING / WIDTH</span>
               <strong class="m-val cyan">138% WIDE</strong>
               <div class="meter-bar"><div class="fill cyan" style="width: 85%;"></div></div>
+              <span class="m-sub">Clean Mid/Side Mono Sub</span>
             </div>
+
             <div class="metric-tile">
               <span class="m-label">SUB-BASS DENSITY (30-80Hz)</span>
               <strong class="m-val purple">+4.2 dB</strong>
-              <div class="meter-bar"><div class="fill purple" style="width: 60%;"></div></div>
+              <div class="meter-bar"><div class="fill purple" style="width: 65%;"></div></div>
+              <span class="m-sub">High Impact Low-End</span>
             </div>
+
             <div class="metric-tile">
               <span class="m-label">ALGORITHMIC GROW SCORE</span>
               <strong class="m-val green">98.5 / 100</strong>
               <div class="meter-bar"><div class="fill green" style="width: 98%;"></div></div>
+              <span class="m-sub">High Retention Potential</span>
             </div>
           </div>
         </div>
 
-        <div class="glass-card dna-box">
+        <!-- DIAGNOSTICS & CHARACTERISTICS -->
+        <div class="glass-card diag-card">
           <div class="card-head">
-            <h3><i data-lucide="cpu" class="icon-green"></i> AI Audio Diagnostics</h3>
+            <h3><i data-lucide="cpu" class="icon-green"></i> AI Neural Diagnostics</h3>
+            <span class="badge-tech">CONFIDENCE 99.2%</span>
           </div>
-          <div class="diag-list">
-            <div class="diag-item">
-              <i data-lucide="check-circle-2" class="icon-green"></i>
-              <span><strong>Commercial Loudness Target:</strong> Optimized for Spotify Editorial Playlists (-14 LUFS Ref).</span>
+
+          <div class="diag-rows">
+            <div class="diag-box">
+              <div class="diag-header">
+                <i data-lucide="check-circle-2" class="icon-green"></i>
+                <strong>Commercial Loudness Target</strong>
+              </div>
+              <p>Optimisé pour les playlists éditoriales (Spotify, Apple Music) sans écraser la dynamique globale.</p>
             </div>
-            <div class="diag-item">
-              <i data-lucide="check-circle-2" class="icon-green"></i>
-              <span><strong>Sub-bass Control:</strong> Clean low-end separation without phase cancellation.</span>
+
+            <div class="diag-box">
+              <div class="diag-header">
+                <i data-lucide="check-circle-2" class="icon-green"></i>
+                <strong>Low-End & Phase Integrity</strong>
+              </div>
+              <p>Séparation chirurgicale sous 100Hz. Aucune annulation de phase constatée en mono.</p>
             </div>
-            <div class="diag-item">
-              <i data-lucide="check-circle-2" class="icon-green"></i>
-              <span><strong>Genre Classification:</strong> Cyberpunk / Synthwave / Midtempo Bass (99.2% confidence).</span>
+
+            <div class="diag-box">
+              <div class="diag-header">
+                <i data-lucide="sliders" class="icon-cyan"></i>
+                <strong>Genre Profile Classification</strong>
+              </div>
+              <div class="tag-pills">
+                <span class="pill cyan">Cyberpunk</span>
+                <span class="pill green">Synthwave</span>
+                <span class="pill purple">Midtempo Bass</span>
+                <span class="pill">Dark Electro</span>
+              </div>
             </div>
           </div>
         </div>
+
       </section>
 
-      <!-- COL 3: SPOTIFY EMBED & INSIGHTS -->
+      <!-- COL 3: SPOTIFY PLAYER & CATALOG TABLE -->
       <section class="dash-col">
-        <div class="glass-card embed-box">
+        
+        <!-- EMBED SPOTIFY ARTIST -->
+        <div class="glass-card embed-card">
           <div class="card-head">
-            <h3><i data-lucide="disc" class="icon-green"></i> Artist Catalog</h3>
-            <span class="badge-tech">SPOTIFY</span>
+            <h3><i data-lucide="disc" class="icon-green"></i> Official Artist Player</h3>
+            <span class="badge-tech">SPOTIFY API</span>
           </div>
           <div class="spotify-wrapper">
             <iframe 
               style="border-radius:12px" 
               src="https://open.spotify.com/embed/artist/6W08IttKpZns5zG7BYTz8e?utm_source=generator&theme=0" 
               width="100%" 
-              height="300" 
+              height="280" 
               frameBorder="0" 
               allowfullscreen="" 
               allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
@@ -169,29 +227,40 @@
           </div>
         </div>
 
-        <div class="glass-card insights-box">
+        <!-- STRATEGIC OBSERVATIONS & TABLEAU DE SOUND DESIGN -->
+        <div class="glass-card insights-card">
           <div class="card-head">
-            <h3><i data-lucide="layers" class="icon-cyan"></i> Strategic Observations</h3>
+            <h3><i data-lucide="layers" class="icon-cyan"></i> Catalog Breakdown & Strategy</h3>
           </div>
           
-          <div class="insight-cards">
-            <div class="insight-row">
-              <span class="num">01</span>
-              <div>
+          <div class="strategy-list">
+            
+            <div class="strategy-item">
+              <div class="strat-badge">01</div>
+              <div class="strat-details">
                 <h4>SoundCloud Experimental Lab</h4>
-                <p>High-retention experimental hook structures and strong organic user retention markers.</p>
+                <p>Structures à hooks rapides et prises de risques mélodiques à fort engagement organique.</p>
+                <div class="mini-metrics">
+                  <span>RETENTION: <strong>HIGH</strong></span>
+                  <span>TARGET: <strong>UNDERGROUND</strong></span>
+                </div>
               </div>
             </div>
 
-            <div class="insight-row">
-              <span class="num">02</span>
-              <div>
-                <h4>Editorial Playlist Readiness</h4>
-                <p>Production quality fully aligned with Spotify Radio and Discover Weekly algorithmic pushes.</p>
+            <div class="strategy-item">
+              <div class="strat-badge">02</div>
+              <div class="strat-details">
+                <h4>Spotify Editorial Readiness</h4>
+                <p>Standard de mixage calibré pour la recommandation algorithmique (Discover Weekly & Radio).</p>
+                <div class="mini-metrics">
+                  <span>STATUS: <strong>PLAYLIST READY</strong></span>
+                </div>
               </div>
             </div>
+
           </div>
         </div>
+
       </section>
 
     </main>
