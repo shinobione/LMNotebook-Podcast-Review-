@@ -53,10 +53,24 @@
       <!-- COLUMN 1: AUDIO PLAYER & SPOTLIGHT CARD -->
       <section class="player-column">
         <div class="glass-card main-player-card">
+          
+          <!-- Cover Art Améliorée -->
           <div class="cover-art">
-            <i data-lucide="radio" class="radio-icon"></i>
-            <div class="sound-wave-bars">
-              <span></span><span></span><span></span><span></span>
+            <div class="artist-brand-overlay">
+              <i data-lucide="disc-3" style="width: 44px; height: 44px; color: var(--spotify-green);"></i>
+              <span class="brand-title">SHINOBIWAN</span>
+              <span class="brand-sub">NEURAL AUDIO LABS</span>
+            </div>
+            <!-- Equalizer background animation -->
+            <div class="cover-eq-bg" id="cover-eq-bg">
+              <div class="cover-eq-bar"></div>
+              <div class="cover-eq-bar"></div>
+              <div class="cover-eq-bar"></div>
+              <div class="cover-eq-bar"></div>
+              <div class="cover-eq-bar"></div>
+              <div class="cover-eq-bar"></div>
+              <div class="cover-eq-bar"></div>
+              <div class="cover-eq-bar"></div>
             </div>
           </div>
 
@@ -71,8 +85,6 @@
 
           <!-- Waveform Progress Visualizer -->
           <div class="waveform-container" id="waveform-click-area">
-            <div class="waveform-progress" id="waveform-progress"></div>
-            <!-- Dynamic SVG Waveform bars rendered by JS -->
             <div class="bars-flex" id="bars-flex"></div>
           </div>
 
@@ -122,22 +134,34 @@
           <div class="transcript-scroll" id="transcript-scroll">
             
             <div class="dialogue-block male-speaker" data-start="0">
-              <div class="speaker-tag">MINH</div>
+              <div class="speaker-tag">
+                <span>MINH</span>
+                <span class="time-stamp">00:00</span>
+              </div>
               <p>Chào mọi người, chào mừng quay trở lại với NotebookLM Audio Spotlight. Hôm nay chúng ta sẽ cùng phân tích một hồ sơ âm nhạc cực kỳ thú vị: nghệ sĩ <strong>SHINOBIWAN</strong> trên Spotify và SoundCloud.</p>
             </div>
 
             <div class="dialogue-block female-speaker" data-start="12">
-              <div class="speaker-tag">LINH</div>
+              <div class="speaker-tag">
+                <span>LINH</span>
+                <span class="time-stamp">00:12</span>
+              </div>
               <p>Đúng vậy Minh. Ngay khi nghe những track đầu tiên trên Spotify, điều làm Linh ấn tượng nhất chính là không gian âm thanh mang đậm màu sắc Cyberpunk kết hợp với Synthwave hiện đại.</p>
             </div>
 
             <div class="dialogue-block male-speaker" data-start="26">
-              <div class="speaker-tag">MINH</div>
+              <div class="speaker-tag">
+                <span>MINH</span>
+                <span class="time-stamp">00:26</span>
+              </div>
               <p>Về mặt kỹ thuật sản xuất, dải trầm (Sub-bass) và cách xử lý Stereo Imaging trong các bản thu của SHINOBIWAN đạt chuẩn nén thương mại rất tốt, tiệm cận với chất lượng của các Editorial Playlist quốc tế.</p>
             </div>
 
             <div class="dialogue-block female-speaker" data-start="42">
-              <div class="speaker-tag">LINH</div>
+              <div class="speaker-tag">
+                <span>LINH</span>
+                <span class="time-stamp">00:42</span>
+              </div>
               <p>Trên SoundCloud, khán giả có thể thấy rõ sự tự do thử nghiệm trong cấu trúc giai điệu và cách đi Hook. Đây chắc chắn là một tên tuổi có tiềm năng tăng trưởng thuật toán rất mạnh trong thời gian tới.</p>
             </div>
 
