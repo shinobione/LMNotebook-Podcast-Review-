@@ -67,10 +67,10 @@ body {
 .avatar.male { background: #2563eb; }
 .avatar.female { background: #ec4899; }
 
-/* 3 COLUMNS GRID FULL FILL */
+/* 3 COLUMNS GRID FULL FILL DYNAMIQUE */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 320px 1fr 340px;
+  grid-template-columns: 320px 1fr 360px;
   gap: 10px;
   flex: 1;
   min-height: 0;
@@ -95,7 +95,7 @@ body {
 .card-head h3 { font-size: 0.78rem; display: flex; align-items: center; gap: 6px; color: #fff; font-weight: 700; }
 .badge-tech { font-family: var(--font-mono); font-size: 0.58rem; background: rgba(0, 240, 255, 0.08); color: var(--accent-cyan); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(0, 240, 255, 0.15); }
 
-/* COL 1: MAIN PLAYER & STREAMING */
+/* COL 1: PLAYER PODCAST & LINKS */
 .main-player { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
 .card-head-compact { display: flex; justify-content: space-between; align-items: center; }
 .badge-tag { font-family: var(--font-mono); font-size: 0.6rem; color: var(--spotify-green); display: flex; align-items: center; gap: 4px; }
@@ -129,41 +129,12 @@ a.profile-item.spotify .p-icon { color: var(--spotify-green) !important; }
 a.profile-item.soundcloud .p-icon { color: var(--soundcloud-orange) !important; }
 a.profile-item .ext-icon { margin-left: auto; width: 12px; opacity: 0.5; }
 
-/* COL 2: DSP SPECTRUM & DIAGNOSTICS */
+/* COL 2: SPECTRUM & DIAGNOSTIC */
 .dsp-card { display: flex; flex-direction: column; gap: 10px; }
-
-/* 32 BANDS RTA SPECTRUM VISUALIZER */
-.rta-spectrum-container {
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid var(--panel-border);
-  border-radius: 8px;
-  padding: 10px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.rta-bars-grid {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 3px;
-  height: 80px;
-}
-.rta-bar {
-  flex: 1;
-  background: linear-gradient(180deg, var(--accent-cyan) 0%, var(--accent-purple) 60%, var(--spotify-green) 100%);
-  border-radius: 1px;
-  opacity: 0.85;
-}
-.rta-labels {
-  display: flex;
-  justify-content: space-between;
-  font-family: var(--font-mono);
-  font-size: 0.55rem;
-  color: var(--text-muted);
-  border-top: 1px solid rgba(255,255,255,0.05);
-  padding-top: 4px;
-}
+.rta-spectrum-container { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--panel-border); border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
+.rta-bars-grid { display: flex; align-items: flex-end; justify-content: space-between; gap: 3px; height: 80px; }
+.rta-bar { flex: 1; background: linear-gradient(180deg, var(--accent-cyan) 0%, var(--accent-purple) 60%, var(--spotify-green) 100%); border-radius: 1px; opacity: 0.85; }
+.rta-labels { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.55rem; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.05); padding-top: 4px; }
 
 .metrics-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
 .metric-tile { background: rgba(0, 0, 0, 0.25); border: 1px solid var(--panel-border); padding: 8px; border-radius: 8px; display: flex; flex-direction: column; gap: 3px; }
@@ -186,29 +157,83 @@ a.profile-item .ext-icon { margin-left: auto; width: 12px; opacity: 0.5; }
 .pill.green { color: var(--spotify-green); border-color: rgba(29,185,84,0.2); background: rgba(29,185,84,0.05); }
 .pill.purple { color: var(--accent-purple); border-color: rgba(139,92,246,0.2); background: rgba(139,92,246,0.05); }
 
-/* COL 3: SPOTIFY PLAYER & CATALOG BREAKDOWN */
-.embed-card-full { display: flex; flex-direction: column; gap: 6px; }
-.spotify-wrapper-full { width: 100%; height: 352px; border-radius: 10px; overflow: hidden; border: 1px solid var(--panel-border); }
-.spotify-wrapper-full iframe { width: 100%; height: 100%; }
+/* COL 3: SPOTIFY XXL FULL FIX & STRATEGIC HUB */
+.embed-card-full {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  height: 440px; /* Fixe la hauteur totale de la carte haut */
+}
 
-.insights-card { flex: 1; display: flex; flex-direction: column; gap: 10px; }
-.catalog-projects-list { display: flex; flex-direction: column; gap: 8px; }
-.project-item { background: rgba(0,0,0,0.25); border: 1px solid var(--panel-border); padding: 10px; border-radius: 8px; display: flex; flex-direction: column; gap: 6px; }
+.spotify-wrapper-fixed {
+  width: 100%;
+  height: 380px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--panel-border);
+  background: #000;
+}
 
-.ep-cover-strip { width: 100%; height: 50px; border-radius: 6px; overflow: hidden; background: linear-gradient(135deg, #1db954 0%, #00f0ff 50%, #8b5cf6 100%); margin-bottom: 4px; }
-.ep-gradient-bg { width: 100%; height: 100%; background: rgba(0,0,0,0.45); backdrop-filter: blur(4px); display: flex; flex-direction: column; justify-content: center; padding: 8px 10px; }
-.ep-badge-tag { font-family: var(--font-mono); font-size: 0.55rem; color: var(--accent-cyan); letter-spacing: 1px; }
-.ep-title { font-size: 0.9rem; font-weight: 800; color: #fff; }
+.spotify-wrapper-fixed iframe {
+  width: 100%;
+  height: 380px;
+  border: none;
+}
 
-.p-header { display: flex; gap: 8px; align-items: flex-start; }
-.p-meta { font-family: var(--font-mono); font-size: 0.6rem; color: var(--spotify-green); display: block; }
-.project-item p { font-size: 0.68rem; color: var(--text-muted); line-height: 1.3; }
+.insights-card {
+  flex: 1; /* S'étire dynamiquement pour combler TOUT le bas de la colonne 3 */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
 
-.p-tags { display: flex; gap: 4px; margin-top: 2px; }
-.mini-tag { font-family: var(--font-mono); font-size: 0.55rem; background: rgba(255,255,255,0.03); border: 1px solid var(--panel-border); padding: 1px 5px; border-radius: 3px; color: var(--text-muted); }
+.catalog-projects-list {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.project-item.featured-project {
+  flex: 1;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--panel-border);
+  padding: 10px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.ep-cover-banner {
+  width: 100%;
+  height: 65px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1db954 0%, #00f0ff 50%, #8b5cf6 100%);
+}
+
+.ep-overlay {
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 8px 12px;
+}
+
+.ep-tag { font-family: var(--font-mono); font-size: 0.55rem; color: var(--accent-cyan); letter-spacing: 1px; }
+.ep-name { font-size: 0.95rem; font-weight: 800; color: #fff; }
+
+.p-info { display: flex; flex-direction: column; gap: 4px; margin: 6px 0; }
+.p-tracks-list { font-family: var(--font-mono); font-size: 0.62rem; color: var(--spotify-green); font-weight: 700; }
+.p-info p { font-size: 0.68rem; color: var(--text-muted); line-height: 1.35; }
+
+.p-tags { display: flex; gap: 4px; }
+.mini-tag { font-family: var(--font-mono); font-size: 0.55rem; background: rgba(255,255,255,0.03); border: 1px solid var(--panel-border); padding: 2px 6px; border-radius: 3px; color: var(--text-muted); }
 .mini-tag.green { color: var(--spotify-green); border-color: rgba(29,185,84,0.2); }
 .mini-tag.cyan { color: var(--accent-cyan); border-color: rgba(0,240,255,0.2); }
-.mini-tag.purple { color: var(--accent-purple); border-color: rgba(139,92,246,0.2); }
 
 .icon-cyan { color: var(--accent-cyan); }
 .icon-green { color: var(--spotify-green); }
@@ -216,4 +241,5 @@ a.profile-item .ext-icon { margin-left: auto; width: 12px; opacity: 0.5; }
 @media (max-width: 1100px) {
   body { height: auto; overflow: auto; }
   .dashboard-grid { grid-template-columns: 1fr; }
+  .embed-card-full { height: auto; }
 }
