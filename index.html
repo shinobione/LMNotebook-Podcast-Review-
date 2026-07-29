@@ -40,7 +40,7 @@
     <!-- WORKSPACE 3 COLUMNS -->
     <main class="dashboard-grid">
       
-      <!-- COL 1: HERO TRACK PLAYER & LINKS -->
+      <!-- COLONNE 1 : PLAYER PRINCIPAL -->
       <section class="dash-col">
         
         <div class="glass-card main-player">
@@ -49,9 +49,9 @@
             <span class="tech-id" id="active-ep-code">NH-EP #01</span>
           </div>
 
-          <!-- COVER PLAYER PRINCIPAL DYNAMIQUE -->
+          <!-- COVER PLAYER PRINCIPAL DYNAMIQUE (.jpeg) -->
           <div class="hero-cover-frame">
-            <img id="player-cover-img" src="assets/neon-heartbreaks.jpg" alt="Active Release Cover" class="player-cover-img" />
+            <img id="player-cover-img" src="assets/neon-heartbreaks.jpeg" alt="Active Cover" class="player-cover-img" />
             <div class="hero-logo-overlay">
               <img src="assets/logo.png" alt="SHINOBIWAN Logo" class="official-logo-img" />
             </div>
@@ -62,7 +62,7 @@
             <p class="subtitle" id="current-track-sub">Lead Track • Neon Heartbreaks EP</p>
           </div>
 
-          <!-- BALISE AUDIO DYNAMIQUE -->
+          <!-- AUDIO INITIAL -->
           <audio id="audio-element" src="audio/before-the-noise.mp3" preload="metadata"></audio>
 
           <div class="waveform-box">
@@ -110,28 +110,28 @@
 
       </section>
 
-      <!-- COL 2: INTERACTIVE CARDS & CANVAS SPECTRUM -->
+      <!-- COLONNE 2 : CARTS EP INTERACTIVES (.jpeg) -->
       <section class="dash-col">
         
         <div class="glass-card catalog-showcase-card">
           <div class="card-head">
             <h3><i data-lucide="layers" class="icon-cyan"></i> Discography & EP Universe</h3>
-            <span class="badge-tech">CLICK CARD TO PLAY</span>
+            <span class="badge-tech">CLICK CARD TO LOAD</span>
           </div>
 
           <div class="ep-grid-3">
             
-            <!-- EP 1 (NEON HEARTBREAKS) -->
+            <!-- EP 1 -->
             <div class="ep-card active" 
                  data-track="Before the Noise" 
                  data-sub="Lead Track • Neon Heartbreaks EP" 
                  data-code="NH-EP #01" 
                  data-audio="audio/before-the-noise.mp3"
-                 data-cover="assets/neon-heartbreaks.jpg"
+                 data-cover="assets/neon-heartbreaks.jpeg"
                  data-lufs="-13.8 LUFS" 
                  data-dr="DR 8.2 dB">
               <div class="ep-cover-frame">
-                <img src="assets/neon-heartbreaks.jpg" alt="Neon Heartbreaks Artwork" class="ep-img-cover" />
+                <img src="assets/neon-heartbreaks.jpeg" alt="Neon Heartbreaks" class="ep-img-cover" />
                 <span class="ep-tag-mini">PRIMARY EP</span>
               </div>
               <div class="ep-details">
@@ -141,17 +141,17 @@
               </div>
             </div>
 
-            <!-- EP 2 (LOVE LETTERS FROM SAIGON) -->
+            <!-- EP 2 -->
             <div class="ep-card" 
                  data-track="Saigon Bound" 
                  data-sub="Focus Track • Love Letters from Saigon" 
                  data-code="LL-EP #02" 
                  data-audio="audio/saigon-bound.mp3"
-                 data-cover="assets/love-letters.jpg"
+                 data-cover="assets/love-letters.jpeg"
                  data-lufs="-14.2 LUFS" 
                  data-dr="DR 9.1 dB">
               <div class="ep-cover-frame">
-                <img src="assets/love-letters.jpg" alt="Love Letters from Saigon Artwork" class="ep-img-cover" />
+                <img src="assets/love-letters.jpeg" alt="Love Letters from Saigon" class="ep-img-cover" />
                 <span class="ep-tag-mini">CONCEPT</span>
               </div>
               <div class="ep-details">
@@ -161,17 +161,17 @@
               </div>
             </div>
 
-            <!-- EP 3 (COAL TO DIAMOND) -->
+            <!-- EP 3 -->
             <div class="ep-card" 
                  data-track="THICK" 
                  data-sub="Focus Track • Coal to Diamond EP" 
                  data-code="CD-EP #03" 
                  data-audio="audio/thick.mp3"
-                 data-cover="assets/coal-to-diamond.jpg"
+                 data-cover="assets/coal-to-diamond.jpeg"
                  data-lufs="-12.5 LUFS" 
                  data-dr="DR 7.4 dB">
               <div class="ep-cover-frame">
-                <img src="assets/coal-to-diamond.jpg" alt="Coal to Diamond Artwork" class="ep-img-cover" />
+                <img src="assets/coal-to-diamond.jpeg" alt="Coal to Diamond" class="ep-img-cover" />
                 <span class="ep-tag-mini">INDUSTRIAL</span>
               </div>
               <div class="ep-details">
@@ -184,7 +184,7 @@
           </div>
         </div>
 
-        <!-- RTA CANVAS ANALYZER -->
+        <!-- SPECTRUM CANVAS -->
         <div class="glass-card dsp-card">
           <div class="card-head">
             <h3><i data-lucide="activity" class="icon-green"></i> Real-Time DAW Canvas RTA Spectrum</h3>
@@ -228,7 +228,7 @@
 
       </section>
 
-      <!-- COL 3: SPOTIFY XXL & EPK -->
+      <!-- COLONNE 3 : SPOTIFY XXL & EPK -->
       <section class="dash-col">
         
         <div class="glass-card embed-card-full">
@@ -278,8 +278,8 @@
     </main>
   </div>
 
-  <script src="js/player.js"></script>
-  <script src="js/hardcore-fx.js"></script>
+  <!-- CHARGING UNIFIÉ -->
+  <script src="js/app-engine.js"></script>
   <script>lucide.createIcons();</script>
 </body>
 </html>
