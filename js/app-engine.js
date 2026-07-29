@@ -3,6 +3,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnPlayPause = document.getElementById('btn-play-pause');
     const btnRewind = document.getElementById('btn-rewind');
     const btnForward = document.getElementById('btn-forward');
+    const progressBar = document.getElementById('progress-bar');
+    const progressContainer = document.getElementById('progress-container');
+    const spotifyIframe = document.getElementById('spotify-iframe');
     const canvas = document.getElementById('rta-canvas');
     
     // UI Elements
@@ -40,7 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         
-        // Handle responsive canvas resolution
         canvas.width = canvas.offsetWidth;
         canvas.height = canvas.offsetHeight;
         
@@ -55,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         for (let i = 0; i < dataArray.length; i++) {
             let barHeight = (dataArray[i] / 255) * canvas.height;
-            // ShinoBiWan Cyber-Palette Gradient
             const r = barHeight * 3 + (10 * (i/dataArray.length));
             const g = 240 * (1 - (i/dataArray.length));
             const b = 255;
@@ -66,12 +67,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- 2. TRANSPORT CONTROLS ---
+    // --- 2. CONTRÔLES DE TRANSPORT & MUTUAL EXCLUSION ---
     btnPlayPause.addEventListener('click', () => {
         initDSP();
         if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
         
         if (audioEl.paused) {
+            // Coupe Spotify en injectant une source vide ou en simulant un focus (sécurité iframe)
+            // L'utilisateur lance le local, on met en pause le flux Spotify si possible ou on isole
             audioEl.play();
             btnPlayPause.textContent = '⏸';
             btnPlayPause.style.background = 'var(--accent-cyan)';
@@ -82,10 +85,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Si l'utilisateur clique/interagit avec l'iframe Spotify, on coupe net le player local central
+    if (spotifyIframe) {
+        spotifyIframe.addEventListener('mouseenter', () => {
+            if (!audioEl.paused) {
+                audioEl.pause();
+                btnPlayPause.textContent = '▶';
+                btnPlayPause.style.background = 'var(--spotify-green)';
+            }
+        });
+    }
+
     btnRewind.addEventListener('click', () => { audioEl.currentTime = Math.max(0, audioEl.currentTime - 10); });
     btnForward.addEventListener('click', () => { audioEl.currentTime = Math.min(audioEl.duration, audioEl.currentTime + 10); });
 
+    // Barre de progression interactive (Seek bar)
+    progressContainer.addEventListener('click', (e) => {
+        const rect = progressContainer.getBoundingClientRect();
+        const clickPosition = (e.clientX - rect.left) / rect.width;
+        if (!isNaN(audioEl.duration)) {
+            audioEl.currentTime = clickPosition * audioEl.duration;
+        }
+    });
+
     audioEl.addEventListener('timeupdate', () => {
+        if (!isNaN(audioEl.duration)) {
+            const percent = (audioEl.currentTime / audioEl.duration) * 100;
+            progressBar.style.width = `${percent}%`;
+        }
+
         const formatTime = (time) => {
             if (isNaN(time)) return "00:00";
             const mins = Math.floor(time / 60);
@@ -99,32 +127,28 @@ document.addEventListener('DOMContentLoaded', () => {
     audioEl.addEventListener('ended', () => {
         btnPlayPause.textContent = '▶';
         btnPlayPause.style.background = 'var(--spotify-green)';
+        progressBar.style.width = '0%';
     });
 
     // --- 3. DYNAMIC TRACK ROUTING ---
     const trackItems = document.querySelectorAll('.mini-track-item');
     
     async function loadTrackData(trackId, epName, title) {
-        // Update Audio
         audioEl.src = `audio/${trackId}.mp3`;
         if(isInitialized) audioEl.play();
         btnPlayPause.textContent = isInitialized ? '⏸' : '▶';
         if(isInitialized) btnPlayPause.style.background = 'var(--accent-cyan)';
         
-        // Update Metadata
         currentTrackTitle.textContent = title;
         currentTrackSubtitle.textContent = epName;
         
-        // Update Cover (Tente le jpeg d'abord)
         playerCover.src = `assets/${trackId}.jpeg`; 
-        // Fallback transparent vers .png si le .jpeg échoue (cas de saigon-bound par ex)
         playerCover.onerror = function() { 
             if (!this.src.endsWith('.png')) {
                 this.src = `assets/${trackId}.png`; 
             }
         };
 
-        // Fetch Lyrics
         lyricsDisplay.textContent = "Establishing uplink to Lyrics Vault...";
         try {
             const response = await fetch(`assets/lyrics/${trackId}.txt`);
