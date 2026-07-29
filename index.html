@@ -68,20 +68,19 @@
       z-index: 2;
     }
 
-    /* TOPBAR AVEC LOGO CENTRAL GRAND FORMAT */
+    /* TOPBAR */
     .topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       background: var(--panel-bg);
       border: 1px solid var(--panel-border);
-      padding: 6px 16px;
+      padding: 8px 16px;
       border-radius: 10px;
       backdrop-filter: blur(20px);
-      height: 64px;
     }
 
-    .brand-zone { display: flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 0.75rem; flex: 1; }
+    .brand-zone { display: flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 0.75rem; }
     .live-dot { 
       width: 8px; height: 8px; 
       background: var(--spotify-green); 
@@ -98,24 +97,8 @@
 
     .brand-title { color: #fff; font-weight: 800; letter-spacing: 1.5px; }
     .badge-ep { background: rgba(0, 240, 255, 0.1); color: var(--accent-cyan); padding: 2px 8px; border-radius: 4px; font-size: 0.62rem; border: 1px solid rgba(0, 240, 255, 0.3); font-weight: 700; }
-    
-    /* LOGO HEADER AGRANDI */
-    .header-logo-center {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex: 1;
-      height: 100%;
-    }
-
-    .header-logo-img {
-      height: 52px;
-      width: auto;
-      object-fit: contain;
-      filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.8));
-    }
-
-    .hosts-zone { display: flex; gap: 8px; flex: 1; justify-content: flex-end; }
+    .title-zone h1 { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); letter-spacing: 1px; font-family: var(--font-mono); }
+    .hosts-zone { display: flex; gap: 8px; }
     .host-pill { display: flex; align-items: center; gap: 6px; font-size: 0.68rem; color: var(--text-muted); background: rgba(255, 255, 255, 0.03); padding: 4px 10px; border-radius: 10px; border: 1px solid var(--panel-border); font-family: var(--font-mono); }
 
     /* DASHBOARD GRID */
@@ -150,11 +133,14 @@
     .icon-inline { width: 12px; height: 12px; }
     .tech-id { font-family: var(--font-mono); font-size: 0.58rem; color: var(--accent-cyan); font-weight: 700; }
 
+    /* CADRE COVER 1:1 */
     .hero-cover-frame {
-      width: 100%; height: 170px; border-radius: 8px; position: relative; border: 1px solid rgba(0, 240, 255, 0.4); overflow: hidden; background: #000;
+      width: 100%; height: 0; padding-bottom: 100%; /* Ratio 1:1 */ border-radius: 8px; position: relative; border: 1px solid rgba(0, 240, 255, 0.3); overflow: hidden; background: #000;
     }
 
-    .player-cover-img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s ease; }
+    .player-cover-img { width: 100%; height: 100%; position: absolute; top: 0; left: 0; object-fit: cover; opacity: 0.75; transition: opacity 0.3s ease; }
+    .hero-logo-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at center, rgba(5,7,10,0.1) 0%, rgba(5,7,10,0.85) 100%); }
+    .official-logo-img { width: 85%; height: auto; max-height: 80px; object-fit: contain; filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.8)); }
 
     .track-meta h2 { font-size: 1.15rem; font-weight: 800; color: #fff; margin-top: 4px; letter-spacing: -0.3px; }
     .track-meta .subtitle { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; line-height: 1.3; }
@@ -179,9 +165,9 @@
     a.profile-item.soundcloud .p-icon { color: var(--soundcloud-orange) !important; }
     a.profile-item .ext-icon { margin-left: auto; width: 12px; opacity: 0.5; }
 
-    /* COL 2: DISCOGRAPHY & RTA SPECTRUM */
+    /* COL 2: DISCOGRAPHY & CARDS */
     .catalog-showcase-card { flex: 1; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
-    .ep-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; flex: 1; }
+    .ep-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; flex: 1; }
 
     .ep-card {
       background: rgba(12, 16, 24, 0.85);
@@ -190,40 +176,47 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      cursor: pointer;
       transition: transform 0.2s ease, border-color 0.2s ease;
     }
 
-    .ep-card:hover { border-color: rgba(0, 240, 255, 0.4); }
+    .ep-card:hover { transform: translateY(-4px); border-color: var(--accent-cyan); }
     .ep-card.active { border-color: var(--accent-cyan); background: rgba(0, 240, 255, 0.06); box-shadow: 0 0 15px rgba(0, 240, 255, 0.2); }
 
-    .ep-cover-frame { width: 100%; height: 125px; position: relative; overflow: hidden; background: #000; }
-    .ep-img-cover { width: 100%; height: 100%; object-fit: cover; }
-    .ep-tag-mini { position: absolute; top: 6px; left: 6px; font-family: var(--font-mono); font-size: 0.55rem; color: #000; background: var(--accent-cyan); padding: 2px 6px; border-radius: 3px; font-weight: 800; }
+    .ep-cover-frame {
+      width: 100%;
+      height: 120px;
+      position: relative;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .ep-img-cover {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .ep-tag-mini {
+      position: absolute; top: 6px; left: 6px; font-family: var(--font-mono); font-size: 0.55rem; color: #000; background: var(--accent-cyan); padding: 2px 6px; border-radius: 3px; font-weight: 800;
+    }
 
     .ep-details { padding: 10px; display: flex; flex-direction: column; justify-content: space-between; flex: 1; gap: 8px; }
-    .ep-info-head h4 { font-size: 0.8rem; font-weight: 800; color: #fff; margin-bottom: 4px; }
+    .ep-info-head h4 { font-size: 0.78rem; font-weight: 800; color: #fff; margin-bottom: 4px; }
     .ep-desc { font-size: 0.68rem; color: #cbd5e1 !important; line-height: 1.35; }
+    .ep-tracks-highlight { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-muted); border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 6px; display: flex; justify-content: space-between; }
+    .ep-tracks-highlight strong { color: var(--spotify-green); }
 
-    /* TRACKLIST CLIQUABLE */
-    .mini-tracklist { display: flex; flex-direction: column; gap: 3px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 6px; margin-top: 4px; }
-    .mini-track-item { 
-      display: flex; justify-content: space-between; align-items: center; font-size: 0.62rem; color: var(--text-muted); font-family: var(--font-mono); padding: 5px 6px; border-radius: 4px; cursor: pointer; transition: all 0.15s ease; 
-    }
-    .mini-track-item:hover { background: rgba(0, 240, 255, 0.15); color: var(--accent-cyan); transform: translateX(2px); }
-    .mini-track-item.active-track { color: var(--spotify-green); font-weight: 700; background: rgba(29, 185, 84, 0.1); border: 1px solid rgba(29, 185, 84, 0.3); }
-
-    .ep-specs-row { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-muted); background: rgba(0,0,0,0.4); padding: 4px 6px; border-radius: 4px; }
-
-    /* RTA CANVAS SEUL */
-    .dsp-card { display: flex; flex-direction: column; gap: 6px; }
-    .rta-spectrum-container { background: rgba(0, 0, 0, 0.6); border: 1px solid var(--panel-border); border-radius: 8px; padding: 8px 12px; display: flex; flex-direction: column; gap: 4px; }
-    #rta-canvas { width: 100%; height: 85px; display: block; }
-    .rta-labels { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.58rem; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.05); padding-top: 4px; }
-
-    /* COL 3: SPOTIFY FULL HEIGHT */
-    .embed-card-full { flex: 1; display: flex; flex-direction: column; gap: 6px; height: 100%; }
+    /* COL 3: SPOTIFY & EPK */
+    .embed-card-full { display: flex; flex-direction: column; gap: 6px; height: 100%; }
     .spotify-wrapper-fixed { width: 100%; height: 100%; border-radius: 10px; overflow: hidden; border: 1px solid var(--panel-border); background: #000; }
-    .spotify-wrapper-fixed iframe { width: 100%; height: 100%; border: none; display: block; }
+    .spotify-wrapper-fixed iframe { width: 100%; height: 100%; border: none; }
+
+    .epk-card { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+    .epk-details-box { display: flex; flex-direction: column; gap: 8px; height: 100%; justify-content: center; }
+    .epk-row { display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.3); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--panel-border); }
+    .epk-row strong { font-size: 0.72rem; color: #fff; display: block; }
+    .epk-row p { font-size: 0.65rem; color: var(--text-muted); line-height: 1.25; }
 
     .icon-cyan { color: var(--accent-cyan); }
     .icon-green { color: var(--spotify-green); }
@@ -232,6 +225,7 @@
       body { height: auto; overflow: auto; }
       .dashboard-grid { grid-template-columns: 1fr; }
       .ep-grid-3 { grid-template-columns: 1fr; }
+      .embed-card-full { height: auto; }
     }
   </style>
 </head>
@@ -242,7 +236,7 @@
 
   <div class="app-viewport">
     
-    <!-- TOPBAR AVEC LOGO CENTRÉ GRAND FORMAT -->
+    <!-- TOPBAR -->
     <header class="topbar">
       <div class="brand-zone">
         <span class="live-dot"></span>
@@ -250,8 +244,8 @@
         <span class="badge-ep">SYSTEM LAUNCHPAD v2.0</span>
       </div>
 
-      <div class="header-logo-center">
-        <img src="assets/logo.png" alt="SHINOBIWAN Logo" class="header-logo-img" />
+      <div class="title-zone">
+        <h1>CYBERPUNK • MIDTEMPO BASS • DARK SYNTHWAVE</h1>
       </div>
 
       <div class="hosts-zone">
@@ -272,12 +266,16 @@
           </div>
 
           <div class="hero-cover-frame">
-            <img id="player-cover-img" src="assets/before-the-noise.jpeg" alt="Track Cover" class="player-cover-img" />
+            <!-- POCHETTE PAR DÉFAUT FORCÉE 1:1 -->
+            <img id="player-cover-img" src="assets/before-the-noise.jpeg" alt="Active Cover" class="player-cover-img" />
+            <div class="hero-logo-overlay">
+              <img src="assets/logo.png" alt="SHINOBIWAN Logo" class="official-logo-img" />
+            </div>
           </div>
 
           <div class="track-meta">
             <h2 id="current-track-title">Before the Noise</h2>
-            <p class="subtitle" id="current-track-sub">Track 1 • Neon Heartbreaks EP</p>
+            <p class="subtitle" id="current-track-sub">Lead Track • Neon Heartbreaks EP</p>
           </div>
 
           <audio id="audio-element" src="audio/before-the-noise.mp3" preload="metadata"></audio>
@@ -301,7 +299,7 @@
 
         <div class="glass-card direct-links">
           <div class="card-head">
-            <h3><i data-lucide="share-2" class="icon-cyan"></i> Streaming & Distribution</h3>
+            <h3><i data-lucide="share-2" class="icon-cyan"></i> Official Streaming Hubs</h3>
           </div>
           <div class="platform-grid">
             <a href="https://open.spotify.com/artist/6W08IttKpZns5zG7BYTz8e" target="_blank" rel="noopener" class="profile-item spotify">
@@ -328,16 +326,21 @@
       <section class="dash-col">
         <div class="glass-card catalog-showcase-card">
           <div class="card-head">
-            <h3><i data-lucide="layers" class="icon-cyan"></i> Discography & Interactive Engine</h3>
-            <span class="badge-tech">CLICK TRACK TO PLAY</span>
+            <h3><i data-lucide="layers" class="icon-cyan"></i> Discography & EP Universe</h3>
+            <span class="badge-tech">CLICK CARD TO LOAD</span>
           </div>
 
           <div class="ep-grid-3">
             
             <!-- EP 1 -->
-            <div class="ep-card active" data-ep="NH-EP #01">
+            <div class="ep-card active" 
+                 data-track="Before the Noise" 
+                 data-sub="Lead Track • Neon Heartbreaks EP" 
+                 data-code="NH-EP #01" 
+                 data-audio="audio/before-the-noise.mp3"
+                 data-cover="assets/before-the-noise.jpeg">
               <div class="ep-cover-frame">
-                <img src="assets/neon-heartbreaks.jpeg" alt="Neon Heartbreaks EP" class="ep-img-cover" />
+                <img src="assets/neon-heartbreaks.jpeg" alt="Neon Heartbreaks" class="ep-img-cover" />
                 <span class="ep-tag-mini">PRIMARY EP</span>
               </div>
               <div class="ep-details">
@@ -345,69 +348,52 @@
                   <h4>NEON HEARTBREAKS</h4>
                   <p class="ep-desc">Rain-soaked synthwave cityscape. Analog basslines & cyber hooks.</p>
                 </div>
-
-                <div class="mini-tracklist">
-                  <div class="mini-track-item active-track" data-track="Before the Noise" data-sub="Track 1 • Neon Heartbreaks EP" data-audio="audio/before-the-noise.mp3" data-cover="assets/before-the-noise.jpeg">1. Before the Noise</div>
-                  <div class="mini-track-item" data-track="Low Bitrate Love" data-sub="Track 2 • Neon Heartbreaks EP" data-audio="audio/low-bitrate-love.mp3" data-cover="assets/low-bitrate-love.jpeg">2. Low Bitrate Love</div>
-                  <div class="mini-track-item" data-track="Real love doesn't rush" data-sub="Track 3 • Neon Heartbreaks EP" data-audio="audio/real-love-doesnt-rush.mp3" data-cover="assets/real-love-doesnt-rush.jpeg">3. Real love doesn't rush</div>
-                </div>
-
-                <div class="ep-specs-row">
-                  <span>108 BPM</span>
-                  <span>F Minor</span>
-                  <span>Analog</span>
+                <div class="ep-tracks-highlight">
+                  <span>Track Focus:</span> <strong>Before the Noise</strong>
                 </div>
               </div>
             </div>
 
             <!-- EP 2 -->
-            <div class="ep-card" data-ep="LL-EP #02">
+            <div class="ep-card" 
+                 data-track="Saigon Bound" 
+                 data-sub="Focus Track • Love Letters from Saigon" 
+                 data-code="LL-EP #02" 
+                 data-audio="audio/saigon-bound.mp3"
+                 data-cover="assets/saigon-bound.jpeg">
               <div class="ep-cover-frame">
-                <img src="assets/love-letters.jpeg" alt="Love Letters from Saigon EP" class="ep-img-cover" />
+                <img src="assets/love-letters.jpeg" alt="Love Letters from Saigon" class="ep-img-cover" />
                 <span class="ep-tag-mini">CONCEPT</span>
               </div>
               <div class="ep-details">
                 <div class="ep-info-head">
                   <h4>LOVE LETTERS FROM SAIGON</h4>
-                  <p class="ep-desc">Trilingual narrative synthpop, organic lofi & tropical neon warmth.</p>
+                  <p class="ep-desc">Trilingual narrative synthpop, organic lofi textures & tropical neon warmth.</p>
                 </div>
-
-                <div class="mini-tracklist">
-                  <div class="mini-track-item" data-track="Saigon Bound" data-sub="Track 1 • Love Letters from Saigon" data-audio="audio/saigon-bound.mp3" data-cover="assets/saigon-bound.jpeg">1. Saigon Bound</div>
-                  <div class="mini-track-item" data-track="Tình Bolero Cho Trân" data-sub="Track 2 • Love Letters from Saigon" data-audio="audio/tinh-bolero-cho-tran.mp3" data-cover="assets/tinh-bolero-cho-tran.jpeg">2. Tình Bolero Cho Trân</div>
-                  <div class="mini-track-item" data-track="Jusqu'au Dernier Souffle" data-sub="Track 3 • Love Letters from Saigon" data-audio="audio/jusquau-dernier-souffle.mp3" data-cover="assets/jusquau-dernier-souffle.jpeg">3. Jusqu'au Dernier Souffle</div>
-                </div>
-
-                <div class="ep-specs-row">
-                  <span>95 BPM</span>
-                  <span>A Minor</span>
-                  <span>Lofi</span>
+                <div class="ep-tracks-highlight">
+                  <span>Track Focus:</span> <strong>Saigon Bound</strong>
                 </div>
               </div>
             </div>
 
             <!-- EP 3 -->
-            <div class="ep-card" data-ep="CD-EP #03">
+            <div class="ep-card" 
+                 data-track="THICK" 
+                 data-sub="Focus Track • Coal to Diamond EP" 
+                 data-code="CD-EP #03" 
+                 data-audio="audio/thick.mp3"
+                 data-cover="assets/thick.jpeg">
               <div class="ep-cover-frame">
-                <img src="assets/coal-to-diamond.jpeg" alt="Coal to Diamond EP" class="ep-img-cover" />
+                <img src="assets/coal-to-diamond.jpeg" alt="Coal to Diamond" class="ep-img-cover" />
                 <span class="ep-tag-mini">INDUSTRIAL</span>
               </div>
               <div class="ep-details">
                 <div class="ep-info-head">
                   <h4>COAL TO DIAMOND</h4>
-                  <p class="ep-desc">Obsidian design, Blade Cut industrial bass, distortion dynamics.</p>
+                  <p class="ep-desc">Obsidian sharp design, Blade Cut industrial bass, brutal distortion dynamics.</p>
                 </div>
-
-                <div class="mini-tracklist">
-                  <div class="mini-track-item" data-track="THICK" data-sub="Track 1 • Coal to Diamond EP" data-audio="audio/thick.mp3" data-cover="assets/thick.jpeg">1. THICK</div>
-                  <div class="mini-track-item" data-track="THE THRONE RESONATES" data-sub="Track 2 • Coal to Diamond EP" data-audio="audio/the-throne-resonates.mp3" data-cover="assets/the-throne-resonates.jpeg">2. THE THRONE RESONATES</div>
-                  <div class="mini-track-item" data-track="Carved from Pressure" data-sub="Track 3 • Coal to Diamond EP" data-audio="audio/carved-from-pressure.mp3" data-cover="assets/carved-from-pressure.jpeg">3. Carved from Pressure</div>
-                </div>
-
-                <div class="ep-specs-row">
-                  <span>115 BPM</span>
-                  <span>D Minor</span>
-                  <span>Midtempo</span>
+                <div class="ep-tracks-highlight">
+                  <span>Track Focus:</span> <strong>THICK</strong>
                 </div>
               </div>
             </div>
