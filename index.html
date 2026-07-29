@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LMNotebook Audio Spotlight — SHINOBIWAN Deep Dive</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <div class="glow-bg"></div>
+
+  <div class="container">
+    
+    <!-- HEADER MEDIA / SHOW -->
+    <header class="show-header">
+      <div class="show-badge">
+        <span class="live-dot"></span>
+        <span>LMNOTEBOOK AUDIO LABS • EPISODE #42</span>
+      </div>
+      <h1 class="show-title">Analysing SHINOBIWAN: The Synthwave & Cyberpunk Crossover</h1>
+      <p class="show-subtitle">
+        Bản phân tích chuyên sâu từ hai chuyên gia âm nhạc Minh & Linh về hồ sơ Spotify và SoundCloud của nghệ sĩ SHINOBIWAN.
+      </p>
+
+      <div class="hosts-row">
+        <div class="host-card">
+          <div class="avatar male">M</div>
+          <div class="host-info">
+            <strong>Minh</strong>
+            <span>Senior DSP Analyst</span>
+          </div>
+        </div>
+        <div class="host-card">
+          <div class="avatar female">L</div>
+          <div class="host-info">
+            <strong>Linh</strong>
+            <span>Music Journalist & Curator</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN PLAYER & TRANSCRIPT SECTION -->
+    <main class="content-grid">
+      
+      <!-- COLUMN 1: AUDIO PLAYER & SPOTLIGHT CARD -->
+      <section class="player-column">
+        <div class="glass-card main-player-card">
+          <div class="cover-art">
+            <i data-lucide="radio" class="radio-icon"></i>
+            <div class="sound-wave-bars">
+              <span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+
+          <div class="track-meta">
+            <span class="category-tag">DEEP DIVE REVIEW</span>
+            <h2>SHINOBIWAN — Neural Catalog Diagnosis</h2>
+            <p>LMNotebook Voice Analysis Core</p>
+          </div>
+
+          <!-- HTML5 Audio Element -->
+          <audio id="audio-element" src="audio/review-shinobiwan.mp3" preload="metadata"></audio>
+
+          <!-- Waveform Progress Visualizer -->
+          <div class="waveform-container" id="waveform-click-area">
+            <div class="waveform-progress" id="waveform-progress"></div>
+            <!-- Dynamic SVG Waveform bars rendered by JS -->
+            <div class="bars-flex" id="bars-flex"></div>
+          </div>
+
+          <div class="time-display">
+            <span id="current-time">00:00</span>
+            <span id="total-duration">--:--</span>
+          </div>
+
+          <!-- Controls -->
+          <div class="controls-row">
+            <button class="btn-secondary" id="btn-rewind"><i data-lucide="rotate-ccw"></i> -10s</button>
+            <button class="btn-play" id="btn-play-pause"><i data-lucide="play" id="play-icon"></i></button>
+            <button class="btn-secondary" id="btn-forward"><i data-lucide="rotate-cw"></i> +10s</button>
+          </div>
+        </div>
+
+        <!-- Target Profiles Card -->
+        <div class="glass-card targets-card">
+          <h3><i data-lucide="crosshair"></i> Analyzed Profiles</h3>
+          <div class="profile-links">
+            <div class="profile-item spotify">
+              <i data-lucide="music"></i>
+              <div>
+                <strong>Spotify Profile</strong>
+                <span>Verified Artist • SHINOBIWAN</span>
+              </div>
+            </div>
+            <div class="profile-item soundcloud">
+              <i data-lucide="cloud"></i>
+              <div>
+                <strong>SoundCloud Catalog</strong>
+                <span>HQ Masters • Direct Uploads</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- COLUMN 2: SYNCHRONIZED VIETNAMESE TRANSCRIPT -->
+      <section class="transcript-column">
+        <div class="glass-card transcript-card">
+          <div class="transcript-header">
+            <h3><i data-lucide="file-text"></i> Live Vietnamese Transcript</h3>
+            <span class="badge-lang">VIETNAMESE (AUDIO)</span>
+          </div>
+
+          <div class="transcript-scroll" id="transcript-scroll">
+            
+            <div class="dialogue-block male-speaker" data-start="0">
+              <div class="speaker-tag">MINH</div>
+              <p>Chào mọi người, chào mừng quay trở lại với NotebookLM Audio Spotlight. Hôm nay chúng ta sẽ cùng phân tích một hồ sơ âm nhạc cực kỳ thú vị: nghệ sĩ <strong>SHINOBIWAN</strong> trên Spotify và SoundCloud.</p>
+            </div>
+
+            <div class="dialogue-block female-speaker" data-start="12">
+              <div class="speaker-tag">LINH</div>
+              <p>Đúng vậy Minh. Ngay khi nghe những track đầu tiên trên Spotify, điều làm Linh ấn tượng nhất chính là không gian âm thanh mang đậm màu sắc Cyberpunk kết hợp với Synthwave hiện đại.</p>
+            </div>
+
+            <div class="dialogue-block male-speaker" data-start="26">
+              <div class="speaker-tag">MINH</div>
+              <p>Về mặt kỹ thuật sản xuất, dải trầm (Sub-bass) và cách xử lý Stereo Imaging trong các bản thu của SHINOBIWAN đạt chuẩn nén thương mại rất tốt, tiệm cận với chất lượng của các Editorial Playlist quốc tế.</p>
+            </div>
+
+            <div class="dialogue-block female-speaker" data-start="42">
+              <div class="speaker-tag">LINH</div>
+              <p>Trên SoundCloud, khán giả có thể thấy rõ sự tự do thử nghiệm trong cấu trúc giai điệu và cách đi Hook. Đây chắc chắn là một tên tuổi có tiềm năng tăng trưởng thuật toán rất mạnh trong thời gian tới.</p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="js/player.js"></script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>
