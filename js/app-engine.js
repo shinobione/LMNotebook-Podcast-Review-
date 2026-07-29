@@ -17,6 +17,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const trackItems = Array.from(document.querySelectorAll('.mini-track-item'));
   const epCards = document.querySelectorAll('.ep-card');
 
+  let currentFallbackCover = 'assets/neon-heartbreaks.jpeg';
+
+  // Gestion d'erreur de chargement de l'image de cover (Fallback automatique sur l'EP)
+  if (playerCoverImg) {
+    playerCoverImg.addEventListener('error', () => {
+      console.warn("Cover introuvable, basculement sur la cover d'EP par défaut:", currentFallbackCover);
+      playerCoverImg.src = currentFallbackCover;
+    });
+  }
+
   const numBars = 40;
   const bars = [];
 
@@ -75,7 +85,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // ENCHAÎNEMENT AUTOMATIQUE DES MORCEAUX
   audio.addEventListener('ended', () => {
     const activeItem = document.querySelector('.mini-track-item.active-track');
     const currentIndex = trackItems.indexOf(activeItem);
@@ -94,7 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // SWITCH TRACK & COVER DIRECT
   trackItems.forEach(item => {
     item.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -111,14 +119,17 @@ document.addEventListener('DOMContentLoaded', () => {
       const trackSubtitle = item.getAttribute('data-sub');
       const audioSrc = item.getAttribute('data-audio');
       const trackCover = item.getAttribute('data-cover');
+      const defaultEpCover = parentCard.getAttribute('data-default-cover');
       const code = parentCard.getAttribute('data-ep');
+
+      currentFallbackCover = defaultEpCover || 'assets/neon-heartbreaks.jpeg';
 
       if (trackTitle) trackTitle.textContent = trackName;
       if (trackSub) trackSub.textContent = trackSubtitle;
       if (epCode) epCode.textContent = code;
       
-      if (playerCoverImg && trackCover) {
-        playerCoverImg.setAttribute('src', trackCover);
+      if (playerCoverImg) {
+        playerCoverImg.src = trackCover || currentFallbackCover;
       }
 
       audio.src = audioSrc;
@@ -127,7 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Spectrum Canvas 60 FPS
   const canvas = document.getElementById('rta-canvas');
   if (canvas) {
     const ctx = canvas.getContext('2d');
