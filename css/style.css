@@ -50,7 +50,7 @@ img { max-width: 100%; display: block; }
   height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   position: relative;
   z-index: 2;
 }
@@ -64,7 +64,7 @@ img { max-width: 100%; display: block; }
   padding: 6px 16px;
   border-radius: 10px;
   backdrop-filter: blur(20px);
-  height: 56px;
+  height: 54px;
 }
 
 .brand-zone { display: flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 0.75rem; flex: 1; }
@@ -94,7 +94,7 @@ img { max-width: 100%; display: block; }
 }
 
 .header-logo-img {
-  height: 42px;
+  height: 38px;
   width: auto;
   object-fit: contain;
   filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.8));
@@ -106,12 +106,18 @@ img { max-width: 100%; display: block; }
 .dashboard-grid {
   display: grid;
   grid-template-columns: 320px 1fr 360px;
-  gap: 10px;
+  gap: 8px;
   flex: 1;
   min-height: 0;
 }
 
-.dash-col { display: flex; flex-direction: column; gap: 10px; height: 100%; min-height: 0; }
+.dash-col { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 8px; 
+  height: 100%; 
+  min-height: 0; 
+}
 
 .glass-card {
   background: var(--panel-bg);
@@ -151,13 +157,13 @@ img { max-width: 100%; display: block; }
 .track-meta .subtitle { font-size: 0.65rem; color: var(--text-muted); margin-top: 1px; line-height: 1.2; }
 
 .waveform-box { display: flex; flex-direction: column; gap: 4px; }
-.waveform-container { height: 32px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 4px 6px; cursor: pointer; }
+.waveform-container { height: 30px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 4px 6px; cursor: pointer; }
 .bars-flex { display: flex; align-items: center; gap: 2px; height: 100%; }
 .bar { flex: 1; background: rgba(255, 255, 255, 0.15); border-radius: 1px; }
 .bar.active { background: var(--spotify-green); box-shadow: 0 0 8px var(--spotify-green); }
 
 .controls-row { display: flex; align-items: center; justify-content: center; gap: 10px; }
-.btn-play { width: 40px; height: 40px; border-radius: 50%; background: var(--spotify-green); border: none; color: #000; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 16px rgba(29, 185, 84, 0.5); }
+.btn-play { width: 38px; height: 38px; border-radius: 50%; background: var(--spotify-green); border: none; color: #000; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 16px rgba(29, 185, 84, 0.5); }
 .btn-play:hover { transform: scale(1.08); }
 .btn-secondary { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--panel-border); color: #fff; padding: 4px 8px; border-radius: 12px; font-size: 0.65rem; cursor: pointer; display: flex; align-items: center; gap: 4px; }
 
@@ -169,20 +175,19 @@ a.profile-item.spotify .p-icon { color: var(--spotify-green) !important; }
 a.profile-item.soundcloud .p-icon { color: var(--soundcloud-orange) !important; }
 a.profile-item .ext-icon { margin-left: auto; width: 12px; opacity: 0.5; }
 
-/* FIX CORRECTION DU CHEVAUCHEMENT CENTRAL */
+/* COLONNE CENTRALE SANS CHEVAUCHEMENT */
 .catalog-showcase-card { 
   display: flex; 
   flex-direction: column; 
-  gap: 8px; 
-  height: auto;
+  gap: 6px; 
   flex-shrink: 0;
 }
 
 .ep-grid-3 { 
   display: grid; 
   grid-template-columns: repeat(3, 1fr); 
-  gap: 10px; 
-  height: 205px;
+  gap: 8px; 
+  height: 190px;
   flex-shrink: 0; 
 }
 
@@ -198,20 +203,20 @@ a.profile-item .ext-icon { margin-left: auto; width: 12px; opacity: 0.5; }
 
 .ep-card.active { border-color: var(--accent-cyan); background: rgba(0, 240, 255, 0.06); box-shadow: 0 0 15px rgba(0, 240, 255, 0.2); }
 
-.ep-cover-frame { width: 100%; height: 75px; position: relative; overflow: hidden; background: #000; flex-shrink: 0; }
+.ep-cover-frame { width: 100%; height: 70px; position: relative; overflow: hidden; background: #000; flex-shrink: 0; }
 .ep-img-cover { width: 100%; height: 100%; object-fit: cover; }
-.ep-tag-mini { position: absolute; top: 4px; left: 4px; font-family: var(--font-mono); font-size: 0.52rem; color: #000; background: var(--accent-cyan); padding: 1px 4px; border-radius: 3px; font-weight: 800; }
+.ep-tag-mini { position: absolute; top: 4px; left: 4px; font-family: var(--font-mono); font-size: 0.5rem; color: #000; background: var(--accent-cyan); padding: 1px 4px; border-radius: 3px; font-weight: 800; }
 
-.ep-details { padding: 6px 8px; display: flex; flex-direction: column; justify-content: space-between; flex: 1; gap: 4px; }
-.ep-info-head h4 { font-size: 0.75rem; font-weight: 800; color: #fff; margin-bottom: 1px; letter-spacing: 0.3px; }
-.ep-desc { font-size: 0.6rem; color: #cbd5e1 !important; line-height: 1.2; }
+.ep-details { padding: 5px 8px; display: flex; flex-direction: column; justify-content: space-between; flex: 1; gap: 3px; }
+.ep-info-head h4 { font-size: 0.72rem; font-weight: 800; color: #fff; margin-bottom: 1px; letter-spacing: 0.3px; }
+.ep-desc { font-size: 0.58rem; color: #cbd5e1 !important; line-height: 1.15; }
 
-.mini-tracklist { display: flex; flex-direction: column; gap: 2px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 4px; margin-top: auto; }
+.mini-tracklist { display: flex; flex-direction: column; gap: 2px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 3px; margin-top: auto; }
 .mini-track-item { 
   display: flex; 
   justify-content: space-between; 
   align-items: center; 
-  font-size: 0.68rem; 
+  font-size: 0.65rem; 
   color: #e2e8f0; 
   font-family: var(--font-mono); 
   padding: 2px 4px; 
@@ -222,7 +227,7 @@ a.profile-item .ext-icon { margin-left: auto; width: 12px; opacity: 0.5; }
 .mini-track-item:hover { background: rgba(0, 240, 255, 0.15); color: var(--accent-cyan); }
 .mini-track-item.active-track { color: var(--spotify-green); font-weight: 700; background: rgba(29, 185, 84, 0.12); border: 1px solid rgba(29, 185, 84, 0.35); }
 
-/* LYRICS VAULT : SEUL ÉLÉMENT FLUIDE QUI PREND L'ESPACE RESTANT */
+/* LYRICS VAULT CARD (TAILLE FLEXIBLE SANS COLLISION) */
 .lyrics-vault-card {
   flex: 1;
   display: flex;
@@ -232,16 +237,16 @@ a.profile-item .ext-icon { margin-left: auto; width: 12px; opacity: 0.5; }
   background: rgba(8, 12, 18, 0.95);
   border: 1px solid var(--panel-border);
   border-radius: 10px;
-  padding: 10px 12px;
+  padding: 8px 10px;
 }
 
 .lyrics-container {
   flex: 1;
   overflow-y: auto;
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   color: #ffffff;
-  line-height: 1.6;
+  line-height: 1.55;
   white-space: pre-wrap;
   background: rgba(0, 0, 0, 0.45);
   border-radius: 6px;
@@ -264,8 +269,8 @@ a.profile-item .ext-icon { margin-left: auto; width: 12px; opacity: 0.5; }
 
 .dsp-card { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
 .rta-spectrum-container { background: rgba(0, 0, 0, 0.6); border: 1px solid var(--panel-border); border-radius: 8px; padding: 6px 10px; display: flex; flex-direction: column; gap: 4px; }
-#rta-canvas { width: 100%; height: 45px; display: block; }
-.rta-labels { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.55rem; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.05); padding-top: 3px; }
+#rta-canvas { width: 100%; height: 40px; display: block; }
+.rta-labels { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.52rem; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.05); padding-top: 2px; }
 
 .embed-card-full { flex: 1; display: flex; flex-direction: column; gap: 6px; height: 100%; }
 .spotify-wrapper-fixed { width: 100%; height: 100%; border-radius: 10px; overflow: hidden; border: 1px solid var(--panel-border); background: #000; }
