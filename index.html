@@ -236,20 +236,25 @@
     .lyrics-container {
       flex: 1;
       overflow-y: auto;
-      padding-right: 8px;
       font-family: var(--font-mono);
-      font-size: 0.78rem;
-      color: var(--text-muted);
+      font-size: 0.8rem;
+      color: #ffffff;
       line-height: 1.6;
       white-space: pre-wrap;
       background: rgba(0, 0, 0, 0.4);
       border-radius: 6px;
-      padding: 12px;
+      padding: 14px;
       border: 1px solid rgba(255, 255, 255, 0.04);
+      text-align: left;
+      display: block;
+    }
+
+    .lyrics-container.is-placeholder {
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
+      color: var(--text-muted);
     }
 
     .lyrics-container::-webkit-scrollbar { width: 4px; }
@@ -485,7 +490,7 @@
             <h3><i data-lucide="file-text" class="icon-cyan"></i> Dynamic Lyrics Vault</h3>
             <span class="badge-tech" id="lyrics-track-title">SELECT TRACK</span>
           </div>
-          <div class="lyrics-container" id="lyrics-display-box">
+          <div class="lyrics-container is-placeholder" id="lyrics-display-box">
 // LYRICS VAULT — SELECT A TRACK TO DISPLAY LYRICS
           </div>
         </div>
