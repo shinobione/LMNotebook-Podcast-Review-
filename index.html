@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SHINOBIWAN — Official Discography & Sonic Universe</title>
+  <title>SHINOBIWAN — Official Discography & Launchpad</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +18,7 @@
 
   <div class="app-viewport">
     
-    <!-- BRAND TOPBAR -->
+    <!-- TOPBAR -->
     <header class="topbar">
       <div class="brand-zone">
         <span class="live-dot"></span>
@@ -31,37 +31,35 @@
       </div>
 
       <div class="hosts-zone">
-        <div class="host-pill"><i data-lucide="radio" class="icon-green"></i> STATUS: ACTIVE CATALOG</div>
+        <div class="host-pill"><i data-lucide="radio" class="icon-green"></i> CATALOG ONLINE</div>
         <div class="host-pill"><i data-lucide="shield-check" class="icon-cyan"></i> VERIFIED ARTIST</div>
       </div>
     </header>
 
-    <!-- DASHBOARD WORKSPACE (3 COLUMNS) -->
+    <!-- WORKSPACE 3 COLUMNS -->
     <main class="dashboard-grid">
       
-      <!-- COL 1: HERO RELEASE PLAYER & STREAMING PLATFORMS -->
+      <!-- COLONNE 1 : HERO TRACK PLAYER & ECOSYSTEM -->
       <section class="dash-col">
         
-        <!-- HERO RELEASE PLAYER -->
         <div class="glass-card main-player">
           <div class="card-head-compact">
-            <span class="badge-tag"><i data-lucide="sparkles" class="icon-inline"></i> FEATURED RELEASE</span>
-            <span class="tech-id">HQ AUDIO</span>
+            <span class="badge-tag"><i data-lucide="sparkles" class="icon-inline"></i> FEATURED TRACK</span>
+            <span class="tech-id">HQ MASTER</span>
           </div>
 
+          <!-- LOGO AGRANDI -->
           <div class="cover-art hero-cover">
-            <div class="artist-brand-overlay">
-              <img src="assets/logo.png" alt="SHINOBIWAN Logo" class="official-logo-img" />
-              <span class="brand-sub">NEON HEARTBREAKS EP</span>
-            </div>
+            <img src="assets/logo.png" alt="SHINOBIWAN Logo" class="official-logo-img" />
           </div>
 
           <div class="track-meta">
             <h2>Ligne 3</h2>
-            <p class="subtitle">Focus Track • Synthwave & Dark Electro Fusion</p>
+            <p class="subtitle">Lead Single • Neon Heartbreaks EP</p>
           </div>
 
-          <audio id="audio-element" src="audio/review-shinobiwan.mp3" preload="metadata"></audio>
+          <!-- FICHIER AUDIO DU VRAI TRACK (Remplace ligne-3.mp3 par le nom exact de ton fichier) -->
+          <audio id="audio-element" src="audio/ligne-3.mp3" preload="metadata"></audio>
 
           <div class="waveform-box">
             <div class="waveform-container" id="waveform-click-area">
@@ -80,7 +78,6 @@
           </div>
         </div>
 
-        <!-- OFFICIAL LINKS HUB -->
         <div class="glass-card direct-links">
           <div class="card-head">
             <h3><i data-lucide="share-2" class="icon-cyan"></i> Stream & Connect</h3>
@@ -99,8 +96,8 @@
             <a href="https://soundcloud.com/shinobiwan-1" target="_blank" rel="noopener" class="profile-item soundcloud">
               <i data-lucide="cloud" class="p-icon"></i>
               <div>
-                <strong>SoundCloud Lab</strong>
-                <span>Demos, Exclusive Edits & Direct Uploads</span>
+                <strong>SoundCloud HQ</strong>
+                <span>Demos, Edits & Direct Uploads</span>
               </div>
               <i data-lucide="external-link" class="ext-icon"></i>
             </a>
@@ -109,10 +106,9 @@
 
       </section>
 
-      <!-- COL 2: DISCOGRAPHY SHOWCASE & AUDIO METRICS -->
+      <!-- COLONNE 2 : CARDS COVER ALBUMS ET SPECTRUM -->
       <section class="dash-col">
         
-        <!-- VISUAL CATALOG SHOWCASE (THE 3 EP CARDS) -->
         <div class="glass-card catalog-showcase-card">
           <div class="card-head">
             <h3><i data-lucide="disc" class="icon-cyan"></i> Key Projects & EP Universe</h3>
@@ -121,46 +117,48 @@
 
           <div class="ep-grid-3">
             
-            <!-- EP 1 -->
+            <!-- EP 1 : NEON HEARTBREAKS -->
             <div class="ep-card featured">
-              <div class="ep-visual neon-bg">
+              <div class="ep-cover-frame">
+                <img src="assets/neon-heartbreaks.jpg" alt="Neon Heartbreaks Cover" class="ep-img-cover" />
                 <span class="ep-tag-mini">PRIMARY EP</span>
+              </div>
+              <div class="ep-details">
                 <h4>NEON HEARTBREAKS</h4>
-              </div>
-              <div class="ep-details">
                 <p>Cyberpunk cityscape, rain & neon aesthetics. Incisive hooks and synthwave atmosphere.</p>
-                <span class="ep-tracks-highlight">Key Track: <strong>Ligne 3</strong></span>
+                <div class="ep-tracks-highlight">Featured: <strong>Ligne 3</strong></div>
               </div>
             </div>
 
-            <!-- EP 2 -->
+            <!-- EP 2 : LOVE LETTERS FROM SAIGON -->
             <div class="ep-card">
-              <div class="ep-visual saigon-bg">
+              <div class="ep-cover-frame">
+                <img src="assets/love-letters.jpg" alt="Love Letters from Saigon Cover" class="ep-img-cover" />
                 <span class="ep-tag-mini">CONCEPT</span>
-                <h4>LOVE LETTERS FROM SAIGON</h4>
               </div>
               <div class="ep-details">
+                <h4>LOVE LETTERS FROM SAIGON</h4>
                 <p>Trilingual narrative fusion, warm analog textures & tropical neon mood.</p>
-                <span class="ep-tracks-highlight">Key Track: <strong>Prayers & Fears</strong></span>
+                <div class="ep-tracks-highlight">Featured: <strong>Saigon Night Drive</strong></div>
               </div>
             </div>
 
-            <!-- EP 3 -->
+            <!-- EP 3 : COAL TO DIAMOND -->
             <div class="ep-card">
-              <div class="ep-visual coal-bg">
+              <div class="ep-cover-frame">
+                <img src="assets/coal-to-diamond.jpg" alt="Coal to Diamond Cover" class="ep-img-cover" />
                 <span class="ep-tag-mini">INDUSTRIAL</span>
-                <h4>COAL TO DIAMOND</h4>
               </div>
               <div class="ep-details">
+                <h4>COAL TO DIAMOND</h4>
                 <p>Heavy mineral design, sharp Blade Cut aesthetics, aggressive Midtempo Bass.</p>
-                <span class="ep-tracks-highlight">Key Track: <strong>Chasing Dreams</strong></span>
+                <div class="ep-tracks-highlight">Featured: <strong>Pressure Drop</strong></div>
               </div>
             </div>
 
           </div>
         </div>
 
-        <!-- RTA SPECTRUM ANALYZER & MASTER SPECS -->
         <div class="glass-card dsp-card">
           <div class="card-head">
             <h3><i data-lucide="activity" class="icon-green"></i> Studio Master Specifications</h3>
@@ -221,10 +219,9 @@
 
       </section>
 
-      <!-- COL 3: SPOTIFY XXL & PRESS / SYNC INFO -->
+      <!-- COLONNE 3 : SPOTIFY XXL & SYNC INFO -->
       <section class="dash-col">
         
-        <!-- SPOTIFY XXL EMBED PLAYER -->
         <div class="glass-card embed-card-full">
           <div class="card-head">
             <h3><i data-lucide="disc" class="icon-green"></i> Top Discography Player</h3>
@@ -243,7 +240,6 @@
           </div>
         </div>
 
-        <!-- EPK / SYNC & CURATOR BRIEF -->
         <div class="glass-card epk-card">
           <div class="card-head">
             <h3><i data-lucide="file-text" class="icon-cyan"></i> Curator & Sync Info</h3>
