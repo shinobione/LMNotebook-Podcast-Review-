@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SHINOBIWAN — Official Discography & Launchpad</title>
+  <title>SHINOBIWAN — Cyberpunk Studio Launchpad</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,51 +15,51 @@
 <body>
 
   <div class="glow-bg"></div>
+  <div class="cyber-grid"></div>
 
   <div class="app-viewport">
     
-    <!-- TOPBAR -->
+    <!-- BRAND TOPBAR -->
     <header class="topbar">
       <div class="brand-zone">
         <span class="live-dot"></span>
-        <strong class="brand-title">SHINOBIWAN</strong>
-        <span class="badge-ep">OFFICIAL LAUNCHPAD</span>
+        <strong class="brand-title glitch-text" data-text="SHINOBIWAN">SHINOBIWAN</strong>
+        <span class="badge-ep">SYSTEM LAUNCHPAD v2.0</span>
       </div>
 
       <div class="title-zone">
-        <h1>Cyberpunk • Midtempo Bass • Dark Synthwave</h1>
+        <h1>CYBERPUNK • MIDTEMPO BASS • DARK SYNTHWAVE</h1>
       </div>
 
       <div class="hosts-zone">
-        <div class="host-pill"><i data-lucide="radio" class="icon-green"></i> CATALOG ONLINE</div>
+        <div class="host-pill"><i data-lucide="zap" class="icon-green"></i> DAW ENGINE ACTIVE</div>
         <div class="host-pill"><i data-lucide="shield-check" class="icon-cyan"></i> VERIFIED ARTIST</div>
       </div>
     </header>
 
-    <!-- WORKSPACE 3 COLUMNS -->
+    <!-- DASHBOARD WORKSPACE (3 COLUMNS) -->
     <main class="dashboard-grid">
       
-      <!-- COLONNE 1 : HERO TRACK PLAYER & ECOSYSTEM -->
+      <!-- COL 1: HERO TRACK PLAYER & LINKS -->
       <section class="dash-col">
         
         <div class="glass-card main-player">
           <div class="card-head-compact">
-            <span class="badge-tag"><i data-lucide="sparkles" class="icon-inline"></i> FEATURED TRACK</span>
-            <span class="tech-id">HQ MASTER</span>
+            <span class="badge-tag"><i data-lucide="disc" class="icon-inline"></i> ACTIVE SELECTION</span>
+            <span class="tech-id" id="active-ep-code">NH-EP #01</span>
           </div>
 
-          <!-- LOGO AGRANDI -->
-          <div class="cover-art hero-cover">
+          <div class="hero-cover" id="hero-cover-container">
+            <div class="hero-artwork-bg" id="hero-art-bg"></div>
             <img src="assets/logo.png" alt="SHINOBIWAN Logo" class="official-logo-img" />
           </div>
 
           <div class="track-meta">
-            <h2>Ligne 3</h2>
-            <p class="subtitle">Lead Single • Neon Heartbreaks EP</p>
+            <h2 id="current-track-title" class="glitch-track">Ligne 3</h2>
+            <p class="subtitle" id="current-track-sub">Lead Single • Neon Heartbreaks EP</p>
           </div>
 
-          <!-- FICHIER AUDIO DU VRAI TRACK (Remplace ligne-3.mp3 par le nom exact de ton fichier) -->
-          <audio id="audio-element" src="audio/ligne-3.mp3" preload="metadata"></audio>
+          <audio id="audio-element" src="audio/review-shinobiwan.mp3" preload="metadata"></audio>
 
           <div class="waveform-box">
             <div class="waveform-container" id="waveform-click-area">
@@ -80,7 +80,7 @@
 
         <div class="glass-card direct-links">
           <div class="card-head">
-            <h3><i data-lucide="share-2" class="icon-cyan"></i> Stream & Connect</h3>
+            <h3><i data-lucide="share-2" class="icon-cyan"></i> Official Streaming Hubs</h3>
           </div>
           
           <div class="platform-grid">
@@ -88,7 +88,7 @@
               <i data-lucide="music" class="p-icon"></i>
               <div>
                 <strong>Spotify Catalog</strong>
-                <span>Official Releases & Top Tracks</span>
+                <span>Direct Discography & Top Tracks</span>
               </div>
               <i data-lucide="external-link" class="ext-icon"></i>
             </a>
@@ -96,8 +96,8 @@
             <a href="https://soundcloud.com/shinobiwan-1" target="_blank" rel="noopener" class="profile-item soundcloud">
               <i data-lucide="cloud" class="p-icon"></i>
               <div>
-                <strong>SoundCloud HQ</strong>
-                <span>Demos, Edits & Direct Uploads</span>
+                <strong>SoundCloud HQ Lab</strong>
+                <span>Demos, Edits & VIP Masters</span>
               </div>
               <i data-lucide="external-link" class="ext-icon"></i>
             </a>
@@ -106,84 +106,69 @@
 
       </section>
 
-      <!-- COLONNE 2 : CARDS COVER ALBUMS ET SPECTRUM -->
+      <!-- COL 2: INTERACTIVE DISCOGRAPHY CARDS & CANVAS SPECTRUM -->
       <section class="dash-col">
         
         <div class="glass-card catalog-showcase-card">
           <div class="card-head">
-            <h3><i data-lucide="disc" class="icon-cyan"></i> Key Projects & EP Universe</h3>
-            <span class="badge-tech">DISCOGRAPHY</span>
+            <h3><i data-lucide="layers" class="icon-cyan"></i> Interactive Release Selectors</h3>
+            <span class="badge-tech">CLICK TO LOAD</span>
           </div>
 
           <div class="ep-grid-3">
             
-            <!-- EP 1 : NEON HEARTBREAKS -->
-            <div class="ep-card featured">
-              <div class="ep-cover-frame">
-                <img src="assets/neon-heartbreaks.jpg" alt="Neon Heartbreaks Cover" class="ep-img-cover" />
+            <!-- EP 1 (NEON HEARTBREAKS) -->
+            <div class="ep-card active" data-ep="neon" data-title="Ligne 3" data-sub="Lead Single • Neon Heartbreaks EP" data-code="NH-EP #01" data-lufs="-13.8 LUFS" data-dr="DR 8.2 dB">
+              <div class="ep-cover-frame art-neon">
                 <span class="ep-tag-mini">PRIMARY EP</span>
+                <div class="ep-glitch-overlay"></div>
               </div>
               <div class="ep-details">
                 <h4>NEON HEARTBREAKS</h4>
-                <p>Cyberpunk cityscape, rain & neon aesthetics. Incisive hooks and synthwave atmosphere.</p>
-                <div class="ep-tracks-highlight">Featured: <strong>Ligne 3</strong></div>
+                <p>Rain-soaked synthwave cityscape. Incisive analog basslines & cyber hooks.</p>
+                <div class="ep-tracks-highlight">Load Track: <strong>Ligne 3</strong></div>
               </div>
             </div>
 
-            <!-- EP 2 : LOVE LETTERS FROM SAIGON -->
-            <div class="ep-card">
-              <div class="ep-cover-frame">
-                <img src="assets/love-letters.jpg" alt="Love Letters from Saigon Cover" class="ep-img-cover" />
+            <!-- EP 2 (LOVE LETTERS FROM SAIGON) -->
+            <div class="ep-card" data-ep="saigon" data-title="Saigon Night Drive" data-sub="Focus Track • Love Letters from Saigon" data-code="LL-EP #02" data-lufs="-14.2 LUFS" data-dr="DR 9.1 dB">
+              <div class="ep-cover-frame art-saigon">
                 <span class="ep-tag-mini">CONCEPT</span>
+                <div class="ep-glitch-overlay"></div>
               </div>
               <div class="ep-details">
                 <h4>LOVE LETTERS FROM SAIGON</h4>
-                <p>Trilingual narrative fusion, warm analog textures & tropical neon mood.</p>
-                <div class="ep-tracks-highlight">Featured: <strong>Saigon Night Drive</strong></div>
+                <p>Trilingual narrative synthpop, organic lofi textures & tropical neon warmth.</p>
+                <div class="ep-tracks-highlight">Load Track: <strong>Saigon Drive</strong></div>
               </div>
             </div>
 
-            <!-- EP 3 : COAL TO DIAMOND -->
-            <div class="ep-card">
-              <div class="ep-cover-frame">
-                <img src="assets/coal-to-diamond.jpg" alt="Coal to Diamond Cover" class="ep-img-cover" />
+            <!-- EP 3 (COAL TO DIAMOND) -->
+            <div class="ep-card" data-ep="coal" data-title="Pressure Drop" data-sub="Focus Track • Coal to Diamond EP" data-code="CD-EP #03" data-lufs="-12.5 LUFS" data-dr="DR 7.4 dB">
+              <div class="ep-cover-frame art-coal">
                 <span class="ep-tag-mini">INDUSTRIAL</span>
+                <div class="ep-glitch-overlay"></div>
               </div>
               <div class="ep-details">
                 <h4>COAL TO DIAMOND</h4>
-                <p>Heavy mineral design, sharp Blade Cut aesthetics, aggressive Midtempo Bass.</p>
-                <div class="ep-tracks-highlight">Featured: <strong>Pressure Drop</strong></div>
+                <p>Obsidian sharp design, Blade Cut industrial bass, brutal distortion dynamics.</p>
+                <div class="ep-tracks-highlight">Load Track: <strong>Pressure Drop</strong></div>
               </div>
             </div>
 
           </div>
         </div>
 
+        <!-- RTA CANVAS ANALYZER -->
         <div class="glass-card dsp-card">
           <div class="card-head">
-            <h3><i data-lucide="activity" class="icon-green"></i> Studio Master Specifications</h3>
-            <span class="badge-tech">32-BAND RTA</span>
+            <h3><i data-lucide="activity" class="icon-green"></i> Real-Time DAW Canvas RTA Spectrum</h3>
+            <span class="badge-tech">LIVE DSP 60 FPS</span>
           </div>
 
           <div class="rta-spectrum-container">
-            <div class="rta-bars-grid">
-              <div class="rta-bar" style="height: 65%;"></div><div class="rta-bar" style="height: 82%;"></div>
-              <div class="rta-bar" style="height: 94%;"></div><div class="rta-bar" style="height: 88%;"></div>
-              <div class="rta-bar" style="height: 70%;"></div><div class="rta-bar" style="height: 55%;"></div>
-              <div class="rta-bar" style="height: 48%;"></div><div class="rta-bar" style="height: 62%;"></div>
-              <div class="rta-bar" style="height: 75%;"></div><div class="rta-bar" style="height: 80%;"></div>
-              <div class="rta-bar" style="height: 68%;"></div><div class="rta-bar" style="height: 52%;"></div>
-              <div class="rta-bar" style="height: 44%;"></div><div class="rta-bar" style="height: 58%;"></div>
-              <div class="rta-bar" style="height: 72%;"></div><div class="rta-bar" style="height: 85%;"></div>
-              <div class="rta-bar" style="height: 90%;"></div><div class="rta-bar" style="height: 78%;"></div>
-              <div class="rta-bar" style="height: 64%;"></div><div class="rta-bar" style="height: 70%;"></div>
-              <div class="rta-bar" style="height: 82%;"></div><div class="rta-bar" style="height: 76%;"></div>
-              <div class="rta-bar" style="height: 60%;"></div><div class="rta-bar" style="height: 50%;"></div>
-              <div class="rta-bar" style="height: 66%;"></div><div class="rta-bar" style="height: 74%;"></div>
-              <div class="rta-bar" style="height: 84%;"></div><div class="rta-bar" style="height: 91%;"></div>
-              <div class="rta-bar" style="height: 73%;"></div><div class="rta-bar" style="height: 62%;"></div>
-              <div class="rta-bar" style="height: 55%;"></div><div class="rta-bar" style="height: 40%;"></div>
-            </div>
+            <!-- CANVAS HIGH PERF -->
+            <canvas id="rta-canvas" width="600" height="90"></canvas>
             <div class="rta-labels">
               <span>20Hz (Sub)</span>
               <span>250Hz (Low-Mid)</span>
@@ -196,30 +181,30 @@
           <div class="metrics-grid-4">
             <div class="metric-tile">
               <span class="m-label">LOUDNESS TARGET</span>
-              <strong class="m-val green">-13.8 LUFS</strong>
-              <span class="m-sub">Streaming Optimized</span>
+              <strong class="m-val green" id="metric-lufs">-13.8 LUFS</strong>
+              <span class="m-sub">Streaming Calibrated</span>
             </div>
             <div class="metric-tile">
-              <span class="m-label">STEREO WIDTH</span>
+              <span class="m-label">STEREO PHASE</span>
               <strong class="m-val cyan">138% / +0.92</strong>
-              <span class="m-sub">Clean Center Low-End</span>
+              <span class="m-sub">Mono-Coherent Low</span>
             </div>
             <div class="metric-tile">
               <span class="m-label">TRUE PEAK</span>
               <strong class="m-val purple">-0.8 dBTP</strong>
-              <span class="m-sub">Zero Distortion</span>
+              <span class="m-sub">No Clipping</span>
             </div>
             <div class="metric-tile">
               <span class="m-label">DYNAMIC RANGE</span>
-              <strong class="m-val green">DR 8.2 dB</strong>
-              <span class="m-sub">High Impact Transients</span>
+              <strong class="m-val green" id="metric-dr">DR 8.2 dB</strong>
+              <span class="m-sub">Punch Preserved</span>
             </div>
           </div>
         </div>
 
       </section>
 
-      <!-- COLONNE 3 : SPOTIFY XXL & SYNC INFO -->
+      <!-- COL 3: SPOTIFY XXL & EPK -->
       <section class="dash-col">
         
         <div class="glass-card embed-card-full">
@@ -242,23 +227,23 @@
 
         <div class="glass-card epk-card">
           <div class="card-head">
-            <h3><i data-lucide="file-text" class="icon-cyan"></i> Curator & Sync Info</h3>
+            <h3><i data-lucide="cpu" class="icon-cyan"></i> Curator & Sync Specification</h3>
           </div>
           
           <div class="epk-details-box">
             <div class="epk-row">
-              <i data-lucide="headphones" class="icon-green"></i>
+              <i data-lucide="radio" class="icon-green"></i>
               <div>
-                <strong>Playlist Readiness</strong>
-                <p>Calibrated for Spotify Radio, Discover Weekly & Editorial Playlists.</p>
+                <strong>Algorithmic Target</strong>
+                <p>Engineered for Cyberpunk, Darksynth & Synthwave official playlists.</p>
               </div>
             </div>
 
             <div class="epk-row">
               <i data-lucide="clapperboard" class="icon-cyan"></i>
               <div>
-                <strong>Sync / Licensing Ready</strong>
-                <p>High-energy tracks built for video games, trailers & cinematic syncs.</p>
+                <strong>Sync Licensing</strong>
+                <p>Mastered stems & instrumental versions available for trailers & gaming sync.</p>
               </div>
             </div>
           </div>
@@ -270,6 +255,7 @@
   </div>
 
   <script src="js/player.js"></script>
+  <script src="js/hardcore-fx.js"></script>
   <script>lucide.createIcons();</script>
 </body>
 </html>
