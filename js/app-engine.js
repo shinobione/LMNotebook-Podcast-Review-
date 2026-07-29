@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnForward = document.getElementById('btn-forward');
     const progressBar = document.getElementById('progress-bar');
     const progressContainer = document.getElementById('progress-container');
+    const spotifyContainer = document.getElementById('spotify-container');
     const spotifyIframe = document.getElementById('spotify-iframe');
     const canvas = document.getElementById('rta-canvas');
     
@@ -67,14 +68,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- 2. CONTRÔLES DE TRANSPORT & MUTUAL EXCLUSION ---
+    // --- 2. EXCLUSION MUTUELLE AUDIO ---
+    // Fonction pour couper net le lecteur local central
+    function pauseLocalPlayer() {
+        if (!audioEl.paused) {
+            audioEl.pause();
+            btnPlayPause.textContent = '▶';
+            btnPlayPause.style.background = 'var(--spotify-green)';
+        }
+    }
+
+    // Dès qu'on clique dans la colonne de droite (là où se trouve l'iframe Spotify), on coupe le son local
+    if (spotifyContainer) {
+        spotifyContainer.addEventListener('pointerdown', () => {
+            pauseLocalPlayer();
+        });
+    }
+
+    // Quand l'utilisateur clique sur Play au centre, on force un "flush" de l'iframe Spotify en rechargeant son src pour couper son son éventuel
+    function muteSpotifyEmbed() {
+        if (spotifyIframe) {
+            const currentSrc = spotifyIframe.src;
+            spotifyIframe.src = "";
+            setTimeout(() => { spotifyIframe.src = currentSrc; }, 50);
+        }
+    }
+
+    // --- 3. TRANSPORT CONTROLS ---
     btnPlayPause.addEventListener('click', () => {
         initDSP();
         if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
         
         if (audioEl.paused) {
-            // Coupe Spotify en injectant une source vide ou en simulant un focus (sécurité iframe)
-            // L'utilisateur lance le local, on met en pause le flux Spotify si possible ou on isole
+            muteSpotifyEmbed(); // Coupe l'iframe Spotify
             audioEl.play();
             btnPlayPause.textContent = '⏸';
             btnPlayPause.style.background = 'var(--accent-cyan)';
@@ -85,21 +111,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Si l'utilisateur clique/interagit avec l'iframe Spotify, on coupe net le player local central
-    if (spotifyIframe) {
-        spotifyIframe.addEventListener('mouseenter', () => {
-            if (!audioEl.paused) {
-                audioEl.pause();
-                btnPlayPause.textContent = '▶';
-                btnPlayPause.style.background = 'var(--spotify-green)';
-            }
-        });
-    }
-
     btnRewind.addEventListener('click', () => { audioEl.currentTime = Math.max(0, audioEl.currentTime - 10); });
     btnForward.addEventListener('click', () => { audioEl.currentTime = Math.min(audioEl.duration, audioEl.currentTime + 10); });
 
-    // Barre de progression interactive (Seek bar)
     progressContainer.addEventListener('click', (e) => {
         const rect = progressContainer.getBoundingClientRect();
         const clickPosition = (e.clientX - rect.left) / rect.width;
@@ -130,10 +144,11 @@ document.addEventListener('DOMContentLoaded', () => {
         progressBar.style.width = '0%';
     });
 
-    // --- 3. DYNAMIC TRACK ROUTING ---
+    // --- 4. DYNAMIC TRACK ROUTING ---
     const trackItems = document.querySelectorAll('.mini-track-item');
     
     async function loadTrackData(trackId, epName, title) {
+        muteSpotifyEmbed(); // Coupe l'iframe Spotify au changement de track locale
         audioEl.src = `audio/${trackId}.mp3`;
         if(isInitialized) audioEl.play();
         btnPlayPause.textContent = isInitialized ? '⏸' : '▶';
