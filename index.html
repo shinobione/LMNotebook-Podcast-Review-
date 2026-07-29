@@ -1,511 +1,184 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SHINOBIWAN — Official Artist Launchpad</title>
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/lucide@latest"></script>
-  
-  <style>
-    :root {
-      --bg-dark: #040608;
-      --panel-bg: rgba(10, 14, 20, 0.94);
-      --panel-border: rgba(0, 240, 255, 0.12);
-      --spotify-green: #1db954;
-      --soundcloud-orange: #ff5500;
-      --accent-cyan: #00f0ff;
-      --accent-purple: #9333ea;
-      --text-main: #f8fafc;
-      --text-muted: #8e9aaf;
-      --font-sans: 'Plus Jakarta Sans', sans-serif;
-      --font-mono: 'JetBrains Mono', monospace;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      font-family: var(--font-sans);
-      height: 100vh;
-      width: 100vw;
-      overflow: hidden;
-      padding: 12px;
-      position: relative;
-    }
-
-    img { max-width: 100%; display: block; }
-
-    .glow-bg {
-      position: fixed; inset: 0;
-      background: 
-        radial-gradient(circle at 10% 15%, rgba(0, 240, 255, 0.15), transparent 40%),
-        radial-gradient(circle at 90% 85%, rgba(147, 51, 234, 0.15), transparent 40%);
-      pointer-events: none;
-    }
-
-    .cyber-grid {
-      position: fixed; inset: 0;
-      background-image: 
-        linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
-      background-size: 40px 40px;
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    .app-viewport {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      position: relative;
-      z-index: 2;
-    }
-
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: var(--panel-bg);
-      border: 1px solid var(--panel-border);
-      padding: 6px 16px;
-      border-radius: 10px;
-      backdrop-filter: blur(20px);
-      height: 60px;
-    }
-
-    .brand-zone { display: flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 0.75rem; flex: 1; }
-    .live-dot { 
-      width: 8px; height: 8px; 
-      background: var(--spotify-green); 
-      border-radius: 50%; 
-      box-shadow: 0 0 10px var(--spotify-green);
-      animation: pulseDot 1.5s infinite;
-    }
-
-    @keyframes pulseDot {
-      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(29, 185, 84, 0.7); }
-      70% { transform: scale(1.15); box-shadow: 0 0 0 8px rgba(29, 185, 84, 0); }
-      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(29, 185, 84, 0); }
-    }
-
-    .brand-title { color: #fff; font-weight: 800; letter-spacing: 1.5px; }
-    .badge-ep { background: rgba(0, 240, 255, 0.1); color: var(--accent-cyan); padding: 2px 8px; border-radius: 4px; font-size: 0.62rem; border: 1px solid rgba(0, 240, 255, 0.3); font-weight: 700; }
-    
-    .header-logo-center {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex: 1;
-      height: 100%;
-    }
-
-    .header-logo-img {
-      height: 46px;
-      width: auto;
-      object-fit: contain;
-      filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.8));
-    }
-
-    .hosts-zone { display: flex; gap: 8px; flex: 1; justify-content: flex-end; }
-    .host-pill { display: flex; align-items: center; gap: 6px; font-size: 0.68rem; color: var(--text-muted); background: rgba(255, 255, 255, 0.03); padding: 4px 10px; border-radius: 10px; border: 1px solid var(--panel-border); font-family: var(--font-mono); }
-
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: 320px 1fr 360px;
-      gap: 10px;
-      flex: 1;
-      min-height: 0;
-    }
-
-    .dash-col { display: flex; flex-direction: column; gap: 10px; height: 100%; min-height: 0; }
-
-    .glass-card {
-      background: var(--panel-bg);
-      border: 1px solid var(--panel-border);
-      border-radius: 12px;
-      padding: 12px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
-    }
-
-    .card-head h3 { font-size: 0.78rem; display: flex; align-items: center; gap: 6px; color: #fff; font-weight: 700; }
-    .badge-tech { font-family: var(--font-mono); font-size: 0.58rem; background: rgba(0, 240, 255, 0.08); color: var(--accent-cyan); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(0, 240, 255, 0.2); }
-
-    .main-player { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
-    .card-head-compact { display: flex; justify-content: space-between; align-items: center; }
-    .badge-tag { font-family: var(--font-mono); font-size: 0.6rem; color: var(--spotify-green); display: flex; align-items: center; gap: 4px; }
-    .icon-inline { width: 12px; height: 12px; }
-    .tech-id { font-family: var(--font-mono); font-size: 0.58rem; color: var(--accent-cyan); font-weight: 700; }
-
-    .hero-cover-frame {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      border-radius: 8px;
-      border: 1px solid rgba(0, 240, 255, 0.4);
-      overflow: hidden;
-      background: #000;
-      margin: 6px 0;
-    }
-
-    .player-cover-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .track-meta h2 { font-size: 1.1rem; font-weight: 800; color: #fff; margin-top: 2px; letter-spacing: -0.3px; }
-    .track-meta .subtitle { font-size: 0.68rem; color: var(--text-muted); margin-top: 1px; line-height: 1.2; }
-
-    .waveform-box { display: flex; flex-direction: column; gap: 4px; }
-    .waveform-container { height: 34px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 4px 6px; cursor: pointer; }
-    .bars-flex { display: flex; align-items: center; gap: 2px; height: 100%; }
-    .bar { flex: 1; background: rgba(255, 255, 255, 0.15); border-radius: 1px; }
-    .bar.active { background: var(--spotify-green); box-shadow: 0 0 8px var(--spotify-green); }
-
-    .controls-row { display: flex; align-items: center; justify-content: center; gap: 10px; }
-    .btn-play { width: 42px; height: 42px; border-radius: 50%; background: var(--spotify-green); border: none; color: #000; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 16px rgba(29, 185, 84, 0.5); }
-    .btn-play:hover { transform: scale(1.08); }
-    .btn-secondary { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--panel-border); color: #fff; padding: 4px 8px; border-radius: 12px; font-size: 0.65rem; cursor: pointer; display: flex; align-items: center; gap: 4px; }
-
-    .platform-grid { display: flex; flex-direction: column; gap: 6px; }
-    a.profile-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--panel-border); border-radius: 8px; text-decoration: none !important; color: #fff !important; }
-    a.profile-item div strong { display: block; font-size: 0.72rem; }
-    a.profile-item div span { font-size: 0.6rem; color: var(--text-muted) !important; }
-    a.profile-item.spotify .p-icon { color: var(--spotify-green) !important; }
-    a.profile-item.soundcloud .p-icon { color: var(--soundcloud-orange) !important; }
-    a.profile-item .ext-icon { margin-left: auto; width: 12px; opacity: 0.5; }
-
-    .catalog-showcase-card { flex: 1; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
-    .ep-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; height: 260px; flex-shrink: 0; }
-
-    .ep-card {
-      background: rgba(12, 16, 24, 0.85);
-      border: 1px solid var(--panel-border);
-      border-radius: 10px;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-    }
-
-    .ep-card.active { border-color: var(--accent-cyan); background: rgba(0, 240, 255, 0.06); box-shadow: 0 0 15px rgba(0, 240, 255, 0.2); }
-
-    .ep-cover-frame { width: 100%; height: 95px; position: relative; overflow: hidden; background: #000; flex-shrink: 0; }
-    .ep-img-cover { width: 100%; height: 100%; object-fit: cover; }
-    .ep-tag-mini { position: absolute; top: 4px; left: 4px; font-family: var(--font-mono); font-size: 0.55rem; color: #000; background: var(--accent-cyan); padding: 1px 5px; border-radius: 3px; font-weight: 800; }
-
-    .ep-details { padding: 8px; display: flex; flex-direction: column; justify-content: space-between; flex: 1; gap: 6px; }
-    .ep-info-head h4 { font-size: 0.82rem; font-weight: 800; color: #fff; margin-bottom: 2px; letter-spacing: 0.3px; }
-    .ep-desc { font-size: 0.65rem; color: #cbd5e1 !important; line-height: 1.3; }
-
-    .mini-tracklist { display: flex; flex-direction: column; gap: 2px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 4px; margin-top: auto; }
-    .mini-track-item { 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      font-size: 0.72rem; 
-      color: #e2e8f0; 
-      font-family: var(--font-mono); 
-      padding: 4px 6px; 
-      border-radius: 4px; 
-      cursor: pointer;
-      font-weight: 500;
-    }
-    .mini-track-item:hover { background: rgba(0, 240, 255, 0.15); color: var(--accent-cyan); }
-    .mini-track-item.active-track { color: var(--spotify-green); font-weight: 700; background: rgba(29, 185, 84, 0.12); border: 1px solid rgba(29, 185, 84, 0.35); }
-
-    .lyrics-vault-card {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      min-height: 0;
-      background: rgba(8, 12, 18, 0.95);
-      border: 1px solid var(--panel-border);
-      border-radius: 10px;
-      padding: 10px;
-    }
-
-    .lyrics-container {
-      flex: 1;
-      overflow-y: auto;
-      font-family: var(--font-mono);
-      font-size: 0.8rem;
-      color: #ffffff;
-      line-height: 1.6;
-      white-space: pre-wrap;
-      background: rgba(0, 0, 0, 0.4);
-      border-radius: 6px;
-      padding: 14px;
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      text-align: left;
-      display: block;
-    }
-
-    .lyrics-container.is-placeholder {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      color: var(--text-muted);
-    }
-
-    .lyrics-container::-webkit-scrollbar { width: 4px; }
-    .lyrics-container::-webkit-scrollbar-thumb { background: var(--accent-cyan); border-radius: 4px; }
-
-    .dsp-card { display: flex; flex-direction: column; gap: 6px; }
-    .rta-spectrum-container { background: rgba(0, 0, 0, 0.6); border: 1px solid var(--panel-border); border-radius: 8px; padding: 6px 10px; display: flex; flex-direction: column; gap: 4px; }
-    #rta-canvas { width: 100%; height: 60px; display: block; }
-    .rta-labels { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.55rem; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.05); padding-top: 3px; }
-
-    .embed-card-full { flex: 1; display: flex; flex-direction: column; gap: 6px; height: 100%; }
-    .spotify-wrapper-fixed { width: 100%; height: 100%; border-radius: 10px; overflow: hidden; border: 1px solid var(--panel-border); background: #000; }
-    .spotify-wrapper-fixed iframe { width: 100%; height: 100%; border: none; display: block; }
-
-    .icon-cyan { color: var(--accent-cyan); }
-    .icon-green { color: var(--spotify-green); }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SHINOBIWAN — Official Artist Launchpad & Sonic Vault</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-
   <div class="glow-bg"></div>
   <div class="cyber-grid"></div>
 
   <div class="app-viewport">
-    
+    <!-- TOPBAR -->
     <header class="topbar">
       <div class="brand-zone">
-        <span class="live-dot"></span>
-        <strong class="brand-title">SHINOBIWAN</strong>
+        <div class="live-dot"></div>
+        <span class="brand-title">SHINOBIWAN</span>
         <span class="badge-ep">SYSTEM LAUNCHPAD v2.0</span>
       </div>
-
       <div class="header-logo-center">
-        <img src="assets/logo.png" alt="SHINOBIWAN Logo" class="header-logo-img" />
+        <!-- Replace with actual logo path -->
+        <h1 style="font-family: var(--font-mono); font-weight: 800; font-style: italic; font-size: 1.2rem; text-shadow: 0 0 10px var(--accent-cyan);">SHINOBIWAN</h1>
       </div>
-
       <div class="hosts-zone">
-        <div class="host-pill"><i data-lucide="zap" class="icon-green"></i> DAW ENGINE ACTIVE</div>
-        <div class="host-pill"><i data-lucide="shield-check" class="icon-cyan"></i> VERIFIED ARTIST</div>
+        <div class="host-pill"><span class="icon-green">⚡</span> DAW ENGINE ACTIVE</div>
+        <div class="host-pill"><span class="icon-cyan">✔</span> VERIFIED ARTIST</div>
       </div>
     </header>
 
+    <!-- MAIN DASHBOARD -->
     <main class="dashboard-grid">
       
-      <!-- COL 1 -->
+      <!-- COL 1 : ACTIVE PLAYBACK & ROUTING -->
       <section class="dash-col">
         <div class="glass-card main-player">
           <div class="card-head-compact">
-            <span class="badge-tag"><i data-lucide="disc" class="icon-inline"></i> ACTIVE PLAYBACK</span>
-            <span class="tech-id" id="active-ep-code">NH-EP #01</span>
+            <span class="badge-tag"><span class="live-dot"></span> ACTIVE PLAYBACK</span>
+            <span class="tech-id">NB-EP #01</span>
           </div>
-
+          
           <div class="hero-cover-frame">
-            <img id="player-cover-img" src="assets/before-the-noise.jpeg" alt="Track Cover Art" class="player-cover-img" />
+            <img src="https://via.placeholder.com/300" alt="Before the Noise Cover" class="player-cover-img">
           </div>
-
+          
           <div class="track-meta">
-            <h2 id="current-track-title">Before the Noise</h2>
-            <p class="subtitle" id="current-track-sub">Track 1 • Neon Heartbreaks EP</p>
+            <h2>Before the Noise</h2>
+            <div class="subtitle">Track 1 • Neon Heartbreaks EP</div>
           </div>
-
-          <audio id="audio-element" src="audio/before-the-noise.mp3" preload="metadata"></audio>
+          
+          <audio id="audio-element" src="YOUR_AUDIO_PATH.mp3" crossorigin="anonymous"></audio>
 
           <div class="waveform-box">
-            <div class="waveform-container" id="waveform-click-area">
-              <div class="bars-flex" id="bars-flex"></div>
-            </div>
             <div class="time-display">
-              <span id="current-time">00:00</span>
-              <span id="total-duration">--:--</span>
+              <span>00:05</span>
+              <span>03:53</span>
             </div>
-          </div>
-
-          <div class="controls-row">
-            <button class="btn-secondary" id="btn-rewind"><i data-lucide="rotate-ccw"></i> -10s</button>
-            <button class="btn-play" id="btn-play-pause"><i data-lucide="play" id="play-icon"></i></button>
-            <button class="btn-secondary" id="btn-forward"><i data-lucide="rotate-cw"></i> +10s</button>
+            <div class="controls-row">
+              <button class="btn-secondary" id="btn-rewind">↺ -10s</button>
+              <button class="btn-play" id="btn-play-pause">▶</button>
+              <button class="btn-secondary" id="btn-forward">↻ +10s</button>
+            </div>
           </div>
         </div>
 
-        <div class="glass-card direct-links">
+        <div class="glass-card platform-grid">
           <div class="card-head">
-            <h3><i data-lucide="share-2" class="icon-cyan"></i> Streaming Hubs</h3>
+            <h3><span style="color:var(--accent-cyan)">☍</span> Streaming Hubs</h3>
           </div>
-          <div class="platform-grid">
-            <a href="https://open.spotify.com/artist/6W08IttKpZns5zG7BYTz8e" target="_blank" rel="noopener" class="profile-item spotify">
-              <i data-lucide="music" class="p-icon"></i>
-              <div>
-                <strong>Spotify Catalog</strong>
-                <span>Direct Discography & Top Tracks</span>
-              </div>
-              <i data-lucide="external-link" class="ext-icon"></i>
-            </a>
-            <a href="https://soundcloud.com/shinobiwan-1" target="_blank" rel="noopener" class="profile-item soundcloud">
-              <i data-lucide="cloud" class="p-icon"></i>
-              <div>
-                <strong>SoundCloud HQ Lab</strong>
-                <span>Demos, Edits & VIP Masters</span>
-              </div>
-              <i data-lucide="external-link" class="ext-icon"></i>
-            </a>
-          </div>
+          <a href="#" class="profile-item spotify">
+            <div class="p-icon">S</div>
+            <div>
+              <strong>Spotify Catalog</strong>
+              <span>Direct Discography & Top Tracks</span>
+            </div>
+          </a>
+          <a href="#" class="profile-item soundcloud">
+            <div class="p-icon">SC</div>
+            <div>
+              <strong>SoundCloud HQ Lab</strong>
+              <span>Demos, Edits & VIP Masters</span>
+            </div>
+          </a>
         </div>
       </section>
 
-      <!-- COL 2 -->
+      <!-- COL 2 : CATALOG & LYRICS VAULT -->
       <section class="dash-col">
-        <div class="glass-card catalog-showcase-card">
+        <div class="catalog-showcase-card">
           <div class="card-head">
-            <h3><i data-lucide="layers" class="icon-cyan"></i> Discography & Interactive Engine</h3>
-            <span class="badge-tech">CLICK TRACK TO PLAY</span>
+            <h3><span style="color:var(--accent-cyan)">◱</span> Discography & Interactive Engine</h3>
           </div>
-
           <div class="ep-grid-3">
-            
             <!-- EP 1 -->
-            <div class="ep-card active" data-ep="NH-EP #01">
+            <div class="ep-card active">
               <div class="ep-cover-frame">
-                <img src="assets/neon-heartbreaks.jpeg" alt="Neon Heartbreaks EP" class="ep-img-cover" />
                 <span class="ep-tag-mini">PRIMARY EP</span>
+                <img src="https://via.placeholder.com/150" alt="Neon Heartbreaks" class="ep-img-cover">
               </div>
               <div class="ep-details">
                 <div class="ep-info-head">
                   <h4>NEON HEARTBREAKS</h4>
-                  <p class="ep-desc">Rain-soaked synthwave cityscape. Analog basslines & cyber hooks.</p>
+                  <div class="ep-desc">Rain-soaked synthwave cityscape. Analog basslines & cyber hooks.</div>
                 </div>
-
                 <div class="mini-tracklist">
-                  <div class="mini-track-item active-track" 
-                       data-track="Before the Noise" 
-                       data-sub="Track 1 • Neon Heartbreaks EP" 
-                       data-audio="audio/before-the-noise.mp3" 
-                       data-cover="assets/before-the-noise.jpeg" 
-                       data-lyrics-file="assets/lyrics/before-the-noise.txt">1. Before the Noise</div>
-
-                  <div class="mini-track-item" 
-                       data-track="Low Bitrate Love" 
-                       data-sub="Track 2 • Neon Heartbreaks EP" 
-                       data-audio="audio/low-bitrate-love.mp3" 
-                       data-cover="assets/low-bitrate-love.jpeg" 
-                       data-lyrics-file="assets/lyrics/low-bitrate-love.txt">2. Low Bitrate Love</div>
-
-                  <div class="mini-track-item" 
-                       data-track="Real love doesn't rush" 
-                       data-sub="Track 3 • Neon Heartbreaks EP" 
-                       data-audio="audio/real-love-doesnt-rush.mp3" 
-                       data-cover="assets/real-love-doesnt-rush.jpeg" 
-                       data-lyrics-file="assets/lyrics/real-love-doesnt-rush.txt">3. Real love doesn't rush</div>
+                  <div class="mini-track-item active-track">1. Before the Noise</div>
+                  <div class="mini-track-item">2. Low Bitrate Love</div>
+                  <div class="mini-track-item">3. Real love doesn't rush</div>
                 </div>
               </div>
             </div>
-
             <!-- EP 2 -->
-            <div class="ep-card" data-ep="LL-EP #02">
+            <div class="ep-card">
               <div class="ep-cover-frame">
-                <img src="assets/love-letters.jpeg" alt="Love Letters from Saigon EP" class="ep-img-cover" />
-                <span class="ep-tag-mini">CONCEPT</span>
+                <span class="ep-tag-mini" style="background:var(--accent-purple); color:#fff;">CONCEPT</span>
+                <img src="https://via.placeholder.com/150" alt="Love Letters from Saigon" class="ep-img-cover">
               </div>
               <div class="ep-details">
                 <div class="ep-info-head">
                   <h4>LOVE LETTERS FROM SAIGON</h4>
-                  <p class="ep-desc">Trilingual narrative synthpop, organic lofi & tropical neon warmth.</p>
+                  <div class="ep-desc">Trilingual narrative synthpop, organic lo-fi & tropical neon warmth.</div>
                 </div>
-
                 <div class="mini-tracklist">
-                  <div class="mini-track-item" 
-                       data-track="Saigon Bound" 
-                       data-sub="Track 1 • Love Letters from Saigon" 
-                       data-audio="audio/saigon-bound.mp3" 
-                       data-cover="assets/saigon-bound.png" 
-                       data-lyrics-file="assets/lyrics/saigon-bound.txt">1. Saigon Bound</div>
-
-                  <div class="mini-track-item" 
-                       data-track="Tình Bolero Cho Trân" 
-                       data-sub="Track 2 • Love Letters from Saigon" 
-                       data-audio="audio/tinh-bolero-cho-tran.mp3" 
-                       data-cover="assets/tinh-bolero-cho-tran.png" 
-                       data-lyrics-file="assets/lyrics/tinh-bolero-cho-tran.txt">2. Tình Bolero Cho Trân</div>
-
-                  <div class="mini-track-item" 
-                       data-track="Jusqu'au Dernier Souffle" 
-                       data-sub="Track 3 • Love Letters from Saigon" 
-                       data-audio="audio/jusquau-dernier-souffle.mp3" 
-                       data-cover="assets/jusquau-dernier-souffle.jpeg" 
-                       data-lyrics-file="assets/lyrics/jusquau-dernier-souffle.txt">3. Jusqu'au Dernier Souffle</div>
+                  <div class="mini-track-item">1. Saigon Bound</div>
+                  <div class="mini-track-item">2. Tình Bolero Cho Trân</div>
+                  <div class="mini-track-item">3. Jusqu'au Dernier Souffle</div>
                 </div>
               </div>
             </div>
-
             <!-- EP 3 -->
-            <div class="ep-card" data-ep="CD-EP #03">
+            <div class="ep-card">
               <div class="ep-cover-frame">
-                <img src="assets/coal-to-diamond.jpeg" alt="Coal to Diamond EP" class="ep-img-cover" />
-                <span class="ep-tag-mini">INDUSTRIAL</span>
+                <span class="ep-tag-mini" style="background:#ff3366; color:#fff;">INDUSTRIAL</span>
+                <img src="https://via.placeholder.com/150" alt="Coal to Diamond" class="ep-img-cover">
               </div>
               <div class="ep-details">
                 <div class="ep-info-head">
                   <h4>COAL TO DIAMOND</h4>
-                  <p class="ep-desc">Obsidian design, Blade Cut industrial bass, distortion dynamics.</p>
+                  <div class="ep-desc">Obsidian design, Blade Cut industrial bass, distortion dynamics.</div>
                 </div>
-
                 <div class="mini-tracklist">
-                  <div class="mini-track-item" 
-                       data-track="THICK" 
-                       data-sub="Track 1 • Coal to Diamond EP" 
-                       data-audio="audio/thick.mp3" 
-                       data-cover="assets/thick.jpeg" 
-                       data-lyrics-file="assets/lyrics/thick.txt">1. THICK</div>
-
-                  <div class="mini-track-item" 
-                       data-track="THE THRONE RESONATES" 
-                       data-sub="Track 2 • Coal to Diamond EP" 
-                       data-audio="audio/the-throne-resonates.mp3" 
-                       data-cover="assets/the-throne-resonates.jpeg" 
-                       data-lyrics-file="assets/lyrics/the-throne-resonates.txt">2. THE THRONE RESONATES</div>
-
-                  <div class="mini-track-item" 
-                       data-track="Carved from Pressure" 
-                       data-sub="Track 3 • Coal to Diamond EP" 
-                       data-audio="audio/carved-from-pressure.mp3" 
-                       data-cover="assets/carved-from-pressure.jpeg" 
-                       data-lyrics-file="assets/lyrics/carved-from-pressure.txt">3. Carved from Pressure</div>
+                  <div class="mini-track-item">1. THICK</div>
+                  <div class="mini-track-item">2. THE THRONE RESONATES</div>
+                  <div class="mini-track-item">3. Carved from Pressure</div>
                 </div>
               </div>
             </div>
-
           </div>
         </div>
 
-        <!-- MODULE LYRICS VAULT -->
         <div class="lyrics-vault-card">
-          <div class="card-head">
-            <h3><i data-lucide="file-text" class="icon-cyan"></i> Dynamic Lyrics Vault</h3>
-            <span class="badge-tech" id="lyrics-track-title">SELECT TRACK</span>
+          <div class="card-head-compact" style="margin-bottom: 5px;">
+            <h3 style="font-size: 0.72rem; color: #fff; font-weight: 700;">Dynamic Lyrics Vault</h3>
+            <span class="badge-tech">BEFORE THE NOISE</span>
           </div>
-          <div class="lyrics-container is-placeholder" id="lyrics-display-box">
-// LYRICS VAULT — SELECT A TRACK TO DISPLAY LYRICS
+          <div class="lyrics-container">
+Yeah..
+Back when the world moved slow, when the sunlight cut bright.
+Dreams packed in pockets, hearts kicking real light.
+Before the noise, before the weight, before the late-night fight—
+We lived in moments that cracked..
+Then kicked straight back to life.
+
+And the memories rush in..
+
+I remember bike rides under orange skies
+Dirty sneakers, playground dreams in our eyes
           </div>
         </div>
-
+        
         <div class="glass-card dsp-card">
-          <div class="card-head">
-            <h3><i data-lucide="activity" class="icon-green"></i> Real-Time DAW Canvas RTA Spectrum</h3>
-            <span class="badge-tech">LIVE DSP 60 FPS</span>
+           <div class="card-head-compact" style="margin-bottom: 3px;">
+            <h3 style="font-size: 0.72rem; color: #fff; font-weight: 700;">Real-Time DAW Canvas RTA Spectrum</h3>
+            <span class="badge-tech" style="color:var(--spotify-green); border-color:var(--spotify-green);">LIVE DSP 60 FPS</span>
           </div>
-
           <div class="rta-spectrum-container">
-            <canvas id="rta-canvas" width="600" height="60"></canvas>
+            <canvas id="rta-canvas"></canvas>
             <div class="rta-labels">
               <span>20Hz (Sub)</span>
-              <span>250Hz (Low-Mid)</span>
+              <span>250Hz (Low Mid)</span>
               <span>2kHz (Mid)</span>
               <span>8kHz (Presence)</span>
               <span>20kHz (Air)</span>
@@ -514,23 +187,21 @@
         </div>
       </section>
 
-      <!-- COL 3 -->
+      <!-- COL 3 : EXTERNAL EMBED / SPOTIFY -->
       <section class="dash-col">
         <div class="glass-card embed-card-full">
-          <div class="card-head">
-            <h3><i data-lucide="disc" class="icon-green"></i> Top Discography Player</h3>
-            <span class="badge-tech">SPOTIFY LIVE</span>
+           <div class="card-head" style="margin-bottom: 5px;">
+            <h3><span class="live-dot"></span> Top Discography Player</h3>
           </div>
-          <div class="spotify-wrapper-fixed" id="spotify-container">
-            <iframe id="spotify-iframe" src="https://open.spotify.com/embed/artist/6W08IttKpZns5zG7BYTz8e?utm_source=generator&theme=0" width="100%" height="100%" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+          <div class="spotify-wrapper-fixed">
+            <!-- Remplacer l'URL par l'ID réel artiste -->
+            <iframe src="https://open.spotify.com/embed/artist/YOUR_ARTIST_ID?utm_source=generator&theme=0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
           </div>
         </div>
       </section>
 
     </main>
   </div>
-
-  <script src="js/app-engine.js"></script>
-  <script>lucide.createIcons();</script>
+  <script src="script.js"></script>
 </body>
 </html>
