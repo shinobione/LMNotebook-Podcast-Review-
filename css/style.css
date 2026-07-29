@@ -6,7 +6,6 @@
   --soundcloud-orange: #ff5500;
   --accent-cyan: #00f0ff;
   --accent-purple: #9333ea;
-  --accent-pink: #ec4899;
   --text-main: #f8fafc;
   --text-muted: #8e9aaf;
   --font-sans: 'Plus Jakarta Sans', sans-serif;
@@ -64,7 +63,6 @@ body {
   padding: 8px 16px;
   border-radius: 10px;
   backdrop-filter: blur(20px);
-  box-shadow: 0 0 15px rgba(0, 240, 255, 0.05);
 }
 
 .brand-zone { display: flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 0.75rem; }
@@ -124,28 +122,30 @@ body {
 .card-head h3 { font-size: 0.78rem; display: flex; align-items: center; gap: 6px; color: #fff; font-weight: 700; }
 .badge-tech { font-family: var(--font-mono); font-size: 0.58rem; background: rgba(0, 240, 255, 0.08); color: var(--accent-cyan); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(0, 240, 255, 0.2); }
 
-/* COL 1: PLAYER & LOGO */
+/* COL 1: MAIN PLAYER */
 .main-player { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
 .card-head-compact { display: flex; justify-content: space-between; align-items: center; }
 .badge-tag { font-family: var(--font-mono); font-size: 0.6rem; color: var(--spotify-green); display: flex; align-items: center; gap: 4px; }
 .icon-inline { width: 12px; height: 12px; }
 .tech-id { font-family: var(--font-mono); font-size: 0.58rem; color: var(--accent-cyan); font-weight: 700; }
 
-.hero-cover {
-  width: 100%; height: 140px; border-radius: 8px; position: relative; border: 1px solid rgba(0, 240, 255, 0.3); display: flex; align-items: center; justify-content: center; padding: 12px;
-  overflow: hidden;
-  box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
+.hero-cover-frame {
+  width: 100%; height: 140px; border-radius: 8px; position: relative; border: 1px solid rgba(0, 240, 255, 0.3); overflow: hidden;
+  background: #000;
 }
 
-.hero-artwork-bg {
-  position: absolute; inset: 0;
-  background: linear-gradient(135deg, rgba(0, 240, 255, 0.25) 0%, rgba(147, 51, 234, 0.3) 100%);
-  transition: background 0.5s ease;
+.player-cover-img {
+  width: 100%; height: 100%; object-fit: cover; opacity: 0.65; transition: opacity 0.3s ease;
+}
+
+.hero-logo-overlay {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(circle at center, rgba(5,7,10,0.2) 0%, rgba(5,7,10,0.85) 100%);
 }
 
 .official-logo-img { 
-  width: 88%; height: auto; max-height: 85px; object-fit: contain; position: relative; z-index: 2;
-  filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.6));
+  width: 85%; height: auto; max-height: 80px; object-fit: contain;
+  filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.8));
 }
 
 .track-meta h2 { font-size: 1.15rem; font-weight: 800; color: #fff; margin-top: 4px; letter-spacing: -0.3px; }
@@ -181,7 +181,7 @@ a.profile-item.spotify .p-icon { color: var(--spotify-green) !important; }
 a.profile-item.soundcloud .p-icon { color: var(--soundcloud-orange) !important; }
 a.profile-item .ext-icon { margin-left: auto; width: 12px; opacity: 0.5; }
 
-/* COL 2: INTERACTIVE CARDS & CANVAS SPECTRUM */
+/* COL 2: POCHETTES D'ALBUMS ET SPECTRUM */
 .catalog-showcase-card { flex: 1; display: flex; flex-direction: column; gap: 10px; }
 .ep-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; flex: 1; }
 
@@ -194,7 +194,6 @@ a.profile-item .ext-icon { margin-left: auto; width: 12px; opacity: 0.5; }
   flex-direction: column;
   transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
   cursor: pointer;
-  position: relative;
 }
 
 .ep-card:hover {
@@ -205,33 +204,28 @@ a.profile-item .ext-icon { margin-left: auto; width: 12px; opacity: 0.5; }
 
 .ep-card.active {
   border-color: var(--accent-cyan);
-  background: rgba(0, 240, 255, 0.04);
+  background: rgba(0, 240, 255, 0.05);
   box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
 }
 
 .ep-cover-frame {
   width: 100%;
-  height: 110px;
+  aspect-ratio: 1 / 1;
+  max-height: 140px;
   position: relative;
   overflow: hidden;
+  background: #000;
 }
 
-/* ARTWORKS SYNTHÉTIQUES CSS HAUTE QUALITÉ */
-.art-neon {
-  background: radial-gradient(circle at 30% 30%, #00f0ff 0%, #9333ea 70%, #05070a 100%);
+.ep-img-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
 }
 
-.art-saigon {
-  background: radial-gradient(circle at 70% 30%, #ff5500 0%, #ec4899 60%, #05070a 100%);
-}
-
-.art-coal {
-  background: linear-gradient(135deg, #374151 0%, #111827 50%, #000000 100%);
-}
-
-.art-coal::after {
-  content: ""; position: absolute; inset: 0;
-  background: repeating-linear-gradient(45deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 2px, transparent 2px, transparent 8px);
+.ep-card:hover .ep-img-cover {
+  transform: scale(1.06);
 }
 
 .ep-tag-mini {
@@ -246,6 +240,7 @@ a.profile-item .ext-icon { margin-left: auto; width: 12px; opacity: 0.5; }
   border-radius: 3px;
   font-weight: 800;
   z-index: 2;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.6);
 }
 
 .ep-details { padding: 10px; display: flex; flex-direction: column; justify-content: space-between; flex: 1; gap: 6px; }
@@ -254,7 +249,7 @@ a.profile-item .ext-icon { margin-left: auto; width: 12px; opacity: 0.5; }
 .ep-tracks-highlight { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.06); padding-top: 4px; }
 .ep-tracks-highlight strong { color: var(--spotify-green); }
 
-/* CANVAS RTA DYNAMIQUE 60FPS */
+/* CANVAS SPECTRUM 60 FPS */
 .dsp-card { display: flex; flex-direction: column; gap: 10px; }
 .rta-spectrum-container { 
   background: rgba(0, 0, 0, 0.6); 
