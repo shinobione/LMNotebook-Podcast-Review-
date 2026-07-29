@@ -7,7 +7,7 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
   
   <link rel="stylesheet" href="css/style.css" />
@@ -96,7 +96,7 @@
           </div>
         </div>
 
-        <!-- BLOC 1 REVISION: LARGE SPOTIFY DISC PLAYLIST & DIRECT LINKS -->
+        <!-- STREAMING HUB & PLAYER SPOTIFY LARGE -->
         <div class="glass-card targets-card">
           <h3><i data-lucide="disc"></i> Official Artist Streaming Hub</h3>
           
@@ -120,7 +120,7 @@
             </a>
           </div>
 
-          <!-- PLAYER SPOTIFY EN GRAND (352px height pour un rendu pro & lisible) -->
+          <!-- SPOTIFY EMBED GRAND FORMAT -->
           <div class="embed-wrapper-large">
             <iframe 
               style="border-radius:12px" 
@@ -136,59 +136,72 @@
         </div>
       </section>
 
-      <!-- BLOC 2 REVISION: SONIC ARCHITECTURE & INSIGHTS AUDIOTEXTUELS -->
+      <!-- COLUMN 2: DASHBOARD SONIC ARCHITECTURE -->
       <section class="analytics-column">
         <div class="glass-card analytics-card">
           
           <div class="analytics-header">
-            <h3><i data-lucide="sliders"></i> Sonic DNA & Identity Breakdown</h3>
-            <span class="badge-lang">ARTIST SPOTLIGHT</span>
+            <h3><i data-lucide="cpu"></i> Sonic Architecture & Diagnostic</h3>
+            <span class="badge-lang">LIVE INSIGHTS</span>
           </div>
 
-          <!-- KEY PROD HIGHLIGHTS -->
-          <div class="dna-grid">
-            <div class="dna-card">
-              <div class="dna-icon"><i data-lucide="zap"></i></div>
-              <div class="dna-content">
-                <strong>Main Vibe / Genre Crossover</strong>
-                <p>Synthwave, Cyberpunk, Cinematic Midtempo Bass & Dark Electro Fusion.</p>
+          <!-- METRICS TOP CARDS -->
+          <div class="dna-grid-v2">
+            <div class="dna-box">
+              <div class="dna-header">
+                <i data-lucide="zap" class="icon-cyan"></i>
+                <span>GENRE CROSSOVER</span>
               </div>
+              <h4>Cyberpunk & Synthwave</h4>
+              <p>Cinematic Midtempo Bass • Dark Electro Fusion</p>
             </div>
 
-            <div class="dna-card">
-              <div class="dna-icon"><i data-lucide="radio"></i></div>
-              <div class="dna-content">
-                <strong>Mix & Master Profile</strong>
-                <p>Dải trầm Sub-bass chắc chắn, Stereo Imaging rộng, chuẩn nén thương mại Spotify / Apple Music.</p>
+            <div class="dna-box">
+              <div class="dna-header">
+                <i data-lucide="sliders" class="icon-green"></i>
+                <span>MASTERING TARGET</span>
               </div>
+              <h4>-14.2 LUFS (Integrated)</h4>
+              <p>Clean Low-End Separation • Stereo Width: 135%</p>
             </div>
           </div>
 
-          <!-- DETAILED CATALOG ANALYSIS SECTION -->
-          <div class="catalog-insights">
-            <h4><i data-lucide="layers"></i> Key Strategic Observations</h4>
-            
-            <div class="insight-block">
-              <div class="insight-badge">01</div>
-              <div>
-                <h5>Cấu trúc Hook & Melodic Freedom (SoundCloud)</h5>
-                <p>Khán giả SoundCloud được trải nghiệm sự tự do sáng tạo cao trong các bản thử nghiệm giai điệu, giúp tăng tỉ lệ tương tác tự nhiên (organic engagement).</p>
+          <!-- INSIGHTS CARDS STACK -->
+          <div class="insights-stack">
+            <h4 class="stack-title"><i data-lucide="layers"></i> Strategic Catalog Breakdown</h4>
+
+            <div class="insight-card">
+              <div class="card-num">01</div>
+              <div class="card-content">
+                <h5>SoundCloud Lab & Hook Freedom</h5>
+                <p>Espace d'expérimentation mélodique à haute rétention. Structure axée sur la prise de risque et le branding underground.</p>
+                <div class="card-tags">
+                  <span class="mini-tag green">Organic Reach</span>
+                  <span class="mini-tag">Experimental</span>
+                </div>
               </div>
             </div>
 
-            <div class="insight-block">
-              <div class="insight-badge">02</div>
-              <div>
-                <h5>Editorial Playlist Readiness (Spotify)</h5>
-                <p>Chất lượng sản xuất của SHINOBIWAN đạt mức độ hoàn thiện cao về Loudness (-14 LUFS target), tối ưu cho thuật toán đề xuất của Spotify (Radio & Discover Weekly).</p>
+            <div class="insight-card">
+              <div class="card-num">02</div>
+              <div class="card-content">
+                <h5>Spotify Editorial Standard</h5>
+                <p>Niveau de production prêt pour les playlists éditoriales. Dynamique maîtrisée et équilibre des sub-basses optimal pour le streaming.</p>
+                <div class="card-tags">
+                  <span class="mini-tag cyan">Commercial Ready</span>
+                  <span class="mini-tag">Algorithmic Push</span>
+                </div>
               </div>
             </div>
 
-            <div class="insight-block">
-              <div class="insight-badge">03</div>
-              <div>
-                <h5>Identity & Branding Visual</h5>
-                <p>Sự đồng nhất giữa Sound Design đậm chất Cyberpunk và nhận diện thương hiệu (Logo Blade Cut) tạo nên dấu ấn nghệ sĩ vô cùng rõ nét.</p>
+            <div class="insight-card">
+              <div class="card-num">03</div>
+              <div class="card-content">
+                <h5>Identity & Blade-Cut Visuals</h5>
+                <p>Cohérence totale entre le sound design rugueux/futuriste et l'univers visuel typographique de la marque artistique.</p>
+                <div class="card-tags">
+                  <span class="mini-tag purple">Visual Branding</span>
+                </div>
               </div>
             </div>
           </div>
