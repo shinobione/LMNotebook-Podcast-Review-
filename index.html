@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SHINOBIWAN — Cyberpunk Studio Launchpad</title>
+  <title>SHINOBIWAN — Official Artist Launchpad</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,11 +19,11 @@
 
   <div class="app-viewport">
     
-    <!-- BRAND TOPBAR -->
+    <!-- TOPBAR -->
     <header class="topbar">
       <div class="brand-zone">
         <span class="live-dot"></span>
-        <strong class="brand-title glitch-text" data-text="SHINOBIWAN">SHINOBIWAN</strong>
+        <strong class="brand-title">SHINOBIWAN</strong>
         <span class="badge-ep">SYSTEM LAUNCHPAD v2.0</span>
       </div>
 
@@ -37,7 +37,7 @@
       </div>
     </header>
 
-    <!-- DASHBOARD WORKSPACE (3 COLUMNS) -->
+    <!-- WORKSPACE 3 COLUMNS -->
     <main class="dashboard-grid">
       
       <!-- COL 1: HERO TRACK PLAYER & LINKS -->
@@ -45,21 +45,25 @@
         
         <div class="glass-card main-player">
           <div class="card-head-compact">
-            <span class="badge-tag"><i data-lucide="disc" class="icon-inline"></i> ACTIVE SELECTION</span>
+            <span class="badge-tag"><i data-lucide="disc" class="icon-inline"></i> ACTIVE PLAYBACK</span>
             <span class="tech-id" id="active-ep-code">NH-EP #01</span>
           </div>
 
-          <div class="hero-cover" id="hero-cover-container">
-            <div class="hero-artwork-bg" id="hero-art-bg"></div>
-            <img src="assets/logo.png" alt="SHINOBIWAN Logo" class="official-logo-img" />
+          <!-- COVER PLAYER PRINCIPAL DYNAMIQUE -->
+          <div class="hero-cover-frame">
+            <img id="player-cover-img" src="assets/neon-heartbreaks.jpg" alt="Active Release Cover" class="player-cover-img" />
+            <div class="hero-logo-overlay">
+              <img src="assets/logo.png" alt="SHINOBIWAN Logo" class="official-logo-img" />
+            </div>
           </div>
 
           <div class="track-meta">
-            <h2 id="current-track-title" class="glitch-track">Ligne 3</h2>
-            <p class="subtitle" id="current-track-sub">Lead Single • Neon Heartbreaks EP</p>
+            <h2 id="current-track-title">Before the Noise</h2>
+            <p class="subtitle" id="current-track-sub">Lead Track • Neon Heartbreaks EP</p>
           </div>
 
-          <audio id="audio-element" src="audio/review-shinobiwan.mp3" preload="metadata"></audio>
+          <!-- BALISE AUDIO DYNAMIQUE -->
+          <audio id="audio-element" src="audio/before-the-noise.mp3" preload="metadata"></audio>
 
           <div class="waveform-box">
             <div class="waveform-container" id="waveform-click-area">
@@ -106,53 +110,74 @@
 
       </section>
 
-      <!-- COL 2: INTERACTIVE DISCOGRAPHY CARDS & CANVAS SPECTRUM -->
+      <!-- COL 2: INTERACTIVE CARDS & CANVAS SPECTRUM -->
       <section class="dash-col">
         
         <div class="glass-card catalog-showcase-card">
           <div class="card-head">
-            <h3><i data-lucide="layers" class="icon-cyan"></i> Interactive Release Selectors</h3>
-            <span class="badge-tech">CLICK TO LOAD</span>
+            <h3><i data-lucide="layers" class="icon-cyan"></i> Discography & EP Universe</h3>
+            <span class="badge-tech">CLICK CARD TO PLAY</span>
           </div>
 
           <div class="ep-grid-3">
             
             <!-- EP 1 (NEON HEARTBREAKS) -->
-            <div class="ep-card active" data-ep="neon" data-title="Ligne 3" data-sub="Lead Single • Neon Heartbreaks EP" data-code="NH-EP #01" data-lufs="-13.8 LUFS" data-dr="DR 8.2 dB">
-              <div class="ep-cover-frame art-neon">
+            <div class="ep-card active" 
+                 data-track="Before the Noise" 
+                 data-sub="Lead Track • Neon Heartbreaks EP" 
+                 data-code="NH-EP #01" 
+                 data-audio="audio/before-the-noise.mp3"
+                 data-cover="assets/neon-heartbreaks.jpg"
+                 data-lufs="-13.8 LUFS" 
+                 data-dr="DR 8.2 dB">
+              <div class="ep-cover-frame">
+                <img src="assets/neon-heartbreaks.jpg" alt="Neon Heartbreaks Artwork" class="ep-img-cover" />
                 <span class="ep-tag-mini">PRIMARY EP</span>
-                <div class="ep-glitch-overlay"></div>
               </div>
               <div class="ep-details">
                 <h4>NEON HEARTBREAKS</h4>
                 <p>Rain-soaked synthwave cityscape. Incisive analog basslines & cyber hooks.</p>
-                <div class="ep-tracks-highlight">Load Track: <strong>Ligne 3</strong></div>
+                <div class="ep-tracks-highlight">Track: <strong>Before the Noise</strong></div>
               </div>
             </div>
 
             <!-- EP 2 (LOVE LETTERS FROM SAIGON) -->
-            <div class="ep-card" data-ep="saigon" data-title="Saigon Night Drive" data-sub="Focus Track • Love Letters from Saigon" data-code="LL-EP #02" data-lufs="-14.2 LUFS" data-dr="DR 9.1 dB">
-              <div class="ep-cover-frame art-saigon">
+            <div class="ep-card" 
+                 data-track="Saigon Bound" 
+                 data-sub="Focus Track • Love Letters from Saigon" 
+                 data-code="LL-EP #02" 
+                 data-audio="audio/saigon-bound.mp3"
+                 data-cover="assets/love-letters.jpg"
+                 data-lufs="-14.2 LUFS" 
+                 data-dr="DR 9.1 dB">
+              <div class="ep-cover-frame">
+                <img src="assets/love-letters.jpg" alt="Love Letters from Saigon Artwork" class="ep-img-cover" />
                 <span class="ep-tag-mini">CONCEPT</span>
-                <div class="ep-glitch-overlay"></div>
               </div>
               <div class="ep-details">
                 <h4>LOVE LETTERS FROM SAIGON</h4>
                 <p>Trilingual narrative synthpop, organic lofi textures & tropical neon warmth.</p>
-                <div class="ep-tracks-highlight">Load Track: <strong>Saigon Drive</strong></div>
+                <div class="ep-tracks-highlight">Track: <strong>Saigon Bound</strong></div>
               </div>
             </div>
 
             <!-- EP 3 (COAL TO DIAMOND) -->
-            <div class="ep-card" data-ep="coal" data-title="Pressure Drop" data-sub="Focus Track • Coal to Diamond EP" data-code="CD-EP #03" data-lufs="-12.5 LUFS" data-dr="DR 7.4 dB">
-              <div class="ep-cover-frame art-coal">
+            <div class="ep-card" 
+                 data-track="THICK" 
+                 data-sub="Focus Track • Coal to Diamond EP" 
+                 data-code="CD-EP #03" 
+                 data-audio="audio/thick.mp3"
+                 data-cover="assets/coal-to-diamond.jpg"
+                 data-lufs="-12.5 LUFS" 
+                 data-dr="DR 7.4 dB">
+              <div class="ep-cover-frame">
+                <img src="assets/coal-to-diamond.jpg" alt="Coal to Diamond Artwork" class="ep-img-cover" />
                 <span class="ep-tag-mini">INDUSTRIAL</span>
-                <div class="ep-glitch-overlay"></div>
               </div>
               <div class="ep-details">
                 <h4>COAL TO DIAMOND</h4>
                 <p>Obsidian sharp design, Blade Cut industrial bass, brutal distortion dynamics.</p>
-                <div class="ep-tracks-highlight">Load Track: <strong>Pressure Drop</strong></div>
+                <div class="ep-tracks-highlight">Track: <strong>THICK</strong></div>
               </div>
             </div>
 
@@ -167,7 +192,6 @@
           </div>
 
           <div class="rta-spectrum-container">
-            <!-- CANVAS HIGH PERF -->
             <canvas id="rta-canvas" width="600" height="90"></canvas>
             <div class="rta-labels">
               <span>20Hz (Sub)</span>
