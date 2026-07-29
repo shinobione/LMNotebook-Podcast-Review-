@@ -1,12 +1,348 @@
-<div class="glass-card catalog-showcase-card">
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SHINOBIWAN — Official Artist Launchpad</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    :root {
+      --bg-dark: #040608;
+      --panel-bg: rgba(10, 14, 20, 0.94);
+      --panel-border: rgba(0, 240, 255, 0.12);
+      --spotify-green: #1db954;
+      --soundcloud-orange: #ff5500;
+      --accent-cyan: #00f0ff;
+      --accent-purple: #9333ea;
+      --text-main: #f8fafc;
+      --text-muted: #8e9aaf;
+      --font-sans: 'Plus Jakarta Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      padding: 12px;
+      position: relative;
+    }
+
+    img { max-width: 100%; display: block; }
+
+    .glow-bg {
+      position: fixed; inset: 0;
+      background: 
+        radial-gradient(circle at 10% 15%, rgba(0, 240, 255, 0.15), transparent 40%),
+        radial-gradient(circle at 90% 85%, rgba(147, 51, 234, 0.15), transparent 40%);
+      pointer-events: none;
+    }
+
+    .cyber-grid {
+      position: fixed; inset: 0;
+      background-image: 
+        linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .app-viewport {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* TOPBAR */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      padding: 8px 16px;
+      border-radius: 10px;
+      backdrop-filter: blur(20px);
+    }
+
+    .brand-zone { display: flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 0.75rem; }
+    .live-dot { 
+      width: 8px; height: 8px; 
+      background: var(--spotify-green); 
+      border-radius: 50%; 
+      box-shadow: 0 0 10px var(--spotify-green);
+      animation: pulseDot 1.5s infinite;
+    }
+
+    @keyframes pulseDot {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(29, 185, 84, 0.7); }
+      70% { transform: scale(1.15); box-shadow: 0 0 0 8px rgba(29, 185, 84, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(29, 185, 84, 0); }
+    }
+
+    .brand-title { color: #fff; font-weight: 800; letter-spacing: 1.5px; }
+    .badge-ep { background: rgba(0, 240, 255, 0.1); color: var(--accent-cyan); padding: 2px 8px; border-radius: 4px; font-size: 0.62rem; border: 1px solid rgba(0, 240, 255, 0.3); font-weight: 700; }
+    .title-zone h1 { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); letter-spacing: 1px; font-family: var(--font-mono); }
+    .hosts-zone { display: flex; gap: 8px; }
+    .host-pill { display: flex; align-items: center; gap: 6px; font-size: 0.68rem; color: var(--text-muted); background: rgba(255, 255, 255, 0.03); padding: 4px 10px; border-radius: 10px; border: 1px solid var(--panel-border); font-family: var(--font-mono); }
+
+    /* DASHBOARD GRID */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 320px 1fr 360px;
+      gap: 10px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .dash-col { display: flex; flex-direction: column; gap: 10px; height: 100%; }
+
+    .glass-card {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 14px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .glass-card:hover { border-color: rgba(0, 240, 255, 0.3); box-shadow: 0 0 20px rgba(0, 240, 255, 0.1); }
+    .card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .card-head h3 { font-size: 0.78rem; display: flex; align-items: center; gap: 6px; color: #fff; font-weight: 700; }
+    .badge-tech { font-family: var(--font-mono); font-size: 0.58rem; background: rgba(0, 240, 255, 0.08); color: var(--accent-cyan); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(0, 240, 255, 0.2); }
+
+    /* COL 1: MAIN PLAYER */
+    .main-player { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+    .card-head-compact { display: flex; justify-content: space-between; align-items: center; }
+    .badge-tag { font-family: var(--font-mono); font-size: 0.6rem; color: var(--spotify-green); display: flex; align-items: center; gap: 4px; }
+    .icon-inline { width: 12px; height: 12px; }
+    .tech-id { font-family: var(--font-mono); font-size: 0.58rem; color: var(--accent-cyan); font-weight: 700; }
+
+    .hero-cover-frame {
+      width: 100%; height: 140px; border-radius: 8px; position: relative; border: 1px solid rgba(0, 240, 255, 0.3); overflow: hidden; background: #000;
+    }
+
+    .player-cover-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.75; transition: opacity 0.3s ease; }
+    .hero-logo-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at center, rgba(5,7,10,0.1) 0%, rgba(5,7,10,0.85) 100%); }
+    .official-logo-img { width: 85%; height: auto; max-height: 80px; object-fit: contain; filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.8)); }
+
+    .track-meta h2 { font-size: 1.15rem; font-weight: 800; color: #fff; margin-top: 4px; letter-spacing: -0.3px; }
+    .track-meta .subtitle { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; line-height: 1.3; }
+
+    .waveform-box { display: flex; flex-direction: column; gap: 4px; }
+    .waveform-container { height: 38px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 4px 6px; cursor: pointer; }
+    .bars-flex { display: flex; align-items: center; gap: 2px; height: 100%; }
+    .bar { flex: 1; background: rgba(255, 255, 255, 0.15); border-radius: 1px; }
+    .bar.active { background: var(--spotify-green); box-shadow: 0 0 8px var(--spotify-green); }
+
+    .controls-row { display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .btn-play { width: 44px; height: 44px; border-radius: 50%; background: var(--spotify-green); border: none; color: #000; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 16px rgba(29, 185, 84, 0.5); }
+    .btn-play:hover { transform: scale(1.08); box-shadow: 0 0 24px rgba(29, 185, 84, 0.8); }
+    .btn-secondary { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--panel-border); color: #fff; padding: 4px 8px; border-radius: 12px; font-size: 0.65rem; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+
+    .platform-grid { display: flex; flex-direction: column; gap: 6px; }
+    a.profile-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--panel-border); border-radius: 8px; text-decoration: none !important; color: #fff !important; }
+    a.profile-item:hover { border-color: var(--accent-cyan); }
+    a.profile-item div strong { display: block; font-size: 0.72rem; }
+    a.profile-item div span { font-size: 0.6rem; color: var(--text-muted) !important; }
+    a.profile-item.spotify .p-icon { color: var(--spotify-green) !important; }
+    a.profile-item.soundcloud .p-icon { color: var(--soundcloud-orange) !important; }
+    a.profile-item .ext-icon { margin-left: auto; width: 12px; opacity: 0.5; }
+
+    /* COL 2: DISCOGRAPHY & CARDS */
+    .catalog-showcase-card { flex: 1; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+    .ep-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; flex: 1; }
+
+    .ep-card {
+      background: rgba(12, 16, 24, 0.85);
+      border: 1px solid var(--panel-border);
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .ep-card:hover { transform: translateY(-4px); border-color: var(--accent-cyan); }
+    .ep-card.active { border-color: var(--accent-cyan); background: rgba(0, 240, 255, 0.06); box-shadow: 0 0 15px rgba(0, 240, 255, 0.2); }
+
+    .ep-cover-frame {
+      width: 100%;
+      height: 120px;
+      position: relative;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .ep-img-cover {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .ep-tag-mini {
+      position: absolute; top: 6px; left: 6px; font-family: var(--font-mono); font-size: 0.55rem; color: #000; background: var(--accent-cyan); padding: 2px 6px; border-radius: 3px; font-weight: 800;
+    }
+
+    .ep-details { padding: 10px; display: flex; flex-direction: column; justify-content: space-between; flex: 1; gap: 8px; }
+    .ep-info-head h4 { font-size: 0.78rem; font-weight: 800; color: #fff; margin-bottom: 4px; }
+    .ep-desc { font-size: 0.68rem; color: #cbd5e1 !important; line-height: 1.35; }
+    .ep-tracks-highlight { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-muted); border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 6px; display: flex; justify-content: space-between; }
+    .ep-tracks-highlight strong { color: var(--spotify-green); }
+
+    /* RTA CANVAS */
+    .dsp-card { display: flex; flex-direction: column; gap: 10px; }
+    .rta-spectrum-container { background: rgba(0, 0, 0, 0.6); border: 1px solid var(--panel-border); border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 4px; }
+    #rta-canvas { width: 100%; height: 85px; display: block; }
+    .rta-labels { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.55rem; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.05); padding-top: 4px; }
+    .metrics-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .metric-tile { background: rgba(0, 0, 0, 0.3); border: 1px solid var(--panel-border); padding: 8px; border-radius: 8px; display: flex; flex-direction: column; gap: 3px; }
+    .m-label { font-family: var(--font-mono); font-size: 0.55rem; color: var(--text-muted); }
+    .m-val { font-family: var(--font-mono); font-size: 0.95rem; font-weight: 800; }
+    .m-val.green { color: var(--spotify-green); }
+    .m-val.cyan { color: var(--accent-cyan); }
+    .m-val.purple { color: var(--accent-purple); }
+    .m-sub { font-size: 0.58rem; color: var(--text-muted); }
+
+    /* COL 3: SPOTIFY & EPK */
+    .embed-card-full { display: flex; flex-direction: column; gap: 6px; height: 440px; }
+    .spotify-wrapper-fixed { width: 100%; height: 380px; border-radius: 10px; overflow: hidden; border: 1px solid var(--panel-border); background: #000; }
+    .spotify-wrapper-fixed iframe { width: 100%; height: 380px; border: none; }
+
+    .epk-card { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+    .epk-details-box { display: flex; flex-direction: column; gap: 8px; height: 100%; justify-content: center; }
+    .epk-row { display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.3); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--panel-border); }
+    .epk-row strong { font-size: 0.72rem; color: #fff; display: block; }
+    .epk-row p { font-size: 0.65rem; color: var(--text-muted); line-height: 1.25; }
+
+    .icon-cyan { color: var(--accent-cyan); }
+    .icon-green { color: var(--spotify-green); }
+
+    @media (max-width: 1100px) {
+      body { height: auto; overflow: auto; }
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .ep-grid-3 { grid-template-columns: 1fr; }
+      .embed-card-full { height: auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="glow-bg"></div>
+  <div class="cyber-grid"></div>
+
+  <div class="app-viewport">
+    
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="brand-zone">
+        <span class="live-dot"></span>
+        <strong class="brand-title">SHINOBIWAN</strong>
+        <span class="badge-ep">SYSTEM LAUNCHPAD v2.0</span>
+      </div>
+
+      <div class="title-zone">
+        <h1>CYBERPUNK • MIDTEMPO BASS • DARK SYNTHWAVE</h1>
+      </div>
+
+      <div class="hosts-zone">
+        <div class="host-pill"><i data-lucide="zap" class="icon-green"></i> DAW ENGINE ACTIVE</div>
+        <div class="host-pill"><i data-lucide="shield-check" class="icon-cyan"></i> VERIFIED ARTIST</div>
+      </div>
+    </header>
+
+    <!-- WORKSPACE 3 COLUMNS -->
+    <main class="dashboard-grid">
+      
+      <!-- COL 1 -->
+      <section class="dash-col">
+        <div class="glass-card main-player">
+          <div class="card-head-compact">
+            <span class="badge-tag"><i data-lucide="disc" class="icon-inline"></i> ACTIVE PLAYBACK</span>
+            <span class="tech-id" id="active-ep-code">NH-EP #01</span>
+          </div>
+
+          <div class="hero-cover-frame">
+            <img id="player-cover-img" src="assets/neon-heartbreaks.jpeg" alt="Active Cover" class="player-cover-img" />
+            <div class="hero-logo-overlay">
+              <img src="assets/logo.png" alt="SHINOBIWAN Logo" class="official-logo-img" />
+            </div>
+          </div>
+
+          <div class="track-meta">
+            <h2 id="current-track-title">Before the Noise</h2>
+            <p class="subtitle" id="current-track-sub">Lead Track • Neon Heartbreaks EP</p>
+          </div>
+
+          <audio id="audio-element" src="audio/before-the-noise.mp3" preload="metadata"></audio>
+
+          <div class="waveform-box">
+            <div class="waveform-container" id="waveform-click-area">
+              <div class="bars-flex" id="bars-flex"></div>
+            </div>
+            <div class="time-display">
+              <span id="current-time">00:00</span>
+              <span id="total-duration">--:--</span>
+            </div>
+          </div>
+
+          <div class="controls-row">
+            <button class="btn-secondary" id="btn-rewind"><i data-lucide="rotate-ccw"></i> -10s</button>
+            <button class="btn-play" id="btn-play-pause"><i data-lucide="play" id="play-icon"></i></button>
+            <button class="btn-secondary" id="btn-forward"><i data-lucide="rotate-cw"></i> +10s</button>
+          </div>
+        </div>
+
+        <div class="glass-card direct-links">
+          <div class="card-head">
+            <h3><i data-lucide="share-2" class="icon-cyan"></i> Official Streaming Hubs</h3>
+          </div>
+          <div class="platform-grid">
+            <a href="https://open.spotify.com/artist/6W08IttKpZns5zG7BYTz8e" target="_blank" rel="noopener" class="profile-item spotify">
+              <i data-lucide="music" class="p-icon"></i>
+              <div>
+                <strong>Spotify Catalog</strong>
+                <span>Direct Discography & Top Tracks</span>
+              </div>
+              <i data-lucide="external-link" class="ext-icon"></i>
+            </a>
+            <a href="https://soundcloud.com/shinobiwan-1" target="_blank" rel="noopener" class="profile-item soundcloud">
+              <i data-lucide="cloud" class="p-icon"></i>
+              <div>
+                <strong>SoundCloud HQ Lab</strong>
+                <span>Demos, Edits & VIP Masters</span>
+              </div>
+              <i data-lucide="external-link" class="ext-icon"></i>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- COL 2 -->
+      <section class="dash-col">
+        <div class="glass-card catalog-showcase-card">
           <div class="card-head">
             <h3><i data-lucide="layers" class="icon-cyan"></i> Discography & EP Universe</h3>
             <span class="badge-tech">CLICK CARD TO LOAD</span>
           </div>
 
           <div class="ep-grid-3">
-            
-            <!-- EP 1 -->
             <div class="ep-card active" 
                  data-track="Before the Noise" 
                  data-sub="Lead Track • Neon Heartbreaks EP" 
@@ -30,7 +366,6 @@
               </div>
             </div>
 
-            <!-- EP 2 -->
             <div class="ep-card" 
                  data-track="Saigon Bound" 
                  data-sub="Focus Track • Love Letters from Saigon" 
@@ -54,7 +389,6 @@
               </div>
             </div>
 
-            <!-- EP 3 -->
             <div class="ep-card" 
                  data-track="THICK" 
                  data-sub="Focus Track • Coal to Diamond EP" 
@@ -77,6 +411,90 @@
                 </div>
               </div>
             </div>
-
           </div>
         </div>
+
+        <div class="glass-card dsp-card">
+          <div class="card-head">
+            <h3><i data-lucide="activity" class="icon-green"></i> Real-Time DAW Canvas RTA Spectrum</h3>
+            <span class="badge-tech">LIVE DSP 60 FPS</span>
+          </div>
+
+          <div class="rta-spectrum-container">
+            <canvas id="rta-canvas" width="600" height="90"></canvas>
+            <div class="rta-labels">
+              <span>20Hz (Sub)</span>
+              <span>250Hz (Low-Mid)</span>
+              <span>2kHz (Mid)</span>
+              <span>8kHz (Presence)</span>
+              <span>20kHz (Air)</span>
+            </div>
+          </div>
+
+          <div class="metrics-grid-4">
+            <div class="metric-tile">
+              <span class="m-label">LOUDNESS TARGET</span>
+              <strong class="m-val green" id="metric-lufs">-13.8 LUFS</strong>
+              <span class="m-sub">Streaming Calibrated</span>
+            </div>
+            <div class="metric-tile">
+              <span class="m-label">STEREO PHASE</span>
+              <strong class="m-val cyan">138% / +0.92</strong>
+              <span class="m-sub">Mono-Coherent Low</span>
+            </div>
+            <div class="metric-tile">
+              <span class="m-label">TRUE PEAK</span>
+              <strong class="m-val purple">-0.8 dBTP</strong>
+              <span class="m-sub">No Clipping</span>
+            </div>
+            <div class="metric-tile">
+              <span class="m-label">DYNAMIC RANGE</span>
+              <strong class="m-val green" id="metric-dr">DR 8.2 dB</strong>
+              <span class="m-sub">Punch Preserved</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- COL 3 -->
+      <section class="dash-col">
+        <div class="glass-card embed-card-full">
+          <div class="card-head">
+            <h3><i data-lucide="disc" class="icon-green"></i> Top Discography Player</h3>
+            <span class="badge-tech">SPOTIFY LIVE</span>
+          </div>
+          <div class="spotify-wrapper-fixed">
+            <iframe src="https://open.spotify.com/embed/artist/6W08IttKpZns5zG7BYTz8e?utm_source=generator&theme=0" width="100%" height="380" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+          </div>
+        </div>
+
+        <div class="glass-card epk-card">
+          <div class="card-head">
+            <h3><i data-lucide="cpu" class="icon-cyan"></i> Curator & Sync Specification</h3>
+          </div>
+          <div class="epk-details-box">
+            <div class="epk-row">
+              <i data-lucide="radio" class="icon-green"></i>
+              <div>
+                <strong>Algorithmic Target</strong>
+                <p>Engineered for Cyberpunk, Darksynth & Synthwave official playlists.</p>
+              </div>
+            </div>
+            <div class="epk-row">
+              <i data-lucide="clapperboard" class="icon-cyan"></i>
+              <div>
+                <strong>Sync Licensing</strong>
+                <p>Mastered stems & instrumental versions available for trailers & gaming sync.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="js/app-engine.js"></script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>
