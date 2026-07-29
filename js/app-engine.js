@@ -14,13 +14,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const epCode = document.getElementById('active-ep-code');
   const playerCoverImg = document.getElementById('player-cover-img');
   
+  const lyricsDisplayBox = document.getElementById('lyrics-display-box');
+  const lyricsTrackTitle = document.getElementById('lyrics-track-title');
+
   const trackItems = Array.from(document.querySelectorAll('.mini-track-item'));
   const epCards = document.querySelectorAll('.ep-card');
   const spotifyIframe = document.getElementById('spotify-iframe');
 
   let isSpotifyActive = false;
 
-  // FONCTION POUR COUPER SPOTIFY (Reset du flux iframe)
   function stopSpotifyPlayback() {
     isSpotifyActive = false;
     if (spotifyIframe) {
@@ -29,7 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // DETECTER L'INTERACTION AVEC SPOTIFY
   window.addEventListener('blur', () => {
     if (document.activeElement && document.activeElement.tagName === 'IFRAME') {
       isSpotifyActive = true;
@@ -117,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // CHARGEMENT TRACK LOCAL
+  // CHARGEMENT DE TRACK + FETCH DU FICHIER TXT DE PAROLES
   trackItems.forEach(item => {
     item.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -136,12 +137,34 @@ document.addEventListener('DOMContentLoaded', () => {
       const trackSubtitle = item.getAttribute('data-sub');
       const audioSrc = item.getAttribute('data-audio');
       const trackCover = item.getAttribute('data-cover');
+      const lyricsFile = item.getAttribute('data-lyrics-file'); // Exemple: "assets/lyrics/before-the-noise.txt"
       const code = parentCard.getAttribute('data-ep');
 
       if (trackTitle) trackTitle.textContent = trackName;
       if (trackSub) trackSub.textContent = trackSubtitle;
       if (epCode) epCode.textContent = code;
-      
+      if (lyricsTrackTitle) lyricsTrackTitle.textContent = trackName.toUpperCase();
+
+      // FETCH DU FICHIER .TXT
+      if (lyricsDisplayBox) {
+        if (lyricsFile) {
+          lyricsDisplayBox.textContent = "// LOADING LYRICS...";
+          fetch(lyricsFile)
+            .then(response => {
+              if (!response.ok) throw new Error('Lyrics file not found');
+              return response.text();
+            })
+            .then(text => {
+              lyricsDisplayBox.textContent = text;
+            })
+            .catch(() => {
+              lyricsDisplayBox.textContent = "// NO LYRICS AVAILABLE FOR THIS TRACK";
+            });
+        } else {
+          lyricsDisplayBox.textContent = "// NO LYRICS FILE SPECIFIED";
+        }
+      }
+
       if (playerCoverImg && trackCover) {
         playerCoverImg.src = trackCover;
       }
@@ -152,7 +175,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // RTA SPECTRUM CANVAS : S'ANIME POUR LE PLAYER LOCAL ET SPOTIFY
   const canvas = document.getElementById('rta-canvas');
   if (canvas) {
     const ctx = canvas.getContext('2d');
