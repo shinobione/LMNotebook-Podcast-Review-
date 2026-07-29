@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SHINOBIWAN — Official Artist Launchpad & Sonic Vault</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -20,8 +20,7 @@
         <span class="badge-ep">SYSTEM LAUNCHPAD v2.0</span>
       </div>
       <div class="header-logo-center">
-        <!-- Replace with actual logo path -->
-        <h1 style="font-family: var(--font-mono); font-weight: 800; font-style: italic; font-size: 1.2rem; text-shadow: 0 0 10px var(--accent-cyan);">SHINOBIWAN</h1>
+        <img src="assets/logo.png" alt="SHINOBIWAN" class="header-logo-img" onerror="this.style.display='none'">
       </div>
       <div class="hosts-zone">
         <div class="host-pill"><span class="icon-green">⚡</span> DAW ENGINE ACTIVE</div>
@@ -32,29 +31,29 @@
     <!-- MAIN DASHBOARD -->
     <main class="dashboard-grid">
       
-      <!-- COL 1 : ACTIVE PLAYBACK & ROUTING -->
+      <!-- COL 1 : ACTIVE PLAYBACK -->
       <section class="dash-col">
         <div class="glass-card main-player">
           <div class="card-head-compact">
             <span class="badge-tag"><span class="live-dot"></span> ACTIVE PLAYBACK</span>
-            <span class="tech-id">NB-EP #01</span>
+            <span class="tech-id" id="current-ep-tag">NB-EP #01</span>
           </div>
           
           <div class="hero-cover-frame">
-            <img src="https://via.placeholder.com/300" alt="Before the Noise Cover" class="player-cover-img">
+            <img src="assets/before-the-noise.jpeg" alt="Current Track Cover" id="player-cover" class="player-cover-img">
           </div>
           
           <div class="track-meta">
-            <h2>Before the Noise</h2>
-            <div class="subtitle">Track 1 • Neon Heartbreaks EP</div>
+            <h2 id="current-track-title">Before the Noise</h2>
+            <div class="subtitle" id="current-track-subtitle">Track 1 • Neon Heartbreaks EP</div>
           </div>
           
-          <audio id="audio-element" src="YOUR_AUDIO_PATH.mp3" crossorigin="anonymous"></audio>
+          <audio id="audio-element" src="audio/before-the-noise.mp3" crossorigin="anonymous"></audio>
 
           <div class="waveform-box">
             <div class="time-display">
-              <span>00:05</span>
-              <span>03:53</span>
+              <span id="time-current">00:00</span>
+              <span id="time-total">00:00</span>
             </div>
             <div class="controls-row">
               <button class="btn-secondary" id="btn-rewind">↺ -10s</button>
@@ -96,7 +95,7 @@
             <div class="ep-card active">
               <div class="ep-cover-frame">
                 <span class="ep-tag-mini">PRIMARY EP</span>
-                <img src="https://via.placeholder.com/150" alt="Neon Heartbreaks" class="ep-img-cover">
+                <img src="assets/neon-heartbreaks.jpeg" alt="Neon Heartbreaks" class="ep-img-cover">
               </div>
               <div class="ep-details">
                 <div class="ep-info-head">
@@ -104,9 +103,9 @@
                   <div class="ep-desc">Rain-soaked synthwave cityscape. Analog basslines & cyber hooks.</div>
                 </div>
                 <div class="mini-tracklist">
-                  <div class="mini-track-item active-track">1. Before the Noise</div>
-                  <div class="mini-track-item">2. Low Bitrate Love</div>
-                  <div class="mini-track-item">3. Real love doesn't rush</div>
+                  <div class="mini-track-item active-track" data-track="before-the-noise" data-ep="Neon Heartbreaks EP">1. Before the Noise</div>
+                  <div class="mini-track-item" data-track="low-bitrate-love" data-ep="Neon Heartbreaks EP">2. Low Bitrate Love</div>
+                  <div class="mini-track-item" data-track="real-love-doesnt-rush" data-ep="Neon Heartbreaks EP">3. Real love doesn't rush</div>
                 </div>
               </div>
             </div>
@@ -114,7 +113,7 @@
             <div class="ep-card">
               <div class="ep-cover-frame">
                 <span class="ep-tag-mini" style="background:var(--accent-purple); color:#fff;">CONCEPT</span>
-                <img src="https://via.placeholder.com/150" alt="Love Letters from Saigon" class="ep-img-cover">
+                <img src="assets/love-letters.jpeg" alt="Love Letters from Saigon" class="ep-img-cover">
               </div>
               <div class="ep-details">
                 <div class="ep-info-head">
@@ -122,9 +121,9 @@
                   <div class="ep-desc">Trilingual narrative synthpop, organic lo-fi & tropical neon warmth.</div>
                 </div>
                 <div class="mini-tracklist">
-                  <div class="mini-track-item">1. Saigon Bound</div>
-                  <div class="mini-track-item">2. Tình Bolero Cho Trân</div>
-                  <div class="mini-track-item">3. Jusqu'au Dernier Souffle</div>
+                  <div class="mini-track-item" data-track="saigon-bound" data-ep="Love Letters from Saigon">1. Saigon Bound</div>
+                  <div class="mini-track-item" data-track="tinh-bolero-cho-tran" data-ep="Love Letters from Saigon">2. Tình Bolero Cho Trân</div>
+                  <div class="mini-track-item" data-track="jusquau-dernier-souffle" data-ep="Love Letters from Saigon">3. Jusqu'au Dernier Souffle</div>
                 </div>
               </div>
             </div>
@@ -132,7 +131,7 @@
             <div class="ep-card">
               <div class="ep-cover-frame">
                 <span class="ep-tag-mini" style="background:#ff3366; color:#fff;">INDUSTRIAL</span>
-                <img src="https://via.placeholder.com/150" alt="Coal to Diamond" class="ep-img-cover">
+                <img src="assets/coal-to-diamond.jpeg" alt="Coal to Diamond" class="ep-img-cover">
               </div>
               <div class="ep-details">
                 <div class="ep-info-head">
@@ -140,9 +139,9 @@
                   <div class="ep-desc">Obsidian design, Blade Cut industrial bass, distortion dynamics.</div>
                 </div>
                 <div class="mini-tracklist">
-                  <div class="mini-track-item">1. THICK</div>
-                  <div class="mini-track-item">2. THE THRONE RESONATES</div>
-                  <div class="mini-track-item">3. Carved from Pressure</div>
+                  <div class="mini-track-item" data-track="thick" data-ep="Coal to Diamond">1. THICK</div>
+                  <div class="mini-track-item" data-track="the-throne-resonates" data-ep="Coal to Diamond">2. THE THRONE RESONATES</div>
+                  <div class="mini-track-item" data-track="carved-from-pressure" data-ep="Coal to Diamond">3. Carved from Pressure</div>
                 </div>
               </div>
             </div>
@@ -152,20 +151,11 @@
         <div class="lyrics-vault-card">
           <div class="card-head-compact" style="margin-bottom: 5px;">
             <h3 style="font-size: 0.72rem; color: #fff; font-weight: 700;">Dynamic Lyrics Vault</h3>
-            <span class="badge-tech">BEFORE THE NOISE</span>
+            <span class="badge-tech" id="lyrics-status">SYNC READY</span>
           </div>
-          <div class="lyrics-container">
-Yeah..
-Back when the world moved slow, when the sunlight cut bright.
-Dreams packed in pockets, hearts kicking real light.
-Before the noise, before the weight, before the late-night fight—
-We lived in moments that cracked..
-Then kicked straight back to life.
-
-And the memories rush in..
-
-I remember bike rides under orange skies
-Dirty sneakers, playground dreams in our eyes
+          <div class="lyrics-container" id="lyrics-display">
+            <!-- Lyrics will be fetched here via JS -->
+            Select a track to load lyrics from vault...
           </div>
         </div>
         
@@ -177,11 +167,11 @@ Dirty sneakers, playground dreams in our eyes
           <div class="rta-spectrum-container">
             <canvas id="rta-canvas"></canvas>
             <div class="rta-labels">
-              <span>20Hz (Sub)</span>
-              <span>250Hz (Low Mid)</span>
-              <span>2kHz (Mid)</span>
-              <span>8kHz (Presence)</span>
-              <span>20kHz (Air)</span>
+              <span>20Hz</span>
+              <span>250Hz</span>
+              <span>2kHz</span>
+              <span>8kHz</span>
+              <span>20kHz</span>
             </div>
           </div>
         </div>
@@ -194,7 +184,6 @@ Dirty sneakers, playground dreams in our eyes
             <h3><span class="live-dot"></span> Top Discography Player</h3>
           </div>
           <div class="spotify-wrapper-fixed">
-            <!-- Remplacer l'URL par l'ID réel artiste -->
             <iframe src="https://open.spotify.com/embed/artist/YOUR_ARTIST_ID?utm_source=generator&theme=0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
           </div>
         </div>
@@ -202,6 +191,6 @@ Dirty sneakers, playground dreams in our eyes
 
     </main>
   </div>
-  <script src="script.js"></script>
+  <script src="js/app-engine.js" defer></script>
 </body>
 </html>
