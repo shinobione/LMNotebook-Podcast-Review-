@@ -16,9 +16,17 @@ document.addEventListener('DOMContentLoaded', () => {
   
   const trackItems = Array.from(document.querySelectorAll('.mini-track-item'));
   const epCards = document.querySelectorAll('.ep-card');
-  const spotifyContainer = document.getElementById('spotify-container');
+  const spotifyIframe = document.getElementById('spotify-iframe');
 
-  // GESTION AUDIO DUAL : PAUSE AUTOMATIQUE LORS DE L'INTERACTION AVEC SPOTIFY
+  // FONCTION POUR COUPER SPOTIFY (Reset du flux iframe)
+  function stopSpotifyPlayback() {
+    if (spotifyIframe) {
+      const currentSrc = spotifyIframe.src;
+      spotifyIframe.src = currentSrc; // Recharche l'iframe = coupe le son Spotify instantanément
+    }
+  }
+
+  // COUPER PLAYER LOCAL QUAND ON CLIQUE SUR SPOTIFY
   window.addEventListener('blur', () => {
     if (document.activeElement && document.activeElement.tagName === 'IFRAME') {
       if (audio && !audio.paused) {
@@ -27,12 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   });
-
-  if (spotifyContainer) {
-    spotifyContainer.addEventListener('mouseenter', () => {
-      // Préparation à l'interaction Spotify
-    });
-  }
 
   const numBars = 40;
   const bars = [];
@@ -65,6 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnPlayPause) {
     btnPlayPause.addEventListener('click', () => {
       if (audio.paused) {
+        stopSpotifyPlayback(); // Met fin à Spotify si en lecture
         audio.play().then(() => updatePlayButton(true)).catch(e => console.log(e));
       } else {
         audio.pause();
@@ -110,9 +113,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // CHARGEMENT DE TRACK LOCAL : COUPE AUTOMATIQUEMENT SPOTIFY
   trackItems.forEach(item => {
     item.addEventListener('click', (e) => {
       e.stopPropagation();
+
+      stopSpotifyPlayback(); // Coupe net Spotify lors de la sélection d'un track local
 
       const parentCard = item.closest('.ep-card');
       
@@ -142,11 +148,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // RTA SPECTRUM CANVAS : UNIQUEMENT ACTIF SI LE PLAYER LOCAL JOUE
   const canvas = document.getElementById('rta-canvas');
   if (canvas) {
     const ctx = canvas.getContext('2d');
     const barCount = 32;
-    const rtaBars = Array.from({ length: barCount }, () => 0.15);
+    const rtaBars = Array.from({ length: barCount }, () => 0.05);
 
     function drawSpectrum() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -154,8 +161,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const height = canvas.height;
       const barWidth = (width / barCount) - 2;
 
+      const isPlayingLocal = audio && !audio.paused;
+
       for (let i = 0; i < barCount; i++) {
-        let target = !audio.paused ? (Math.random() * 0.85 + 0.15) : (0.08 + Math.sin(Date.now() * 0.002 + i * 0.3) * 0.04);
+        // Si le player local joue, on anime les barres. Sinon, position de repos plat (0.02)
+        let target = isPlayingLocal ? (Math.random() * 0.85 + 0.15) : 0.02;
         rtaBars[i] += (target - rtaBars[i]) * 0.2;
 
         const barHeight = rtaBars[i] * height;
