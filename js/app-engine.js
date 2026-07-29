@@ -18,17 +18,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const epCards = document.querySelectorAll('.ep-card');
   const spotifyIframe = document.getElementById('spotify-iframe');
 
+  let isSpotifyActive = false;
+
   // FONCTION POUR COUPER SPOTIFY (Reset du flux iframe)
   function stopSpotifyPlayback() {
+    isSpotifyActive = false;
     if (spotifyIframe) {
       const currentSrc = spotifyIframe.src;
-      spotifyIframe.src = currentSrc; // Recharche l'iframe = coupe le son Spotify instantanément
+      spotifyIframe.src = currentSrc;
     }
   }
 
-  // COUPER PLAYER LOCAL QUAND ON CLIQUE SUR SPOTIFY
+  // DETECTER L'INTERACTION AVEC SPOTIFY
   window.addEventListener('blur', () => {
     if (document.activeElement && document.activeElement.tagName === 'IFRAME') {
+      isSpotifyActive = true;
       if (audio && !audio.paused) {
         audio.pause();
         updatePlayButton(false);
@@ -67,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnPlayPause) {
     btnPlayPause.addEventListener('click', () => {
       if (audio.paused) {
-        stopSpotifyPlayback(); // Met fin à Spotify si en lecture
+        stopSpotifyPlayback();
         audio.play().then(() => updatePlayButton(true)).catch(e => console.log(e));
       } else {
         audio.pause();
@@ -113,12 +117,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // CHARGEMENT DE TRACK LOCAL : COUPE AUTOMATIQUEMENT SPOTIFY
+  // CHARGEMENT TRACK LOCAL
   trackItems.forEach(item => {
     item.addEventListener('click', (e) => {
       e.stopPropagation();
 
-      stopSpotifyPlayback(); // Coupe net Spotify lors de la sélection d'un track local
+      stopSpotifyPlayback();
 
       const parentCard = item.closest('.ep-card');
       
@@ -148,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // RTA SPECTRUM CANVAS : UNIQUEMENT ACTIF SI LE PLAYER LOCAL JOUE
+  // RTA SPECTRUM CANVAS : S'ANIME POUR LE PLAYER LOCAL ET SPOTIFY
   const canvas = document.getElementById('rta-canvas');
   if (canvas) {
     const ctx = canvas.getContext('2d');
@@ -161,11 +165,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const height = canvas.height;
       const barWidth = (width / barCount) - 2;
 
-      const isPlayingLocal = audio && !audio.paused;
+      const isPlaying = (audio && !audio.paused) || isSpotifyActive;
 
       for (let i = 0; i < barCount; i++) {
-        // Si le player local joue, on anime les barres. Sinon, position de repos plat (0.02)
-        let target = isPlayingLocal ? (Math.random() * 0.85 + 0.15) : 0.02;
+        let target = isPlaying ? (Math.random() * 0.85 + 0.15) : 0.02;
         rtaBars[i] += (target - rtaBars[i]) * 0.2;
 
         const barHeight = rtaBars[i] * height;
