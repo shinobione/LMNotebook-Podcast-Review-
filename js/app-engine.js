@@ -13,10 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const trackSub = document.getElementById('current-track-sub');
   const epCode = document.getElementById('active-ep-code');
   const playerCoverImg = document.getElementById('player-cover-img');
-  const metricLufs = document.getElementById('metric-lufs');
-  const metricDr = document.getElementById('metric-dr');
   
-  const trackItems = document.querySelectorAll('.mini-track-item');
+  const trackItems = Array.from(document.querySelectorAll('.mini-track-item'));
   const epCards = document.querySelectorAll('.ep-card');
 
   const numBars = 40;
@@ -78,7 +76,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  audio.addEventListener('ended', () => updatePlayButton(false));
+  // ENCHAÎNEMENT AUTOMATIQUE SUR LA PISTE SUIVANTE QUAND TERMINÉ
+  audio.addEventListener('ended', () => {
+    const activeItem = document.querySelector('.mini-track-item.active-track');
+    const currentIndex = trackItems.indexOf(activeItem);
+    if (currentIndex !== -1 && currentIndex < trackItems.length - 1) {
+      trackItems[currentIndex + 1].click();
+    } else if (trackItems.length > 0) {
+      trackItems[0].click(); // Boucle sur le premier
+    }
+  });
 
   if (clickArea) {
     clickArea.addEventListener('click', (e) => {
@@ -88,39 +95,33 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // SWITCH PAR PISTE CLIQUABLE
+  // CHARGEMENT PISTE & COVER
   trackItems.forEach(item => {
     item.addEventListener('click', (e) => {
       e.stopPropagation();
 
       const parentCard = item.closest('.ep-card');
       
-      // Update actif sur cartes et pistes
       epCards.forEach(c => c.classList.remove('active'));
       trackItems.forEach(t => t.classList.remove('active-track'));
 
       parentCard.classList.add('active');
       item.classList.add('active-track');
 
-      // Extraire métadonnées
       const trackName = item.getAttribute('data-track');
       const trackSubtitle = item.getAttribute('data-sub');
       const audioSrc = item.getAttribute('data-audio');
-
+      const trackCover = item.getAttribute('data-cover');
       const code = parentCard.getAttribute('data-ep');
-      const coverSrc = parentCard.getAttribute('data-cover');
-      const lufs = parentCard.getAttribute('data-lufs');
-      const dr = parentCard.getAttribute('data-dr');
 
-      // Injecter dans le Player Principal
       if (trackTitle) trackTitle.textContent = trackName;
       if (trackSub) trackSub.textContent = trackSubtitle;
       if (epCode) epCode.textContent = code;
-      if (playerCoverImg) playerCoverImg.src = coverSrc;
-      if (metricLufs) metricLufs.textContent = lufs;
-      if (metricDr) metricDr.textContent = dr;
+      
+      if (playerCoverImg && trackCover) {
+        playerCoverImg.src = trackCover;
+      }
 
-      // Charger le MP3 spécifique et jouer
       audio.src = audioSrc;
       audio.load();
       audio.play().then(() => updatePlayButton(true)).catch(e => console.log("Audio load error:", e));
