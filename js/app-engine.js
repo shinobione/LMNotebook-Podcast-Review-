@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const numBars = 40;
   const bars = [];
 
-  // Waveform HTML5
   if (barsContainer) {
     barsContainer.innerHTML = '';
     for (let i = 0; i < numBars; i++) {
@@ -76,14 +75,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // ENCHAÎNEMENT AUTOMATIQUE SUR LA PISTE SUIVANTE QUAND TERMINÉ
+  // ENCHAÎNEMENT AUTOMATIQUE DES MORCEAUX
   audio.addEventListener('ended', () => {
     const activeItem = document.querySelector('.mini-track-item.active-track');
     const currentIndex = trackItems.indexOf(activeItem);
     if (currentIndex !== -1 && currentIndex < trackItems.length - 1) {
       trackItems[currentIndex + 1].click();
     } else if (trackItems.length > 0) {
-      trackItems[0].click(); // Boucle sur le premier
+      trackItems[0].click();
     }
   });
 
@@ -95,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // CHARGEMENT PISTE & COVER
+  // SWITCH TRACK & COVER DIRECT
   trackItems.forEach(item => {
     item.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -119,12 +118,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (epCode) epCode.textContent = code;
       
       if (playerCoverImg && trackCover) {
-        playerCoverImg.src = trackCover;
+        playerCoverImg.setAttribute('src', trackCover);
       }
 
       audio.src = audioSrc;
       audio.load();
-      audio.play().then(() => updatePlayButton(true)).catch(e => console.log("Audio load error:", e));
+      audio.play().then(() => updatePlayButton(true)).catch(e => console.log("Audio play error:", e));
     });
   });
 
