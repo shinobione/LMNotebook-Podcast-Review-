@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SHINOBIWAN — Neural Audio Spotlight & Catalog Diagnosis</title>
+  <title>SHINOBIWAN — Neural Audio Spotlight</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,38 +16,34 @@
 
   <div class="glow-bg"></div>
 
-  <div class="app-wrapper">
+  <div class="app-layout">
     
-    <!-- NAVBAR SUPERIEURE COMPACTE -->
-    <header class="app-navbar">
-      <div class="nav-brand">
+    <!-- TOPBAR FULL WIDTH -->
+    <header class="topbar">
+      <div class="brand-zone">
         <span class="live-dot"></span>
-        <span class="nav-title">LMNOTEBOOK AUDIO LABS</span>
-        <span class="nav-divider">/</span>
-        <span class="nav-sub">EPISODE #42</span>
+        <strong class="brand-title">LMNOTEBOOK AUDIO LABS</strong>
+        <span class="badge-ep">EPISODE #42</span>
       </div>
 
-      <div class="nav-hosts">
-        <div class="mini-host">
-          <span class="avatar male">M</span>
-          <span>Minh (DSP Analyst)</span>
-        </div>
-        <div class="mini-host">
-          <span class="avatar female">L</span>
-          <span>Linh (Curator)</span>
-        </div>
+      <div class="title-zone">
+        <h1>SHINOBIWAN — Neural Catalog Diagnosis</h1>
+      </div>
+
+      <div class="hosts-zone">
+        <div class="host-pill"><span class="avatar male">M</span> Minh (DSP Analyst)</div>
+        <div class="host-pill"><span class="avatar female">L</span> Linh (Curator)</div>
       </div>
     </header>
 
-    <!-- GRID PRINCIPALE 16:9 (3 COLONNES) -->
-    <main class="dashboard-grid">
+    <!-- DASHBOARD 3 COLONNES EN 100% D'ÉCRAN -->
+    <main class="dashboard-3col">
       
-      <!-- COLONNE 1 : PODCAST PLAYER & QUICK LINKS -->
-      <section class="col-left">
-        <div class="glass-card main-player-card">
+      <!-- COLONNE 1 : PODCAST PLAYER & TARGET LINKS -->
+      <section class="dash-col">
+        <div class="glass-card main-player">
           <div class="cover-art">
-            <div class="cover-eq-bg" id="cover-eq-bg">
-              <div class="cover-eq-bar"></div>
+            <div class="cover-eq-bg">
               <div class="cover-eq-bar"></div>
               <div class="cover-eq-bar"></div>
               <div class="cover-eq-bar"></div>
@@ -56,14 +52,14 @@
             </div>
             <div class="artist-brand-overlay">
               <img src="assets/logo.png" alt="SHINOBIWAN Logo" class="official-logo-img" />
-              <span class="brand-sub">NEURAL DIAGNOSIS</span>
+              <span class="brand-sub">NEURAL AUDIO LABS</span>
             </div>
           </div>
 
           <div class="track-meta">
             <span class="category-tag">DEEP DIVE AUDIO REVIEW</span>
-            <h2>SHINOBIWAN — Sound Design & Catalog Analysis</h2>
-            <p>Voice Core Engine v5.5</p>
+            <h2>Catalog & Sound Breakdown</h2>
+            <p>LMNotebook Voice Core v5.5</p>
           </div>
 
           <audio id="audio-element" src="audio/review-shinobiwan.mp3" preload="metadata"></audio>
@@ -84,7 +80,8 @@
           </div>
         </div>
 
-        <div class="glass-card links-card">
+        <div class="glass-card direct-links">
+          <h3><i data-lucide="share-2"></i> Streaming Profiles</h3>
           <a href="https://open.spotify.com/artist/6W08IttKpZns5zG7BYTz8e" target="_blank" rel="noopener" class="profile-item spotify">
             <i data-lucide="music"></i>
             <div>
@@ -105,75 +102,70 @@
         </div>
       </section>
 
-      <!-- COLONNE 2 : SPECTRUM ANALYZER & MASTERING METRICS -->
-      <section class="col-center">
-        <div class="glass-card spectrum-card">
-          <div class="card-header-clean">
-            <h3><i data-lucide="activity" class="icon-cyan"></i> Real-Time Frequency Response</h3>
-            <span class="badge-tech">DSP MATRIX</span>
+      <!-- COLONNE 2 : DSP METRICS & SPECTRUM VISUALIZER -->
+      <section class="dash-col">
+        <div class="glass-card spectrum-box">
+          <div class="card-head">
+            <h3><i data-lucide="activity" class="icon-cyan"></i> Real-Time Frequency Matrix</h3>
+            <span class="badge-tech">DSP ENGINE</span>
           </div>
 
-          <!-- ANALYSEUR DE FREQUENCES ANIME -->
-          <div class="spectrum-visualizer">
-            <div class="freq-band"><div class="band-fill sub" style="height: 82%;"></div><span>SUB (30-80Hz)</span></div>
-            <div class="freq-band"><div class="band-fill low" style="height: 65%;"></div><span>BASS (80-250Hz)</span></div>
-            <div class="freq-band"><div class="band-fill mid" style="height: 48%;"></div><span>MID (250-4kHz)</span></div>
-            <div class="freq-band"><div class="band-fill high" style="height: 74%;"></div><span>HIGH (4k-20kHz)</span></div>
+          <div class="visual-spectrum">
+            <div class="band"><div class="fill purple" style="height: 85%;"></div><span>SUB (30-80Hz)</span></div>
+            <div class="band"><div class="fill cyan" style="height: 60%;"></div><span>BASS (80-250Hz)</span></div>
+            <div class="band"><div class="fill green" style="height: 45%;"></div><span>MID (250-4kHz)</span></div>
+            <div class="band"><div class="fill yellow" style="height: 70%;"></div><span>HIGH (4k-20kHz)</span></div>
           </div>
 
-          <!-- MASTERING SPECS GRID -->
-          <div class="specs-grid">
-            <div class="spec-tile">
-              <span class="spec-label">INTEGRATED LOUDNESS</span>
-              <strong class="spec-val highlight-green">-14.2 LUFS</strong>
-              <span class="spec-sub">Spotify Target Standard</span>
+          <div class="metrics-grid-2x2">
+            <div class="metric-tile">
+              <span class="m-label">LOUDNESS TARGET</span>
+              <strong class="m-val green">-14.2 LUFS</strong>
+              <span class="m-sub">Optimized for Spotify</span>
             </div>
-            <div class="spec-tile">
-              <span class="spec-label">STEREO FIELD WIDTH</span>
-              <strong class="spec-val highlight-cyan">135% WIDE</strong>
-              <span class="spec-sub">Clean Center Low-End</span>
+            <div class="metric-tile">
+              <span class="m-label">STEREO FIELD</span>
+              <strong class="m-val cyan">135% WIDE</strong>
+              <span class="m-sub">Mono Low-End Focus</span>
             </div>
-            <div class="spec-tile">
-              <span class="spec-label">PRIMARY GENRE</span>
-              <strong class="spec-val">Cyberpunk</strong>
-              <span class="spec-sub">Midtempo / Dark Synth</span>
+            <div class="metric-tile">
+              <span class="m-label">GENRE CROSSOVER</span>
+              <strong class="m-val">Cyberpunk</strong>
+              <span class="m-sub">Midtempo / Synthwave</span>
             </div>
-            <div class="spec-tile">
-              <span class="spec-label">BASS DENSITY</span>
-              <strong class="spec-val highlight-purple">+4.2 dB</strong>
-              <span class="spec-sub">Controlled Sub Separation</span>
+            <div class="metric-tile">
+              <span class="m-label">SUB-BASS DENSITY</span>
+              <strong class="m-val purple">+4.2 dB</strong>
+              <span class="m-sub">Clean Separation</span>
             </div>
           </div>
         </div>
 
-        <!-- SONIC SIGNATURE CARD -->
-        <div class="glass-card dna-detail-card">
-          <h3><i data-lucide="cpu" class="icon-green"></i> Signature Sound Architecture</h3>
-          <p class="dna-desc">
-            Le catalogue de <strong>SHINOBIWAN</strong> se caractérise par des lignes de basse chirurgiquement séparées, une saturation harmonique analogique et des structures à haut pouvoir de rétention.
-          </p>
-          <div class="tag-cloud">
-            <span class="tag">#Synthwave</span>
+        <div class="glass-card dna-box">
+          <h3><i data-lucide="cpu" class="icon-green"></i> Sound Architecture</h3>
+          <p>Production caractérisée par des lignes de basses chirurgicales, une saturation analogique contrôlée et une empreinte futuriste affirmée.</p>
+          <div class="tags-row">
             <span class="tag">#Cyberpunk</span>
-            <span class="tag">#MidtempoBass</span>
-            <span class="tag">#CinematicElectro</span>
+            <span class="tag">#Midtempo</span>
+            <span class="tag">#DarkElectro</span>
+            <span class="tag">#SoundDesign</span>
           </div>
         </div>
       </section>
 
-      <!-- COLONNE 3 : SPOTIFY PLAYER LARGE & CATALOG DIAGNOSIS -->
-      <section class="col-right">
-        <div class="glass-card spotify-full-card">
-          <div class="card-header-clean">
-            <h3><i data-lucide="disc" class="icon-green"></i> Artist Discography</h3>
-            <span class="badge-tech">LIVE PLAYER</span>
+      <!-- COLONNE 3 : PLAYER SPOTIFY LARGE & STRATEGIC INSIGHTS -->
+      <section class="dash-col">
+        <div class="glass-card embed-box">
+          <div class="card-head">
+            <h3><i data-lucide="disc" class="icon-green"></i> Discography Player</h3>
+            <span class="badge-tech">SPOTIFY API</span>
           </div>
-          <div class="embed-container">
+          <div class="spotify-wrapper">
             <iframe 
               style="border-radius:12px" 
               src="https://open.spotify.com/embed/artist/6W08IttKpZns5zG7BYTz8e?utm_source=generator&theme=0" 
               width="100%" 
-              height="300" 
+              height="340" 
               frameBorder="0" 
               allowfullscreen="" 
               allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
@@ -182,23 +174,25 @@
           </div>
         </div>
 
-        <div class="glass-card insights-card">
-          <h3><i data-lucide="layers" class="icon-cyan"></i> Strategic Observations</h3>
+        <div class="glass-card insights-box">
+          <div class="card-head">
+            <h3><i data-lucide="layers" class="icon-cyan"></i> Strategic Observations</h3>
+          </div>
           
-          <div class="insight-list">
-            <div class="insight-item">
-              <div class="num-badge">01</div>
+          <div class="insight-cards">
+            <div class="insight-row">
+              <span class="num">01</span>
               <div>
-                <h4>SoundCloud Experimental Lab</h4>
-                <p>Zone de liberté mélodique et d'innovation sonore, idéale pour générer du rétention-rate organique auprès des puristes.</p>
+                <h4>SoundCloud Lab</h4>
+                <p>Espace d'expérimentation mélodique à haute rétention pour public cible underground.</p>
               </div>
             </div>
 
-            <div class="insight-item">
-              <div class="num-badge">02</div>
+            <div class="insight-row">
+              <span class="num">02</span>
               <div>
-                <h4>Spotify Playlist Optimization</h4>
-                <p>Niveau de rendu sonore conforme aux exigences des curateurs éditoriaux (Radio Algorithm & Discover Weekly Ready).</p>
+                <h4>Playlist Readiness</h4>
+                <p>Niveau de rendu sonore conforme aux algorithmes Discover Weekly & Radio Spotify.</p>
               </div>
             </div>
           </div>
