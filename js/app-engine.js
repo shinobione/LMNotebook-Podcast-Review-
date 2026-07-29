@@ -118,7 +118,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // CHARGEMENT DE TRACK + FETCH DU FICHIER TXT DE PAROLES
   trackItems.forEach(item => {
     item.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -137,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const trackSubtitle = item.getAttribute('data-sub');
       const audioSrc = item.getAttribute('data-audio');
       const trackCover = item.getAttribute('data-cover');
-      const lyricsFile = item.getAttribute('data-lyrics-file'); // Exemple: "assets/lyrics/before-the-noise.txt"
+      const lyricsFile = item.getAttribute('data-lyrics-file');
       const code = parentCard.getAttribute('data-ep');
 
       if (trackTitle) trackTitle.textContent = trackName;
@@ -145,8 +144,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (epCode) epCode.textContent = code;
       if (lyricsTrackTitle) lyricsTrackTitle.textContent = trackName.toUpperCase();
 
-      // FETCH DU FICHIER .TXT
       if (lyricsDisplayBox) {
+        lyricsDisplayBox.classList.remove('is-placeholder');
         if (lyricsFile) {
           lyricsDisplayBox.textContent = "// LOADING LYRICS...";
           fetch(lyricsFile)
@@ -156,12 +155,15 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .then(text => {
               lyricsDisplayBox.textContent = text;
+              lyricsDisplayBox.scrollTop = 0;
             })
             .catch(() => {
               lyricsDisplayBox.textContent = "// NO LYRICS AVAILABLE FOR THIS TRACK";
+              lyricsDisplayBox.classList.add('is-placeholder');
             });
         } else {
           lyricsDisplayBox.textContent = "// NO LYRICS FILE SPECIFIED";
+          lyricsDisplayBox.classList.add('is-placeholder');
         }
       }
 
