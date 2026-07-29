@@ -1,215 +1,140 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const audioEl = document.getElementById('audio-element');
+    const btnPlayPause = document.getElementById('btn-play-pause');
+    const canvas = document.getElementById('rta-canvas');
+    
+    // UI Elements for dynamic updates
+    const currentTrackTitle = document.getElementById('current-track-title');
+    const currentTrackSubtitle = document.getElementById('current-track-subtitle');
+    const playerCover = document.getElementById('player-cover');
+    const lyricsDisplay = document.getElementById('lyrics-display');
+    const timeCurrent = document.getElementById('time-current');
+    const timeTotal = document.getElementById('time-total');
+    
+    let audioCtx, analyser, dataArray;
+    let isInitialized = false;
 
-  const audio = document.getElementById('audio-element');
-  const btnPlayPause = document.getElementById('btn-play-pause');
-  const btnRewind = document.getElementById('btn-rewind');
-  const btnForward = document.getElementById('btn-forward');
-  const currentTimeSpan = document.getElementById('current-time');
-  const totalDurationSpan = document.getElementById('total-duration');
-  const barsContainer = document.getElementById('bars-flex');
-  const clickArea = document.getElementById('waveform-click-area');
-
-  const trackTitle = document.getElementById('current-track-title');
-  const trackSub = document.getElementById('current-track-sub');
-  const epCode = document.getElementById('active-ep-code');
-  const playerCoverImg = document.getElementById('player-cover-img');
-  
-  const lyricsDisplayBox = document.getElementById('lyrics-display-box');
-  const lyricsTrackTitle = document.getElementById('lyrics-track-title');
-
-  const trackItems = Array.from(document.querySelectorAll('.mini-track-item'));
-  const epCards = document.querySelectorAll('.ep-card');
-  const spotifyIframe = document.getElementById('spotify-iframe');
-
-  let isSpotifyActive = false;
-
-  function stopSpotifyPlayback() {
-    isSpotifyActive = false;
-    if (spotifyIframe) {
-      const currentSrc = spotifyIframe.src;
-      spotifyIframe.src = currentSrc;
-    }
-  }
-
-  window.addEventListener('blur', () => {
-    if (document.activeElement && document.activeElement.tagName === 'IFRAME') {
-      isSpotifyActive = true;
-      if (audio && !audio.paused) {
-        audio.pause();
-        updatePlayButton(false);
-      }
-    }
-  });
-
-  const numBars = 40;
-  const bars = [];
-
-  if (barsContainer) {
-    barsContainer.innerHTML = '';
-    for (let i = 0; i < numBars; i++) {
-      const bar = document.createElement('div');
-      bar.classList.add('bar');
-      const h = Math.floor(Math.sin(i * 0.2) * 30 + Math.random() * 40 + 20);
-      bar.style.height = `${Math.min(100, Math.max(15, h))}%`;
-      barsContainer.appendChild(bar);
-      bars.push(bar);
-    }
-  }
-
-  function formatTime(seconds) {
-    if (isNaN(seconds)) return '00:00';
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
-  }
-
-  function updatePlayButton(playing) {
-    if (!btnPlayPause) return;
-    btnPlayPause.innerHTML = playing ? '<i data-lucide="pause"></i>' : '<i data-lucide="play"></i>';
-    if (window.lucide) lucide.createIcons();
-  }
-
-  if (btnPlayPause) {
-    btnPlayPause.addEventListener('click', () => {
-      if (audio.paused) {
-        stopSpotifyPlayback();
-        audio.play().then(() => updatePlayButton(true)).catch(e => console.log(e));
-      } else {
-        audio.pause();
-        updatePlayButton(false);
-      }
-    });
-  }
-
-  if (btnRewind) btnRewind.addEventListener('click', () => { audio.currentTime = Math.max(0, audio.currentTime - 10); });
-  if (btnForward) btnForward.addEventListener('click', () => { audio.currentTime = Math.min(audio.duration, audio.currentTime + 10); });
-
-  audio.addEventListener('loadedmetadata', () => {
-    if (totalDurationSpan) totalDurationSpan.textContent = formatTime(audio.duration);
-  });
-
-  audio.addEventListener('timeupdate', () => {
-    if (currentTimeSpan) currentTimeSpan.textContent = formatTime(audio.currentTime);
-    if (audio.duration) {
-      const progress = audio.currentTime / audio.duration;
-      const activeIndex = Math.floor(progress * numBars);
-      bars.forEach((bar, index) => {
-        if (index <= activeIndex) bar.classList.add('active');
-        else bar.classList.remove('active');
-      });
-    }
-  });
-
-  audio.addEventListener('ended', () => {
-    const activeItem = document.querySelector('.mini-track-item.active-track');
-    const currentIndex = trackItems.indexOf(activeItem);
-    if (currentIndex !== -1 && currentIndex < trackItems.length - 1) {
-      trackItems[currentIndex + 1].click();
-    } else if (trackItems.length > 0) {
-      trackItems[0].click();
-    }
-  });
-
-  if (clickArea) {
-    clickArea.addEventListener('click', (e) => {
-      const rect = clickArea.getBoundingClientRect();
-      const clickX = e.clientX - rect.left;
-      if (audio.duration) audio.currentTime = (clickX / rect.width) * audio.duration;
-    });
-  }
-
-  trackItems.forEach(item => {
-    item.addEventListener('click', (e) => {
-      e.stopPropagation();
-
-      stopSpotifyPlayback();
-
-      const parentCard = item.closest('.ep-card');
-      
-      epCards.forEach(c => c.classList.remove('active'));
-      trackItems.forEach(t => t.classList.remove('active-track'));
-
-      parentCard.classList.add('active');
-      item.classList.add('active-track');
-
-      const trackName = item.getAttribute('data-track');
-      const trackSubtitle = item.getAttribute('data-sub');
-      const audioSrc = item.getAttribute('data-audio');
-      const trackCover = item.getAttribute('data-cover');
-      const lyricsFile = item.getAttribute('data-lyrics-file');
-      const code = parentCard.getAttribute('data-ep');
-
-      if (trackTitle) trackTitle.textContent = trackName;
-      if (trackSub) trackSub.textContent = trackSubtitle;
-      if (epCode) epCode.textContent = code;
-      if (lyricsTrackTitle) lyricsTrackTitle.textContent = trackName.toUpperCase();
-
-      if (lyricsDisplayBox) {
-        lyricsDisplayBox.classList.remove('is-placeholder');
-        if (lyricsFile) {
-          lyricsDisplayBox.textContent = "// LOADING LYRICS...";
-          fetch(lyricsFile)
-            .then(response => {
-              if (!response.ok) throw new Error('Lyrics file not found');
-              return response.text();
-            })
-            .then(text => {
-              lyricsDisplayBox.textContent = text;
-              lyricsDisplayBox.scrollTop = 0;
-            })
-            .catch(() => {
-              lyricsDisplayBox.textContent = "// NO LYRICS AVAILABLE FOR THIS TRACK";
-              lyricsDisplayBox.classList.add('is-placeholder');
-            });
-        } else {
-          lyricsDisplayBox.textContent = "// NO LYRICS FILE SPECIFIED";
-          lyricsDisplayBox.classList.add('is-placeholder');
+    // --- 1. MOTEUR DSP & RTA ---
+    function initDSP() {
+        if (isInitialized) return;
+        try {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 128;
+            dataArray = new Uint8Array(analyser.frequencyBinCount);
+            
+            const source = audioCtx.createMediaElementSource(audioEl);
+            source.connect(analyser);
+            analyser.connect(audioCtx.destination);
+            
+            isInitialized = true;
+            renderRTA();
+        } catch (e) {
+            console.error("DSP Routing Failed : ", e);
         }
-      }
-
-      if (playerCoverImg && trackCover) {
-        playerCoverImg.src = trackCover;
-      }
-
-      audio.src = audioSrc;
-      audio.load();
-      audio.play().then(() => updatePlayButton(true)).catch(e => console.log("Audio play error:", e));
-    });
-  });
-
-  const canvas = document.getElementById('rta-canvas');
-  if (canvas) {
-    const ctx = canvas.getContext('2d');
-    const barCount = 32;
-    const rtaBars = Array.from({ length: barCount }, () => 0.05);
-
-    function drawSpectrum() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const width = canvas.width;
-      const height = canvas.height;
-      const barWidth = (width / barCount) - 2;
-
-      const isPlaying = (audio && !audio.paused) || isSpotifyActive;
-
-      for (let i = 0; i < barCount; i++) {
-        let target = isPlaying ? (Math.random() * 0.85 + 0.15) : 0.02;
-        rtaBars[i] += (target - rtaBars[i]) * 0.2;
-
-        const barHeight = rtaBars[i] * height;
-        const x = i * (barWidth + 2);
-        const y = height - barHeight;
-
-        const gradient = ctx.createLinearGradient(0, y, 0, height);
-        gradient.addColorStop(0, '#00f0ff');
-        gradient.addColorStop(0.5, '#9333ea');
-        gradient.addColorStop(1, '#1db954');
-
-        ctx.fillStyle = gradient;
-        ctx.fillRect(x, y, barWidth, barHeight);
-      }
-      requestAnimationFrame(drawSpectrum);
     }
-    drawSpectrum();
-  }
 
+    function renderRTA() {
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        requestAnimationFrame(renderRTA);
+        
+        if (!audioEl.paused) analyser.getByteFrequencyData(dataArray);
+        else for(let i = 0; i < dataArray.length; i++) dataArray[i] = Math.max(0, dataArray[i] - 5);
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const barWidth = (canvas.width / dataArray.length) * 2;
+        let x = 0;
+        
+        for (let i = 0; i < dataArray.length; i++) {
+            let barHeight = (dataArray[i] / 255) * canvas.height;
+            const r = barHeight * 5 + (25 * (i/dataArray.length));
+            const g = 240 * (1 - (i/dataArray.length));
+            const b = 255;
+            
+            ctx.fillStyle = `rgb(${r},${g},${b})`;
+            ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+            x += barWidth + 1;
+        }
+    }
+
+    // --- 2. GESTION LECTURE ---
+    btnPlayPause.addEventListener('click', () => {
+        initDSP();
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+        
+        if (audioEl.paused) {
+            audioEl.play();
+            btnPlayPause.textContent = '⏸';
+            btnPlayPause.style.background = 'var(--accent-cyan)';
+        } else {
+            audioEl.pause();
+            btnPlayPause.textContent = '▶';
+            btnPlayPause.style.background = 'var(--spotify-green)';
+        }
+    });
+
+    audioEl.addEventListener('timeupdate', () => {
+        const formatTime = (time) => {
+            if (isNaN(time)) return "00:00";
+            const mins = Math.floor(time / 60);
+            const secs = Math.floor(time % 60);
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        };
+        timeCurrent.textContent = formatTime(audioEl.currentTime);
+        timeTotal.textContent = formatTime(audioEl.duration);
+    });
+
+    // --- 3. DYNAMIC TRACK ROUTING (Fetch from Arborescence) ---
+    const trackItems = document.querySelectorAll('.mini-track-item');
+    
+    async function loadTrackData(trackId, epName, title) {
+        // Update Audio
+        audioEl.src = `audio/${trackId}.mp3`;
+        if(isInitialized) audioEl.play();
+        btnPlayPause.textContent = '⏸';
+        
+        // Update Metadata
+        currentTrackTitle.textContent = title;
+        currentTrackSubtitle.textContent = epName;
+        
+        // Update Cover (Assuming jpeg extension as per tree, adjust if png)
+        playerCover.src = `assets/${trackId}.jpeg`; 
+        // Fallback for .png files in your tree (saigon-bound, tinh-bolero-cho-tran)
+        playerCover.onerror = function() { this.src = `assets/${trackId}.png`; };
+
+        // Fetch Lyrics
+        lyricsDisplay.textContent = "Fetching lyrics from vault...";
+        try {
+            const response = await fetch(`assets/lyrics/${trackId}.txt`);
+            if (response.ok) {
+                const text = await response.text();
+                lyricsDisplay.textContent = text;
+            } else {
+                lyricsDisplay.textContent = "// LYRICS NOT FOUND IN VAULT //";
+            }
+        } catch (error) {
+            lyricsDisplay.textContent = "// CONNECTION ERROR //";
+        }
+    }
+
+    trackItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            // UI State update
+            trackItems.forEach(t => t.classList.remove('active-track'));
+            e.target.classList.add('active-track');
+            
+            // Extract data
+            const trackId = e.target.getAttribute('data-track');
+            const epName = e.target.getAttribute('data-ep');
+            const title = e.target.textContent.replace(/^\d+\.\s*/, ''); // Remove "1. " from title
+            
+            initDSP();
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+            loadTrackData(trackId, epName, title);
+        });
+    });
+
+    // Initial load attempt for first track lyrics
+    loadTrackData('before-the-noise', 'Neon Heartbreaks EP', 'Before the Noise');
 });
