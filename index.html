@@ -143,16 +143,15 @@
     .icon-inline { width: 12px; height: 12px; }
     .tech-id { font-family: var(--font-mono); font-size: 0.58rem; color: var(--accent-cyan); font-weight: 700; }
 
+    /* RATIO 1:1 STRICT (POCHETTE CARRÉE SANS DÉFORMATION) */
     .hero-cover-frame {
       width: 100%;
-      height: 240px;
+      aspect-ratio: 1 / 1;
       border-radius: 8px;
       border: 1px solid rgba(0, 240, 255, 0.4);
       overflow: hidden;
       background: #000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      margin: 6px 0;
     }
 
     .player-cover-img {
@@ -162,17 +161,17 @@
       display: block;
     }
 
-    .track-meta h2 { font-size: 1.15rem; font-weight: 800; color: #fff; margin-top: 4px; letter-spacing: -0.3px; }
-    .track-meta .subtitle { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; line-height: 1.3; }
+    .track-meta h2 { font-size: 1.1rem; font-weight: 800; color: #fff; margin-top: 2px; letter-spacing: -0.3px; }
+    .track-meta .subtitle { font-size: 0.68rem; color: var(--text-muted); margin-top: 1px; line-height: 1.2; }
 
     .waveform-box { display: flex; flex-direction: column; gap: 4px; }
-    .waveform-container { height: 38px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 4px 6px; cursor: pointer; }
+    .waveform-container { height: 34px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 4px 6px; cursor: pointer; }
     .bars-flex { display: flex; align-items: center; gap: 2px; height: 100%; }
     .bar { flex: 1; background: rgba(255, 255, 255, 0.15); border-radius: 1px; }
     .bar.active { background: var(--spotify-green); box-shadow: 0 0 8px var(--spotify-green); }
 
     .controls-row { display: flex; align-items: center; justify-content: center; gap: 10px; }
-    .btn-play { width: 44px; height: 44px; border-radius: 50%; background: var(--spotify-green); border: none; color: #000; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 16px rgba(29, 185, 84, 0.5); }
+    .btn-play { width: 42px; height: 42px; border-radius: 50%; background: var(--spotify-green); border: none; color: #000; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 16px rgba(29, 185, 84, 0.5); }
     .btn-play:hover { transform: scale(1.08); }
     .btn-secondary { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--panel-border); color: #fff; padding: 4px 8px; border-radius: 12px; font-size: 0.65rem; cursor: pointer; display: flex; align-items: center; gap: 4px; }
 
@@ -261,7 +260,7 @@
           </div>
 
           <div class="hero-cover-frame">
-            <img id="player-cover-img" src="assets/neon-heartbreaks.jpeg" alt="Cover" class="player-cover-img" />
+            <img id="player-cover-img" src="assets/before-the-noise.jpeg" alt="Track Cover Art" class="player-cover-img" />
           </div>
 
           <div class="track-meta">
@@ -324,7 +323,7 @@
           <div class="ep-grid-3">
             
             <!-- EP 1 -->
-            <div class="ep-card active" data-ep="NH-EP #01" data-default-cover="assets/neon-heartbreaks.jpeg">
+            <div class="ep-card active" data-ep="NH-EP #01">
               <div class="ep-cover-frame">
                 <img src="assets/neon-heartbreaks.jpeg" alt="Neon Heartbreaks EP" class="ep-img-cover" />
                 <span class="ep-tag-mini">PRIMARY EP</span>
@@ -336,7 +335,7 @@
                 </div>
 
                 <div class="mini-tracklist">
-                  <div class="mini-track-item active-track" data-track="Before the Noise" data-sub="Track 1 • Neon Heartbreaks EP" data-audio="audio/before-the-noise.mp3" data-cover="assets/neon-heartbreaks.jpeg">1. Before the Noise</div>
+                  <div class="mini-track-item active-track" data-track="Before the Noise" data-sub="Track 1 • Neon Heartbreaks EP" data-audio="audio/before-the-noise.mp3" data-cover="assets/before-the-noise.jpeg">1. Before the Noise</div>
                   <div class="mini-track-item" data-track="Low Bitrate Love" data-sub="Track 2 • Neon Heartbreaks EP" data-audio="audio/low-bitrate-love.mp3" data-cover="assets/low-bitrate-love.jpeg">2. Low Bitrate Love</div>
                   <div class="mini-track-item" data-track="Real love doesn't rush" data-sub="Track 3 • Neon Heartbreaks EP" data-audio="audio/real-love-doesnt-rush.mp3" data-cover="assets/real-love-doesnt-rush.jpeg">3. Real love doesn't rush</div>
                 </div>
@@ -344,7 +343,7 @@
             </div>
 
             <!-- EP 2 -->
-            <div class="ep-card" data-ep="LL-EP #02" data-default-cover="assets/love-letters.jpeg">
+            <div class="ep-card" data-ep="LL-EP #02">
               <div class="ep-cover-frame">
                 <img src="assets/love-letters.jpeg" alt="Love Letters from Saigon EP" class="ep-img-cover" />
                 <span class="ep-tag-mini">CONCEPT</span>
@@ -356,15 +355,15 @@
                 </div>
 
                 <div class="mini-tracklist">
-                  <div class="mini-track-item" data-track="Saigon Bound" data-sub="Track 1 • Love Letters from Saigon" data-audio="audio/saigon-bound.mp3" data-cover="assets/love-letters.jpeg">1. Saigon Bound</div>
-                  <div class="mini-track-item" data-track="Tình Bolero Cho Trân" data-sub="Track 2 • Love Letters from Saigon" data-audio="audio/tinh-bolero-cho-tran.mp3" data-cover="assets/love-letters.jpeg">2. Tình Bolero Cho Trân</div>
+                  <div class="mini-track-item" data-track="Saigon Bound" data-sub="Track 1 • Love Letters from Saigon" data-audio="audio/saigon-bound.mp3" data-cover="assets/saigon-bound.jpeg">1. Saigon Bound</div>
+                  <div class="mini-track-item" data-track="Tình Bolero Cho Trân" data-sub="Track 2 • Love Letters from Saigon" data-audio="audio/tinh-bolero-cho-tran.mp3" data-cover="assets/tinh-bolero-cho-tran.jpeg">2. Tình Bolero Cho Trân</div>
                   <div class="mini-track-item" data-track="Jusqu'au Dernier Souffle" data-sub="Track 3 • Love Letters from Saigon" data-audio="audio/jusquau-dernier-souffle.mp3" data-cover="assets/jusquau-dernier-souffle.jpeg">3. Jusqu'au Dernier Souffle</div>
                 </div>
               </div>
             </div>
 
             <!-- EP 3 -->
-            <div class="ep-card" data-ep="CD-EP #03" data-default-cover="assets/coal-to-diamond.jpeg">
+            <div class="ep-card" data-ep="CD-EP #03">
               <div class="ep-cover-frame">
                 <img src="assets/coal-to-diamond.jpeg" alt="Coal to Diamond EP" class="ep-img-cover" />
                 <span class="ep-tag-mini">INDUSTRIAL</span>
