@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const playerCoverImg = document.getElementById('player-cover-img');
   const metricLufs = document.getElementById('metric-lufs');
   const metricDr = document.getElementById('metric-dr');
+  
+  const trackItems = document.querySelectorAll('.mini-track-item');
   const epCards = document.querySelectorAll('.ep-card');
 
   const numBars = 40;
@@ -86,30 +88,42 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Clic sur cartes d'EP : Bascule Audio + Cover + Metas
-  epCards.forEach(card => {
-    card.addEventListener('click', () => {
+  // SWITCH PAR PISTE CLIQUABLE
+  trackItems.forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.stopPropagation();
+
+      const parentCard = item.closest('.ep-card');
+      
+      // Update actif sur cartes et pistes
       epCards.forEach(c => c.classList.remove('active'));
-      card.classList.add('active');
+      trackItems.forEach(t => t.classList.remove('active-track'));
 
-      const track = card.getAttribute('data-track');
-      const sub = card.getAttribute('data-sub');
-      const code = card.getAttribute('data-code');
-      const audioSrc = card.getAttribute('data-audio');
-      const coverSrc = card.getAttribute('data-cover');
-      const lufs = card.getAttribute('data-lufs');
-      const dr = card.getAttribute('data-dr');
+      parentCard.classList.add('active');
+      item.classList.add('active-track');
 
-      if (trackTitle) trackTitle.textContent = track;
-      if (trackSub) trackSub.textContent = sub;
+      // Extraire métadonnées
+      const trackName = item.getAttribute('data-track');
+      const trackSubtitle = item.getAttribute('data-sub');
+      const audioSrc = item.getAttribute('data-audio');
+
+      const code = parentCard.getAttribute('data-ep');
+      const coverSrc = parentCard.getAttribute('data-cover');
+      const lufs = parentCard.getAttribute('data-lufs');
+      const dr = parentCard.getAttribute('data-dr');
+
+      // Injecter dans le Player Principal
+      if (trackTitle) trackTitle.textContent = trackName;
+      if (trackSub) trackSub.textContent = trackSubtitle;
       if (epCode) epCode.textContent = code;
+      if (playerCoverImg) playerCoverImg.src = coverSrc;
       if (metricLufs) metricLufs.textContent = lufs;
       if (metricDr) metricDr.textContent = dr;
-      if (playerCoverImg) playerCoverImg.src = coverSrc;
 
+      // Charger le MP3 spécifique et jouer
       audio.src = audioSrc;
       audio.load();
-      audio.play().then(() => updatePlayButton(true)).catch(e => console.log(e));
+      audio.play().then(() => updatePlayButton(true)).catch(e => console.log("Audio load error:", e));
     });
   });
 
