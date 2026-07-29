@@ -223,3 +223,39 @@ body {
 .insights-list li i { color: var(--spotify-green); min-width: 18px; margin-top: 2px; }
 
 @media (max-width: 900px) { .content-grid { grid-template-columns: 1fr; } }
+
+/* Profil Links interactifs */
+.profile-item {
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.profile-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.ext-icon {
+  margin-left: auto;
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+.profile-item:hover .ext-icon {
+  opacity: 1;
+  color: #fff;
+}
+
+/* Embed Spotify Container */
+.embed-wrapper {
+  margin-top: 16px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--panel-border);
+  background: #000;
+}
