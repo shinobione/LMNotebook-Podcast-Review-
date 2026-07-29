@@ -198,13 +198,25 @@ a.profile-item.soundcloud .p-icon { color: var(--soundcloud-orange) !important; 
 a.profile-item .ext-icon { margin-left: auto; width: 12px; opacity: 0.5; }
 
 /* COL 2: POCHETTES D'ALBUMS ET SPECTRUM */
-.catalog-showcase-card { flex: 1; display: flex; flex-direction: column; gap: 10px; }
-.ep-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; flex: 1; }
+.catalog-showcase-card { 
+  flex: 1; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 10px; 
+  min-height: 0;
+}
+
+.ep-grid-3 { 
+  display: grid; 
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 12px; 
+  flex: 1; 
+}
 
 .ep-card {
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(12, 16, 24, 0.85);
   border: 1px solid var(--panel-border);
-  border-radius: 8px;
+  border-radius: 10px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -220,17 +232,17 @@ a.profile-item .ext-icon { margin-left: auto; width: 12px; opacity: 0.5; }
 
 .ep-card.active {
   border-color: var(--accent-cyan);
-  background: rgba(0, 240, 255, 0.05);
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+  background: rgba(0, 240, 255, 0.06);
+  box-shadow: 0 0 22px rgba(0, 240, 255, 0.25);
 }
 
 .ep-cover-frame {
   width: 100%;
-  aspect-ratio: 1 / 1;
-  max-height: 140px;
+  aspect-ratio: 16 / 10;
   position: relative;
   overflow: hidden;
   background: #000;
+  border-bottom: 1px solid rgba(0, 240, 255, 0.15);
 }
 
 .ep-img-cover {
@@ -246,24 +258,64 @@ a.profile-item .ext-icon { margin-left: auto; width: 12px; opacity: 0.5; }
 
 .ep-tag-mini {
   position: absolute;
-  top: 6px;
-  left: 6px;
+  top: 8px;
+  left: 8px;
   font-family: var(--font-mono);
-  font-size: 0.52rem;
+  font-size: 0.58rem;
   color: #000;
   background: var(--accent-cyan);
-  padding: 2px 6px;
-  border-radius: 3px;
+  padding: 3px 8px;
+  border-radius: 4px;
   font-weight: 800;
   z-index: 2;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.7);
+  letter-spacing: 0.5px;
 }
 
-.ep-details { padding: 10px; display: flex; flex-direction: column; justify-content: space-between; flex: 1; gap: 6px; }
-.ep-details h4 { font-size: 0.75rem; font-weight: 800; color: #fff; }
-.ep-details p { font-size: 0.62rem; color: var(--text-muted); line-height: 1.3; }
-.ep-tracks-highlight { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.06); padding-top: 4px; }
-.ep-tracks-highlight strong { color: var(--spotify-green); }
+.ep-details { 
+  padding: 12px; 
+  display: flex; 
+  flex-direction: column; 
+  justify-content: space-between; 
+  flex: 1; 
+  gap: 10px; 
+}
+
+.ep-info-head h4 { 
+  font-size: 0.82rem; 
+  font-weight: 800; 
+  color: #fff; 
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.ep-desc { 
+  font-size: 0.72rem; 
+  color: #cbd5e1 !important; /* Gris ultra clair pour haute lisibilité */
+  line-height: 1.45; 
+  font-weight: 500;
+}
+
+.ep-tracks-highlight { 
+  font-family: var(--font-mono); 
+  font-size: 0.68rem; 
+  color: var(--text-muted); 
+  border-top: 1px solid rgba(255, 255, 255, 0.08); 
+  padding-top: 8px; 
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ep-tracks-highlight span {
+  color: var(--text-muted);
+  font-size: 0.62rem;
+}
+
+.ep-tracks-highlight strong { 
+  color: var(--spotify-green); 
+  font-weight: 700;
+}
 
 /* CANVAS SPECTRUM 60 FPS */
 .dsp-card { display: flex; flex-direction: column; gap: 10px; }
