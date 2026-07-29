@@ -50,15 +50,13 @@
     <!-- MAIN GRID -->
     <main class="content-grid">
       
-      <!-- COLUMN 1: PLAYER & ECOSYSTEM -->
+      <!-- COLUMN 1: PLAYER & EMBED LARGE -->
       <section class="player-column">
+        
+        <!-- AUDIOLAB PODCAST PLAYER -->
         <div class="glass-card main-player-card">
-          
-          <!-- Cover Art -->
           <div class="cover-art">
             <div class="cover-eq-bg" id="cover-eq-bg">
-              <div class="cover-eq-bar"></div>
-              <div class="cover-eq-bar"></div>
               <div class="cover-eq-bar"></div>
               <div class="cover-eq-bar"></div>
               <div class="cover-eq-bar"></div>
@@ -75,14 +73,13 @@
           </div>
 
           <div class="track-meta">
-            <span class="category-tag">DEEP DIVE REVIEW</span>
-            <h2>SHINOBIWAN — Cyberpunk & Synthwave Analysis</h2>
+            <span class="category-tag">PODCAST EPISODE</span>
+            <h2>SHINOBIWAN — Catalog & Sound Breakdown</h2>
             <p>LMNotebook Voice Core v5.5</p>
           </div>
 
           <audio id="audio-element" src="audio/review-shinobiwan.mp3" preload="metadata"></audio>
 
-          <!-- Waveform Progress Visualizer -->
           <div class="waveform-container" id="waveform-click-area">
             <div class="bars-flex" id="bars-flex"></div>
           </div>
@@ -99,12 +96,11 @@
           </div>
         </div>
 
-        <!-- Analyzed Ecosystem Card avec Liens & Embeds -->
+        <!-- BLOC 1 REVISION: LARGE SPOTIFY DISC PLAYLIST & DIRECT LINKS -->
         <div class="glass-card targets-card">
-          <h3><i data-lucide="crosshair"></i> Analyzed Profiles & Streaming</h3>
+          <h3><i data-lucide="disc"></i> Official Artist Streaming Hub</h3>
           
           <div class="profile-links">
-            <!-- Spotify Link -->
             <a href="https://open.spotify.com/artist/6W08IttKpZns5zG7BYTz8e" target="_blank" rel="noopener" class="profile-item spotify">
               <i data-lucide="music"></i>
               <div>
@@ -114,7 +110,6 @@
               <i data-lucide="external-link" class="ext-icon"></i>
             </a>
 
-            <!-- SoundCloud Link -->
             <a href="https://soundcloud.com/shinobiwan-1" target="_blank" rel="noopener" class="profile-item soundcloud">
               <i data-lucide="cloud"></i>
               <div>
@@ -125,68 +120,77 @@
             </a>
           </div>
 
-          <!-- Live Embed Spotify Player -->
-          <div class="embed-wrapper">
+          <!-- PLAYER SPOTIFY EN GRAND (352px height pour un rendu pro & lisible) -->
+          <div class="embed-wrapper-large">
             <iframe 
               style="border-radius:12px" 
               src="https://open.spotify.com/embed/artist/6W08IttKpZns5zG7BYTz8e?utm_source=generator&theme=0" 
               width="100%" 
-              height="152" 
+              height="352" 
               frameBorder="0" 
               allowfullscreen="" 
               allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
               loading="lazy">
             </iframe>
           </div>
-
         </div>
       </section>
 
-      <!-- COLUMN 2: REALTIME DSP METRICS -->
+      <!-- BLOC 2 REVISION: SONIC ARCHITECTURE & INSIGHTS AUDIOTEXTUELS -->
       <section class="analytics-column">
         <div class="glass-card analytics-card">
+          
           <div class="analytics-header">
-            <h3><i data-lucide="activity"></i> Neural DSP Audio Metrics</h3>
-            <span class="badge-lang">LIVE ANALYZER</span>
+            <h3><i data-lucide="sliders"></i> Sonic DNA & Identity Breakdown</h3>
+            <span class="badge-lang">ARTIST SPOTLIGHT</span>
           </div>
 
-          <div class="metrics-grid">
+          <!-- KEY PROD HIGHLIGHTS -->
+          <div class="dna-grid">
+            <div class="dna-card">
+              <div class="dna-icon"><i data-lucide="zap"></i></div>
+              <div class="dna-content">
+                <strong>Main Vibe / Genre Crossover</strong>
+                <p>Synthwave, Cyberpunk, Cinematic Midtempo Bass & Dark Electro Fusion.</p>
+              </div>
+            </div>
+
+            <div class="dna-card">
+              <div class="dna-icon"><i data-lucide="radio"></i></div>
+              <div class="dna-content">
+                <strong>Mix & Master Profile</strong>
+                <p>Dải trầm Sub-bass chắc chắn, Stereo Imaging rộng, chuẩn nén thương mại Spotify / Apple Music.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- DETAILED CATALOG ANALYSIS SECTION -->
+          <div class="catalog-insights">
+            <h4><i data-lucide="layers"></i> Key Strategic Observations</h4>
             
-            <div class="metric-box">
-              <span class="metric-label">DYNAMIC RANGE (LUFS)</span>
-              <div class="metric-value" id="lufs-val">-11.4 LUFS</div>
-              <div class="meter-bar-wrap"><div class="meter-fill" style="width: 78%;"></div></div>
+            <div class="insight-block">
+              <div class="insight-badge">01</div>
+              <div>
+                <h5>Cấu trúc Hook & Melodic Freedom (SoundCloud)</h5>
+                <p>Khán giả SoundCloud được trải nghiệm sự tự do sáng tạo cao trong các bản thử nghiệm giai điệu, giúp tăng tỉ lệ tương tác tự nhiên (organic engagement).</p>
+              </div>
             </div>
 
-            <div class="metric-box">
-              <span class="metric-label">STEREO IMAGING / WIDTH</span>
-              <div class="metric-value">138% <small>WIDE</small></div>
-              <div class="meter-bar-wrap"><div class="meter-fill cyan" style="width: 88%;"></div></div>
+            <div class="insight-block">
+              <div class="insight-badge">02</div>
+              <div>
+                <h5>Editorial Playlist Readiness (Spotify)</h5>
+                <p>Chất lượng sản xuất của SHINOBIWAN đạt mức độ hoàn thiện cao về Loudness (-14 LUFS target), tối ưu cho thuật toán đề xuất của Spotify (Radio & Discover Weekly).</p>
+              </div>
             </div>
 
-            <div class="metric-box">
-              <span class="metric-label">SUB-BASS DENSITY (30-80Hz)</span>
-              <div class="metric-value">+4.2 dB</div>
-              <div class="meter-bar-wrap"><div class="meter-fill purple" style="width: 65%;"></div></div>
+            <div class="insight-block">
+              <div class="insight-badge">03</div>
+              <div>
+                <h5>Identity & Branding Visual</h5>
+                <p>Sự đồng nhất giữa Sound Design đậm chất Cyberpunk và nhận diện thương hiệu (Logo Blade Cut) tạo nên dấu ấn nghệ sĩ vô cùng rõ nét.</p>
+              </div>
             </div>
-
-            <div class="metric-box">
-              <span class="metric-label">ALGORITHMIC GROW SCORE</span>
-              <div class="metric-value highlight">98.5 / 100</div>
-              <div class="meter-bar-wrap"><div class="meter-fill green" style="width: 98%;"></div></div>
-            </div>
-
-          </div>
-
-          <!-- DSP TAGS & INSIGHTS -->
-          <div class="insights-panel">
-            <h4><i data-lucide="cpu"></i> AI Audio Diagnostics</h4>
-            <ul class="insights-list">
-              <li><i data-lucide="check-circle-2"></i> <strong>Commercial Loudness Target:</strong> Optimized for Spotify Editorial Playlists (-14 LUFS Ref).</li>
-              <li><i data-lucide="check-circle-2"></i> <strong>Sub-bass Control:</strong> Clean low-end separation without phase cancellation.</li>
-              <li><i data-lucide="check-circle-2"></i> <strong>Genre Classification:</strong> Cyberpunk / Synthwave / Midtempo Bass (99.2% confidence).</li>
-              <li><i data-lucide="check-circle-2"></i> <strong>SoundCloud Profile:</strong> Strong experimental hook structures & high user retention markers.</li>
-            </ul>
           </div>
 
         </div>
