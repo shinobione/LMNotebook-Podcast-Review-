@@ -16,14 +16,21 @@ document.addEventListener('DOMContentLoaded', () => {
   
   const trackItems = Array.from(document.querySelectorAll('.mini-track-item'));
   const epCards = document.querySelectorAll('.ep-card');
+  const spotifyContainer = document.getElementById('spotify-container');
 
-  let currentFallbackCover = 'assets/neon-heartbreaks.jpeg';
+  // GESTION AUDIO DUAL : PAUSE AUTOMATIQUE LORS DE L'INTERACTION AVEC SPOTIFY
+  window.addEventListener('blur', () => {
+    if (document.activeElement && document.activeElement.tagName === 'IFRAME') {
+      if (audio && !audio.paused) {
+        audio.pause();
+        updatePlayButton(false);
+      }
+    }
+  });
 
-  // Gestion d'erreur de chargement de l'image de cover (Fallback automatique sur l'EP)
-  if (playerCoverImg) {
-    playerCoverImg.addEventListener('error', () => {
-      console.warn("Cover introuvable, basculement sur la cover d'EP par défaut:", currentFallbackCover);
-      playerCoverImg.src = currentFallbackCover;
+  if (spotifyContainer) {
+    spotifyContainer.addEventListener('mouseenter', () => {
+      // Préparation à l'interaction Spotify
     });
   }
 
@@ -119,17 +126,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const trackSubtitle = item.getAttribute('data-sub');
       const audioSrc = item.getAttribute('data-audio');
       const trackCover = item.getAttribute('data-cover');
-      const defaultEpCover = parentCard.getAttribute('data-default-cover');
       const code = parentCard.getAttribute('data-ep');
-
-      currentFallbackCover = defaultEpCover || 'assets/neon-heartbreaks.jpeg';
 
       if (trackTitle) trackTitle.textContent = trackName;
       if (trackSub) trackSub.textContent = trackSubtitle;
       if (epCode) epCode.textContent = code;
       
-      if (playerCoverImg) {
-        playerCoverImg.src = trackCover || currentFallbackCover;
+      if (playerCoverImg && trackCover) {
+        playerCoverImg.src = trackCover;
       }
 
       audio.src = audioSrc;
