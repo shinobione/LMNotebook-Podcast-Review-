@@ -9,7 +9,6 @@
 </head>
 <body>
   <div class="glow-bg"></div>
-  <div class="cyber-grid"></div>
 
   <div class="app-viewport">
     <!-- TOPBAR -->
@@ -20,7 +19,7 @@
         <span class="badge-ep">SYSTEM LAUNCHPAD v2.0</span>
       </div>
       <div class="header-logo-center">
-        <img src="assets/logo.png" alt="SHINOBIWAN" class="header-logo-img" onerror="this.style.display='none'">
+        <img src="assets/logo.png" alt="SHINOBIWAN" class="header-logo-img">
       </div>
       <div class="hosts-zone">
         <div class="host-pill"><span class="icon-green">⚡</span> DAW ENGINE ACTIVE</div>
@@ -32,7 +31,7 @@
     <main class="dashboard-grid">
       
       <!-- COL 1 : ACTIVE PLAYBACK -->
-      <section class="dash-col">
+      <section class="dash-col col-left">
         <div class="glass-card main-player">
           <div class="card-head-compact">
             <span class="badge-tag"><span class="live-dot"></span> ACTIVE PLAYBACK</span>
@@ -45,7 +44,7 @@
           
           <div class="track-meta">
             <h2 id="current-track-title">Before the Noise</h2>
-            <div class="subtitle" id="current-track-subtitle">Track 1 • Neon Heartbreaks EP</div>
+            <div class="subtitle" id="current-track-subtitle">Neon Heartbreaks EP</div>
           </div>
           
           <audio id="audio-element" src="audio/before-the-noise.mp3" crossorigin="anonymous"></audio>
@@ -64,19 +63,19 @@
         </div>
 
         <div class="glass-card platform-grid">
-          <div class="card-head">
-            <h3><span style="color:var(--accent-cyan)">☍</span> Streaming Hubs</h3>
+          <div class="card-head-compact">
+            <h3>☍ Streaming Hubs</h3>
           </div>
           <a href="#" class="profile-item spotify">
             <div class="p-icon">S</div>
-            <div>
+            <div class="p-info">
               <strong>Spotify Catalog</strong>
               <span>Direct Discography & Top Tracks</span>
             </div>
           </a>
           <a href="#" class="profile-item soundcloud">
             <div class="p-icon">SC</div>
-            <div>
+            <div class="p-info">
               <strong>SoundCloud HQ Lab</strong>
               <span>Demos, Edits & VIP Masters</span>
             </div>
@@ -85,23 +84,21 @@
       </section>
 
       <!-- COL 2 : CATALOG & LYRICS VAULT -->
-      <section class="dash-col">
-        <div class="catalog-showcase-card">
-          <div class="card-head">
-            <h3><span style="color:var(--accent-cyan)">◱</span> Discography & Interactive Engine</h3>
+      <section class="dash-col col-center">
+        <div class="glass-card catalog-showcase-card">
+          <div class="card-head-compact">
+            <h3>◱ Discography & Interactive Engine</h3>
           </div>
           <div class="ep-grid-3">
             <!-- EP 1 -->
             <div class="ep-card active">
               <div class="ep-cover-frame">
-                <span class="ep-tag-mini">PRIMARY EP</span>
+                <span class="ep-tag-mini cyan-tag">PRIMARY EP</span>
                 <img src="assets/neon-heartbreaks.jpeg" alt="Neon Heartbreaks" class="ep-img-cover">
               </div>
               <div class="ep-details">
-                <div class="ep-info-head">
-                  <h4>NEON HEARTBREAKS</h4>
-                  <div class="ep-desc">Rain-soaked synthwave cityscape. Analog basslines & cyber hooks.</div>
-                </div>
+                <h4>NEON HEARTBREAKS</h4>
+                <div class="ep-desc">Rain-soaked synthwave cityscape. Analog basslines & cyber hooks.</div>
                 <div class="mini-tracklist">
                   <div class="mini-track-item active-track" data-track="before-the-noise" data-ep="Neon Heartbreaks EP">1. Before the Noise</div>
                   <div class="mini-track-item" data-track="low-bitrate-love" data-ep="Neon Heartbreaks EP">2. Low Bitrate Love</div>
@@ -112,14 +109,12 @@
             <!-- EP 2 -->
             <div class="ep-card">
               <div class="ep-cover-frame">
-                <span class="ep-tag-mini" style="background:var(--accent-purple); color:#fff;">CONCEPT</span>
+                <span class="ep-tag-mini purple-tag">CONCEPT</span>
                 <img src="assets/love-letters.jpeg" alt="Love Letters from Saigon" class="ep-img-cover">
               </div>
               <div class="ep-details">
-                <div class="ep-info-head">
-                  <h4>LOVE LETTERS FROM SAIGON</h4>
-                  <div class="ep-desc">Trilingual narrative synthpop, organic lo-fi & tropical neon warmth.</div>
-                </div>
+                <h4>LOVE LETTERS FROM SAIGON</h4>
+                <div class="ep-desc">Trilingual narrative synthpop, organic lo-fi & tropical neon warmth.</div>
                 <div class="mini-tracklist">
                   <div class="mini-track-item" data-track="saigon-bound" data-ep="Love Letters from Saigon">1. Saigon Bound</div>
                   <div class="mini-track-item" data-track="tinh-bolero-cho-tran" data-ep="Love Letters from Saigon">2. Tình Bolero Cho Trân</div>
@@ -130,14 +125,12 @@
             <!-- EP 3 -->
             <div class="ep-card">
               <div class="ep-cover-frame">
-                <span class="ep-tag-mini" style="background:#ff3366; color:#fff;">INDUSTRIAL</span>
+                <span class="ep-tag-mini red-tag">INDUSTRIAL</span>
                 <img src="assets/coal-to-diamond.jpeg" alt="Coal to Diamond" class="ep-img-cover">
               </div>
               <div class="ep-details">
-                <div class="ep-info-head">
-                  <h4>COAL TO DIAMOND</h4>
-                  <div class="ep-desc">Obsidian design, Blade Cut industrial bass, distortion dynamics.</div>
-                </div>
+                <h4>COAL TO DIAMOND</h4>
+                <div class="ep-desc">Obsidian design, Blade Cut industrial bass, distortion dynamics.</div>
                 <div class="mini-tracklist">
                   <div class="mini-track-item" data-track="thick" data-ep="Coal to Diamond">1. THICK</div>
                   <div class="mini-track-item" data-track="the-throne-resonates" data-ep="Coal to Diamond">2. THE THRONE RESONATES</div>
@@ -148,21 +141,21 @@
           </div>
         </div>
 
-        <div class="lyrics-vault-card">
-          <div class="card-head-compact" style="margin-bottom: 5px;">
-            <h3 style="font-size: 0.72rem; color: #fff; font-weight: 700;">Dynamic Lyrics Vault</h3>
-            <span class="badge-tech" id="lyrics-status">SYNC READY</span>
+        <div class="glass-card lyrics-vault-card">
+          <div class="card-head-compact flex-between">
+            <h3>Dynamic Lyrics Vault</h3>
+            <span class="badge-tech cyan-border">SYNC READY</span>
           </div>
           <div class="lyrics-container" id="lyrics-display">
-            <!-- Lyrics will be fetched here via JS -->
-            Select a track to load lyrics from vault...
+            <!-- Fetch injection point -->
+            Initializing vault connection...
           </div>
         </div>
         
         <div class="glass-card dsp-card">
-           <div class="card-head-compact" style="margin-bottom: 3px;">
-            <h3 style="font-size: 0.72rem; color: #fff; font-weight: 700;">Real-Time DAW Canvas RTA Spectrum</h3>
-            <span class="badge-tech" style="color:var(--spotify-green); border-color:var(--spotify-green);">LIVE DSP 60 FPS</span>
+           <div class="card-head-compact flex-between">
+            <h3>Real-Time DAW Canvas RTA Spectrum</h3>
+            <span class="badge-tech green-border">LIVE DSP 60 FPS</span>
           </div>
           <div class="rta-spectrum-container">
             <canvas id="rta-canvas"></canvas>
@@ -178,13 +171,14 @@
       </section>
 
       <!-- COL 3 : EXTERNAL EMBED / SPOTIFY -->
-      <section class="dash-col">
+      <section class="dash-col col-right">
         <div class="glass-card embed-card-full">
-           <div class="card-head" style="margin-bottom: 5px;">
-            <h3><span class="live-dot"></span> Top Discography Player</h3>
+           <div class="card-head-compact">
+            <h3><span class="live-dot green-dot"></span> Top Discography Player</h3>
           </div>
           <div class="spotify-wrapper-fixed">
-            <iframe src="https://open.spotify.com/embed/artist/YOUR_ARTIST_ID?utm_source=generator&theme=0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+            <!-- Fix URL 404 appliqué ici -->
+            <iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1DXdLEN7aqioJC?utm_source=generator&theme=0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
           </div>
         </div>
       </section>
