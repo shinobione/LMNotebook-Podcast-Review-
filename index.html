@@ -9,12 +9,13 @@
 </head>
 <body>
   <canvas id="ambient-canvas"></canvas>
-  <div class="glow-bg"></div>
+  <div class="cyber-grid-overlay"></div>
 
   <div class="app-viewport">
+    <!-- TOPBAR -->
     <header class="topbar">
       <div class="brand-zone">
-        <div class="live-dot"></div>
+        <div class="live-pulse"></div>
         <span class="brand-title">SHINOBIWAN</span>
         <span class="badge-ep">SYSTEM LAUNCHPAD v2.0</span>
       </div>
@@ -22,21 +23,25 @@
         <img src="assets/logo.png" alt="SHINOBIWAN" class="header-logo-img">
       </div>
       <div class="hosts-zone">
-        <div class="host-pill"><span class="icon-green">⚡</span> DAW ENGINE ACTIVE</div>
-        <div class="host-pill"><span class="icon-cyan">✔</span> VERIFIED ARTIST</div>
+        <div class="host-pill"><span class="icon-green">⚡</span> DAW ACTIVE</div>
+        <div class="host-pill"><span class="icon-cyan">✔</span> VERIFIED</div>
       </div>
     </header>
 
+    <!-- MAIN GRID 3 COLUMNS NO-SCROLL -->
     <main class="dashboard-grid">
+      
+      <!-- COL 1 : PLAYER & RTA -->
       <section class="dash-col col-left">
         <div class="glass-card main-player">
           <div class="card-head-compact">
-            <span class="badge-tag"><span class="live-dot"></span> ACTIVE PLAYBACK</span>
+            <span class="badge-tag"><span class="live-pulse"></span> ACTIVE PLAYBACK</span>
             <span class="tech-id" id="current-ep-tag">NB-EP #01</span>
           </div>
           
           <div class="hero-cover-frame">
-            <img src="assets/before-the-noise.jpeg" alt="Current Track Cover" id="player-cover" class="player-cover-img">
+            <img src="assets/before-the-noise.jpeg" alt="Cover" id="player-cover" class="player-cover-img">
+            <div class="cover-glitch-overlay"></div>
           </div>
           
           <div class="track-meta">
@@ -78,50 +83,26 @@
           <div class="rta-spectrum-container">
             <canvas id="rta-canvas"></canvas>
             <div class="rta-labels">
-              <span>20Hz</span>
-              <span>250Hz</span>
-              <span>2kHz</span>
-              <span>8kHz</span>
-              <span>20kHz</span>
+              <span>20Hz</span><span>250Hz</span><span>2kHz</span><span>8kHz</span><span>20kHz</span>
             </div>
           </div>
-        </div>
-
-        <div class="glass-card platform-grid">
-          <div class="card-head-compact">
-            <h3>☍ Streaming Hubs</h3>
-          </div>
-          <a href="https://open.spotify.com/artist/6W08IttKpZns5zG7BYTz8e" target="_blank" rel="noopener noreferrer" class="profile-item spotify">
-            <div class="p-icon">S</div>
-            <div class="p-info">
-              <strong>Spotify Catalog</strong>
-              <span>Direct Discography & Top Tracks</span>
-            </div>
-          </a>
-          <a href="https://soundcloud.com/shinobiwan-1" target="_blank" rel="noopener noreferrer" class="profile-item soundcloud">
-            <div class="p-icon">SC</div>
-            <div class="p-info">
-              <strong>SoundCloud HQ Lab</strong>
-              <span>Demos, Edits & VIP Masters</span>
-            </div>
-          </a>
         </div>
       </section>
 
+      <!-- COL 2 : CATALOG & LYRICS -->
       <section class="dash-col col-center">
         <div class="glass-card catalog-showcase-card">
           <div class="card-head-compact">
             <h3>◱ Discography & Interactive Engine</h3>
           </div>
           <div class="ep-grid-3">
-            <div class="ep-card active">
+            <div class="ep-card active" data-ep-target="ep1">
               <div class="ep-cover-frame">
-                <span class="ep-tag-mini cyan-tag">PRIMARY EP</span>
-                <img src="assets/neon-heartbreaks.jpeg" alt="Neon Heartbreaks" class="ep-img-cover">
+                <span class="ep-tag-mini cyan-tag">EP 01</span>
+                <img src="assets/neon-heartbreaks.jpeg" alt="EP1" class="ep-img-cover">
               </div>
               <div class="ep-details">
                 <h4>NEON HEARTBREAKS</h4>
-                <div class="ep-desc">Rain-soaked synthwave cityscape. Analog basslines & cyber hooks.</div>
                 <div class="mini-tracklist">
                   <div class="mini-track-item active-track" data-track="before-the-noise" data-ep="Neon Heartbreaks EP">1. Before the Noise</div>
                   <div class="mini-track-item" data-track="low-bitrate-love" data-ep="Neon Heartbreaks EP">2. Low Bitrate Love</div>
@@ -130,14 +111,13 @@
               </div>
             </div>
 
-            <div class="ep-card">
+            <div class="ep-card" data-ep-target="ep2">
               <div class="ep-cover-frame">
-                <span class="ep-tag-mini purple-tag">CONCEPT</span>
-                <img src="assets/love-letters.jpeg" alt="Love Letters from Saigon" class="ep-img-cover">
+                <span class="ep-tag-mini purple-tag">EP 02</span>
+                <img src="assets/love-letters.jpeg" alt="EP2" class="ep-img-cover">
               </div>
               <div class="ep-details">
-                <h4>LOVE LETTERS FROM SAIGON</h4>
-                <div class="ep-desc">Trilingual narrative synthpop, organic lo-fi & tropical neon warmth.</div>
+                <h4>SAIGON LETTERS</h4>
                 <div class="mini-tracklist">
                   <div class="mini-track-item" data-track="saigon-bound" data-ep="Love Letters from Saigon">1. Saigon Bound</div>
                   <div class="mini-track-item" data-track="tinh-bolero-cho-tran" data-ep="Love Letters from Saigon">2. Tình Bolero Cho Trân</div>
@@ -146,14 +126,13 @@
               </div>
             </div>
 
-            <div class="ep-card">
+            <div class="ep-card" data-ep-target="ep3">
               <div class="ep-cover-frame">
-                <span class="ep-tag-mini red-tag">INDUSTRIAL</span>
-                <img src="assets/coal-to-diamond.jpeg" alt="Coal to Diamond" class="ep-img-cover">
+                <span class="ep-tag-mini red-tag">EP 03</span>
+                <img src="assets/coal-to-diamond.jpeg" alt="EP3" class="ep-img-cover">
               </div>
               <div class="ep-details">
                 <h4>COAL TO DIAMOND</h4>
-                <div class="ep-desc">Obsidian design, Blade Cut industrial bass, distortion dynamics.</div>
                 <div class="mini-tracklist">
                   <div class="mini-track-item" data-track="thick" data-ep="Coal to Diamond">1. THICK</div>
                   <div class="mini-track-item" data-track="the-throne-resonates" data-ep="Coal to Diamond">2. THE THRONE RESONATES</div>
@@ -175,12 +154,13 @@
         </div>
       </section>
 
+      <!-- COL 3 : SPOTIFY & STREAMING HUBS -->
       <section class="dash-col col-right">
         <div class="glass-card embed-card-full">
            <div class="card-head-compact">
-            <h3><span class="live-dot green-dot"></span> Top Discography Player</h3>
+            <h3><span class="live-pulse green-dot"></span> Spotify Master Player</h3>
           </div>
-          <div class="spotify-wrapper-fixed" id="spotify-container">
+          <div class="spotify-wrapper-fixed">
             <iframe 
               id="spotify-iframe"
               src="https://open.spotify.com/embed/artist/6W08IttKpZns5zG7BYTz8e?utm_source=generator&theme=0" 
@@ -188,12 +168,22 @@
               height="100%" 
               frameBorder="0" 
               allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-              loading="lazy" 
-              style="border-radius: 8px;">
+              loading="lazy">
             </iframe>
           </div>
         </div>
+
+        <div class="glass-card hubs-card">
+          <div class="card-head-compact">
+            <h3>☍ Hubs</h3>
+          </div>
+          <div class="hubs-row">
+            <a href="https://open.spotify.com/artist/6W08IttKpZns5zG7BYTz8e" target="_blank" class="hub-pill spotify-pill">Spotify</a>
+            <a href="https://soundcloud.com/shinobiwan-1" target="_blank" class="hub-pill soundcloud-pill">SoundCloud</a>
+          </div>
+        </div>
       </section>
+
     </main>
   </div>
   <script src="js/app-engine.js" defer></script>
