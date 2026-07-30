@@ -30,7 +30,7 @@
     <!-- MAIN DASHBOARD -->
     <main class="dashboard-grid">
       
-      <!-- COL 1 : ACTIVE PLAYBACK + RTA SPECTRUM RESTAURÉ EN HAUT -->
+      <!-- COL 1 : ACTIVE PLAYBACK, RTA, STREAMING & LYRICS -->
       <section class="dash-col col-left">
         <div class="glass-card main-player">
           <div class="card-head-compact">
@@ -73,7 +73,7 @@
           </div>
         </div>
 
-        <!-- RTA SPECTRUM REMONTÉ DANS LA COLONNE DE GAUCHE -->
+        <!-- RTA SPECTRUM -->
         <div class="glass-card dsp-card">
            <div class="card-head-compact flex-between">
             <h3>RTA Spectrum</h3>
@@ -91,6 +91,7 @@
           </div>
         </div>
 
+        <!-- STREAMING HUBS -->
         <div class="glass-card platform-grid">
           <div class="card-head-compact">
             <h3>☍ Streaming Hubs</h3>
@@ -110,9 +111,20 @@
             </div>
           </a>
         </div>
+
+        <!-- DYNAMIC LYRICS VAULT (Désormais en Colonne 1) -->
+        <div class="glass-card lyrics-vault-card">
+          <div class="card-head-compact flex-between">
+            <h3>Dynamic Lyrics Vault</h3>
+            <span class="badge-tech cyan-border">SYNC READY</span>
+          </div>
+          <div class="lyrics-container" id="lyrics-display">
+            Initializing vault connection...
+          </div>
+        </div>
       </section>
 
-      <!-- COL 2 : CATALOG & LYRICS VAULT -->
+      <!-- COL 2 : CATALOG / DISCOGRAPHY SHOWCASE -->
       <section class="dash-col col-center">
         <div class="glass-card catalog-showcase-card">
           <div class="card-head-compact">
@@ -167,16 +179,6 @@
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        <div class="glass-card lyrics-vault-card">
-          <div class="card-head-compact flex-between">
-            <h3>Dynamic Lyrics Vault</h3>
-            <span class="badge-tech cyan-border">SYNC READY</span>
-          </div>
-          <div class="lyrics-container" id="lyrics-display">
-            Initializing vault connection...
           </div>
         </div>
       </section>
