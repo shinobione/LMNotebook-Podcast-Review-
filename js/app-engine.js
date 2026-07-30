@@ -205,14 +205,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const glowIntensity = Math.min(0.3, audioEnergy / 1000);
             document.documentElement.style.setProperty('--dynamic-glow', `rgba(0, 240, 255, ${glowIntensity})`);
 
-            // Bass-Drop Shockwave Trigger
-            if (audioEnergy > 210 && !isShockwaving) {
-                document.body.classList.add('matrix-shockwave');
-                isShockwaving = true;
-                setTimeout(() => { 
-                    document.body.classList.remove('matrix-shockwave'); 
-                    setTimeout(() => { isShockwaving = false; }, 100); // Debounce
-                }, 100);
+            // Bass-Drop Soft Pulse (Version adoucie)
+            if (audioEnergy > 230 && !isShockwaving) {
+                const mainPlayerCard = document.querySelector('.main-player');
+                if(mainPlayerCard) {
+                    mainPlayerCard.classList.add('matrix-shockwave');
+                    isShockwaving = true;
+                    setTimeout(() => { 
+                        mainPlayerCard.classList.remove('matrix-shockwave'); 
+                        setTimeout(() => { isShockwaving = false; }, 250); 
+                    }, 200);
+                }
             }
 
         } else if (spotifyGhostMode) {
