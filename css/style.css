@@ -308,20 +308,21 @@ body.audio-active::before {
   transition-duration: 0.001ms !important;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  #ambient-canvas {
-    display: none;
-  }
-
-  .player-cover-img,
-  .ep-img-cover,
-  .glass-card,
-  .btn-play,
-  .btn-secondary,
-  .btn-export,
-  .hub-pill {
-    transition: none !important;
-  }
+.lyrics-line { display: block; margin: 3px 0; transition: 0.2s; }
+.lyrics-line-active {
+  color: var(--accent-cyan) !important;
+  font-size: 0.82rem !important;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.9);
+  background: rgba(0, 240, 255, 0.12);
+  padding: 3px 8px;
+  border-left: 2px solid var(--accent-cyan);
+  border-right: 2px solid var(--accent-cyan);
+  border-radius: 4px;
+  display: inline-block;
+  width: 85%;
+  margin: 4px auto;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
 }
 
 @media (max-width: 768px) {
@@ -461,6 +462,18 @@ body.audio-active::before {
   0%, 100% { opacity: 0.3; transform: scaleX(0.72); }
   50% { opacity: 0.8; transform: scaleX(1); }
 }
+.glass-card { overflow: clip; }
+.glass-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 30%, rgba(0, 240, 255, 0.035) 48%, transparent 66%);
+  transform: translateX(-110%);
+  transition: transform 0.8s ease;
+}
+.glass-card { position: relative; }
+.glass-card:hover::before { transform: translateX(110%); }
 
 .reduced-motion .header-logo-center::before,
 .reduced-motion .header-logo-img,
@@ -507,3 +520,15 @@ body.audio-active .main-player {
   body { --audio-level: 0 !important; }
   body.audio-active .player-cover-img { transform: none; filter: none; }
 }
+@keyframes logo-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+@keyframes header-signal {
+  0%, 100% { opacity: 0.3; transform: scaleX(0.72); }
+  50% { opacity: 0.8; transform: scaleX(1); }
+}
+
+.reduced-motion .header-logo-center::before,
+.reduced-motion .header-logo-img,
+.reduced-motion .topbar::after { animation: none; }
