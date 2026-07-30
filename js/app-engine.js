@@ -28,6 +28,183 @@ document.addEventListener('DOMContentLoaded', () => {
     let isShockwaving = false;
     let currentActiveTrackId = 'before-the-noise'; // Default track
 
+    // Web Audio FX & Visu instances
+    let fxRack = null;
+    let lyricsEngine = null;
+    let coverVisualizer = null;
+
+    // ==========================================
+    // MODULE PARSER & SYNCHO PAROLES (LRC SYNC)
+    // ==========================================
+    class LyricsSyncEngine {
+        constructor(containerElement) {
+            this.container = containerElement;
+            this.lyrics = [];
+            this.currentIndex = -1;
+        }
+
+        loadLrc(lrcText) {
+            const lines = lrcText.split('\n');
+            this.lyrics = [];
+            const regex = /\[(\d{2}):(\d{2})\.(\d{2,3})\](.*)/;
+            
+            lines.forEach(line => {
+                const match = regex.exec(line);
+                if (match) {
+                    const minutes = parseInt(match[1], 10);
+                    const seconds = parseInt(match[2], 10);
+                    const millis = parseInt(match[3].padEnd(3, '0'), 10);
+                    const time = minutes * 60 + seconds + millis / 1000;
+                    const text = match[4].trim();
+                    if (text) this.lyrics.push({ time, text });
+                }
+            });
+            this.render();
+        }
+
+        render() {
+            if (!this.container) return;
+            this.container.innerHTML = this.lyrics.map((l, i) => 
+                `<div class="lyric-line" data-index="${i}" style="transition: all 0.3s ease; padding: 4px 0; color: #666; font-size: 0.9rem;">${l.text}</div>`
+            ).join('');
+            this.currentIndex = -1;
+        }
+
+        update(currentTime) {
+            if (!this.lyrics.length || !this.container) return;
+            let idx = this.lyrics.findIndex((l, i) => {
+                const next = this.lyrics[i + 1];
+                return currentTime >= l.time && (!next || currentTime < next.time);
+            });
+
+            if (idx !== -1 && idx !== this.currentIndex) {
+                this.currentIndex = idx;
+                const lines = this.container.querySelectorAll('.lyric-line');
+                lines.forEach((el, i) => {
+                    if (i === idx) {
+                        el.style.color = '#00f3ff';
+                        el.style.textShadow = '0 0 10px rgba(0,243,255,0.8)';
+                        el.style.fontWeight = 'bold';
+                        el.style.transform = 'scale(1.02)';
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    } else {
+                        el.style.color = '#555';
+                        el.style.textShadow = 'none';
+                        el.style.fontWeight = 'normal';
+                        el.style.transform = 'scale(1)';
+                    }
+                });
+            }
+        }
+    }
+
+    // ==========================================
+    // MODULE CONSOLE AUDIO FX (PULP FX LIVE)
+    // ==========================================
+    class AudioFXRack {
+        constructor(context, sourceNode) {
+            this.audioCtx = context;
+            this.source = sourceNode;
+            
+            this.filterNode = this.audioCtx.createBiquadFilter();
+            this.filterNode.type = 'lowpass';
+            this.filterNode.frequency.value = 20000;
+
+            this.distortionNode = this.audioCtx.createWaveShaper();
+            this.distortionNode.curve = this.makeDistortionCurve(0);
+
+            // Chainage DSP : Source -> Filter -> Distortion -> Analyser
+            this.source.disconnect();
+            this.source.connect(this.filterNode);
+            this.filterNode.connect(this.distortionNode);
+            this.distortionNode.connect(analyser);
+        }
+
+        toggleUnderwater(active) {
+            this.filterNode.frequency.setTargetAtTime(active ? 800 : 20000, this.audioCtx.currentTime, 0.05);
+        }
+
+        toggleDistortion(active) {
+            this.distortionNode.curve = this.makeDistortionCurve(active ? 40 : 0);
+        }
+
+        makeDistortionCurve(amount) {
+            const k = typeof amount === 'number' ? amount : 50;
+            const n_samples = 44100;
+            const curve = new Float32Array(n_samples);
+            const deg = Math.PI / 180;
+            for (let i = 0; i < n_samples; ++i) {
+                const x = (i * 2) / n_samples - 1;
+                curve[i] = ((3 + k) * x * 20 * deg) / (Math.PI + k * Math.abs(x));
+            }
+            return curve;
+        }
+    }
+
+    // ==========================================
+    // MODULE HUD MINI-VISUALIZER (COVER ART)
+    // ==========================================
+    class CoverArtVisualizer {
+        constructor(coverElement, analyserNode) {
+            this.cover = coverElement;
+            this.analyser = analyserNode;
+            this.canvas = document.createElement('canvas');
+            this.canvas.width = 150;
+            this.canvas.height = 150;
+            this.canvas.style.cssText = "position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; border-radius:inherit; z-index:2;";
+            
+            const parent = this.cover.parentElement || this.cover;
+            if (getComputedStyle(parent).position === 'static') {
+                parent.style.position = 'relative';
+            }
+            parent.appendChild(this.canvas);
+            
+            this.ctx = this.canvas.getContext('2d');
+            this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+            this.animId = null;
+        }
+
+        start() {
+            if (this.animId) cancelAnimationFrame(this.animId);
+            const draw = () => {
+                this.animId = requestAnimationFrame(draw);
+                this.analyser.getByteFrequencyData(this.dataArray);
+                
+                this.ctx.clearRect(0, 0, 150, 150);
+                this.ctx.strokeStyle = '#00f3ff';
+                this.ctx.lineWidth = 2;
+                this.ctx.beginPath();
+                
+                const radius = 50;
+                const centerX = 75;
+                const centerY = 75;
+                const slices = this.dataArray.length;
+                
+                for (let i = 0; i < slices; i++) {
+                    const v = this.dataArray[i] / 255.0;
+                    const angle = (i * 2 * Math.PI) / slices;
+                    const r = radius + v * 18;
+                    const x = centerX + r * Math.cos(angle);
+                    const y = centerY + r * Math.sin(angle);
+                    
+                    if (i === 0) this.ctx.moveTo(x, y);
+                    else this.ctx.lineTo(x, y);
+                }
+                this.ctx.closePath();
+                this.ctx.stroke();
+            };
+            draw();
+        }
+
+        stop() {
+            if (this.animId) cancelAnimationFrame(this.animId);
+            this.ctx.clearRect(0, 0, 150, 150);
+        }
+    }
+
+    // Instanciation de l'engine Synchro Lyrics
+    lyricsEngine = new LyricsSyncEngine(lyricsDisplay);
+
     // ==========================================
     // MODULE 0 : UI SOUND SYNTHESIZER
     // ==========================================
@@ -74,25 +251,28 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.matchMedia("(pointer: fine)").matches) {
         window.addEventListener('mousemove', (e) => {
             mouseX = e.clientX; mouseY = e.clientY;
-            cursor.style.left = mouseX + 'px';
-            cursor.style.top = mouseY + 'px';
+            if(cursor) {
+                cursor.style.left = mouseX + 'px';
+                cursor.style.top = mouseY + 'px';
+            }
         });
 
         function animateTrail() {
             trailX += (mouseX - trailX) * 0.15;
             trailY += (mouseY - trailY) * 0.15;
-            trail.style.left = trailX + 'px';
-            trail.style.top = trailY + 'px';
+            if(trail) {
+                trail.style.left = trailX + 'px';
+                trail.style.top = trailY + 'px';
+            }
             requestAnimationFrame(animateTrail);
         }
         animateTrail();
 
         interactiveElements.forEach(el => {
-            el.addEventListener('mouseenter', () => { cursor.classList.add('hovering'); trail.classList.add('hovering'); });
-            el.addEventListener('mouseleave', () => { cursor.classList.remove('hovering'); trail.classList.remove('hovering'); });
+            el.addEventListener('mouseenter', () => { if(cursor) cursor.classList.add('hovering'); if(trail) trail.classList.add('hovering'); });
+            el.addEventListener('mouseleave', () => { if(cursor) cursor.classList.remove('hovering'); if(trail) trail.classList.remove('hovering'); });
         });
 
-        // 3D Parallax Calculation
         parallaxCards.forEach(card => {
             card.addEventListener('mousemove', (e) => {
                 const rect = card.getBoundingClientRect();
@@ -100,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const y = e.clientY - rect.top;
                 const centerX = rect.width / 2;
                 const centerY = rect.height / 2;
-                const rotateX = ((y - centerY) / centerY) * -10; // Max 10 deg
+                const rotateX = ((y - centerY) / centerY) * -10;
                 const rotateY = ((x - centerX) / centerX) * 10;
                 
                 const inner = card.querySelector('.parallax-inner');
@@ -117,7 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // MODULE 2 : AUDIO REACTIVE PARTICLES
     // ==========================================
     const bgCanvas = document.getElementById('bg-particles');
-    const bgCtx = bgCanvas.getContext('2d');
+    const bgCtx = bgCanvas ? bgCanvas.getContext('2d') : null;
     let particlesArray = [];
 
     class Particle {
@@ -128,6 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.baseX = this.x; this.baseY = this.y;
         }
         draw(currentSize) {
+            if (!bgCtx) return;
             bgCtx.beginPath();
             bgCtx.arc(this.x, this.y, currentSize, 0, Math.PI * 2, false);
             bgCtx.fillStyle = this.color;
@@ -147,6 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function initParticles() {
+        if (!bgCanvas) return;
         particlesArray = [];
         bgCanvas.width = window.innerWidth;
         bgCanvas.height = window.innerHeight;
@@ -163,8 +345,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function animateParticles() {
         requestAnimationFrame(animateParticles);
-        bgCtx.clearRect(0, 0, innerWidth, innerHeight);
-        for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); }
+        if (bgCtx && bgCanvas) {
+            bgCtx.clearRect(0, 0, innerWidth, innerHeight);
+            for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); }
+        }
     }
     initParticles(); animateParticles();
     window.addEventListener('resize', () => initParticles());
@@ -180,11 +364,34 @@ document.addEventListener('DOMContentLoaded', () => {
             analyser.fftSize = 128;
             dataArray = new Uint8Array(analyser.frequencyBinCount);
             const source = audioCtx.createMediaElementSource(audioEl);
-            source.connect(analyser);
-            analyser.connect(audioCtx.destination);
+
+            // Initialisation de la console Pulp FX Rack
+            fxRack = new AudioFXRack(audioCtx, source);
+
+            // Bindings UI facultatifs pour les boutons Pulp FX s'ils sont présents dans la page
+            const btnUnderwater = document.getElementById('btn-fx-underwater');
+            const btnDistortion = document.getElementById('btn-fx-distortion');
+            if (btnUnderwater) {
+                btnUnderwater.addEventListener('click', (e) => {
+                    const active = e.target.classList.toggle('active');
+                    fxRack.toggleUnderwater(active);
+                });
+            }
+            if (btnDistortion) {
+                btnDistortion.addEventListener('click', (e) => {
+                    const active = e.target.classList.toggle('active');
+                    fxRack.toggleDistortion(active);
+                });
+            }
+
+            // Initialisation HUD Visualizer sur le Cover Art
+            if (playerCover) {
+                coverVisualizer = new CoverArtVisualizer(playerCover, analyser);
+            }
+
             isInitialized = true;
             renderRTA();
-        } catch (e) { console.error("DSP Routing Failed"); }
+        } catch (e) { console.error("DSP Routing Failed", e); }
     }
 
     function renderRTA() {
@@ -198,14 +405,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!audioEl.paused) {
             analyser.getByteFrequencyData(dataArray);
-            for(let i=0; i<8; i++) localEnergy += dataArray[i]; // Focus on sub/kick bins
+            for(let i=0; i<8; i++) localEnergy += dataArray[i];
             audioEnergy = localEnergy / 8; 
             
-            // Dynamic EQ Glow based on bass energy
             const glowIntensity = Math.min(0.3, audioEnergy / 1000);
             document.documentElement.style.setProperty('--dynamic-glow', `rgba(0, 240, 255, ${glowIntensity})`);
 
-            // Bass-Drop Soft Pulse (Version adoucie)
             if (audioEnergy > 230 && !isShockwaving) {
                 const mainPlayerCard = document.querySelector('.main-player');
                 if(mainPlayerCard) {
@@ -252,7 +457,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // MODULE 4 : TYPEWRITER LYRICS
+    // MODULE 4 : TYPEWRITER FALLBACK
     // ==========================================
     let typingInterval;
     function typeWriterEffect(textElement, rawText, speed = 15) {
@@ -273,29 +478,30 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     // MODULE 5 : EXPORT MP3 ONLY (STRICT)
     // ==========================================
-    btnExportMp3.addEventListener('click', () => {
-        playUISound('click');
-        const originalText = btnExportMp3.textContent;
-        btnExportMp3.textContent = "[::] PROCESSING DATA...";
-        btnExportMp3.style.background = 'var(--accent-red)';
-        
-        setTimeout(() => {
-            const a = document.createElement('a');
-            a.href = `audio/${currentActiveTrackId}.mp3`;
-            a.download = `SHINOBIWAN_${currentActiveTrackId}_MASTER.mp3`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            
-            btnExportMp3.textContent = "[✔] TRANSFER COMPLETE";
-            btnExportMp3.style.background = 'var(--spotify-green)';
+    if (btnExportMp3) {
+        btnExportMp3.addEventListener('click', () => {
+            playUISound('click');
+            btnExportMp3.textContent = "[::] PROCESSING DATA...";
+            btnExportMp3.style.background = 'var(--accent-red)';
             
             setTimeout(() => {
-                btnExportMp3.textContent = "[⭳] EXPORT MASTER MP3";
-                btnExportMp3.style.background = '';
-            }, 2000);
-        }, 600);
-    });
+                const a = document.createElement('a');
+                a.href = `audio/${currentActiveTrackId}.mp3`;
+                a.download = `SHINOBIWAN_${currentActiveTrackId}_MASTER.mp3`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                
+                btnExportMp3.textContent = "[✔] TRANSFER COMPLETE";
+                btnExportMp3.style.background = 'var(--spotify-green)';
+                
+                setTimeout(() => {
+                    btnExportMp3.textContent = "[⭳] EXPORT MASTER MP3";
+                    btnExportMp3.style.background = '';
+                }, 2000);
+            }, 600);
+        });
+    }
 
     // ==========================================
     // MODULE 6 : TRANSPORT & MUTUAL EXCLUSION
@@ -303,6 +509,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function pauseLocalPlayer() {
         if (!audioEl.paused) {
             audioEl.pause();
+            if (coverVisualizer) coverVisualizer.stop();
             btnPlayPause.textContent = '▶';
             btnPlayPause.style.background = 'var(--spotify-green)';
             btnPlayPause.style.boxShadow = '0 0 15px var(--spotify-green)';
@@ -333,11 +540,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (audioEl.paused) {
             muteSpotifyEmbed();
             audioEl.play();
+            if (coverVisualizer) coverVisualizer.start();
             btnPlayPause.textContent = '⏸';
             btnPlayPause.style.background = 'var(--accent-cyan)';
             btnPlayPause.style.boxShadow = '0 0 25px var(--accent-cyan)';
         } else {
             audioEl.pause();
+            if (coverVisualizer) coverVisualizer.stop();
             btnPlayPause.textContent = '▶';
             btnPlayPause.style.background = 'var(--spotify-green)';
             btnPlayPause.style.boxShadow = '0 0 15px var(--spotify-green)';
@@ -366,6 +575,11 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         timeCurrent.textContent = formatTime(audioEl.currentTime);
         timeTotal.textContent = formatTime(audioEl.duration);
+
+        // Synchro de la ligne active dans les lyrics
+        if (lyricsEngine) {
+            lyricsEngine.update(audioEl.currentTime);
+        }
     });
 
     audioEl.addEventListener('ended', () => {
@@ -373,6 +587,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btnPlayPause.style.background = 'var(--spotify-green)';
         btnPlayPause.style.boxShadow = '0 0 15px var(--spotify-green)';
         progressBar.style.width = '0%';
+        if (coverVisualizer) coverVisualizer.stop();
     });
 
     // ==========================================
@@ -388,12 +603,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const trackItems = document.querySelectorAll('.mini-track-item');
     
     async function loadTrackData(trackId, epName, title) {
-        currentActiveTrackId = trackId; // Store for downloader
+        currentActiveTrackId = trackId;
         muteSpotifyEmbed(); 
         triggerGlitch(); 
         
         audioEl.src = `audio/${trackId}.mp3`;
-        if(isInitialized) audioEl.play();
+        if(isInitialized) {
+            audioEl.play();
+            if (coverVisualizer) coverVisualizer.start();
+        }
         btnPlayPause.textContent = isInitialized ? '⏸' : '▶';
         if(isInitialized) {
             btnPlayPause.style.background = 'var(--accent-cyan)';
@@ -411,7 +629,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(`assets/lyrics/${trackId}.txt`);
             if (response.ok) {
                 const text = await response.text();
-                typeWriterEffect(lyricsDisplay, text, 10);
+                // Si le fichier contient des timestamps LRC [MM:SS.ms], on active l'Engine
+                if (/\[\d{2}:\d{2}\.\d{2,3}\]/.test(text)) {
+                    lyricsEngine.loadLrc(text);
+                } else {
+                    typeWriterEffect(lyricsDisplay, text, 10);
+                }
             } else {
                 typeWriterEffect(lyricsDisplay, `> ERROR 404: /vault/${trackId}.txt NOT FOUND`, 20);
             }
