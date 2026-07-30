@@ -145,7 +145,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const percent = (audioEl.currentTime / audioEl.duration) * 100;
             progressBar.style.width = `${percent}%`;
 
-            // Synchronisation temporelle corrigée (zéro-bug au démarrage)
             if (parsedLyrics.length > 0) {
                 const currentTime = audioEl.currentTime;
                 let activeIndex = 0;
@@ -216,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         const span = document.createElement('span');
                         span.className = 'lyrics-line';
-                        span.textContent = lyricText; // Texte pur sans timestamp visible
+                        span.textContent = lyricText;
                         lyricsDisplay.appendChild(span);
                         lyricsDisplay.appendChild(document.createElement('br'));
                     } else if (line.trim() !== '') {
