@@ -1,6 +1,6 @@
 :root {
   --bg-dark: #05070a;
-  --panel-bg: rgba(10, 15, 25, 0.7);
+  --panel-bg: rgba(10, 15, 25, 0.75);
   --border-color: rgba(0, 240, 255, 0.15);
   --accent-cyan: #00f0ff;
   --spotify-green: #1db954;
@@ -40,7 +40,6 @@ body {
   display: flex;
   flex-direction: column;
   gap: 15px;
-  /* CORRECTION SCROLL MOBILE : Suppression du height 100vh fixe */
   min-height: 100vh;
 }
 
@@ -54,6 +53,7 @@ body {
   border-radius: 8px;
   padding: 10px 20px;
   backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
 }
 
 .brand-zone { display: flex; align-items: center; gap: 10px; }
@@ -95,7 +95,7 @@ body {
 ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
 ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
 
-/* GLASS CARDS */
+/* GLASS CARDS & HOVER EFFECTS */
 .glass-card {
   background: var(--panel-bg);
   border: 1px solid var(--border-color);
@@ -104,7 +104,13 @@ body {
   backdrop-filter: blur(10px);
   display: flex;
   flex-direction: column;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
+.glass-card:hover {
+  border-color: rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.08);
+}
+
 .card-head-compact { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; font-family: var(--font-mono); text-transform: uppercase; }
 .card-head-compact h3 { font-size: 0.8rem; font-weight: 700; color: var(--text-main); margin: 0; }
 .flex-between { justify-content: space-between; }
@@ -146,11 +152,34 @@ body {
   transition: width 0.1s linear;
 }
 
-.controls-row { display: flex; justify-content: center; gap: 15px; align-items: center; }
+.controls-row { display: flex; justify-content: center; gap: 15px; align-items: center; margin-bottom: 10px; }
 .btn-play { background: var(--spotify-green); color: #000; border: none; width: 45px; height: 45px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s; }
 .btn-play:hover { transform: scale(1.05); }
 .btn-secondary { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; cursor: pointer; transition: 0.2s; }
 .btn-secondary:hover { background: rgba(255,255,255,0.2); }
+
+/* EXPORT BUTTON */
+.export-row { margin-top: 8px; width: 100%; }
+.btn-export {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid var(--accent-cyan);
+  color: var(--accent-cyan);
+  padding: 8px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-decoration: none;
+  transition: 0.2s;
+  letter-spacing: 1px;
+}
+.btn-export:hover {
+  background: var(--accent-cyan);
+  color: #000;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+}
 
 /* PLATFORMS */
 .profile-item { display: flex; align-items: center; gap: 12px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 6px; text-decoration: none; color: inherit; border: 1px solid transparent; transition: 0.2s; margin-bottom: 8px; }
@@ -163,7 +192,8 @@ body {
 
 /* CATALOG COL 2 */
 .ep-grid-3 { display: flex; gap: 15px; margin-bottom: 15px; }
-.ep-card { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); border-radius: 6px; padding: 10px; display: flex; flex-direction: column; gap: 10px; }
+.ep-card { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); border-radius: 6px; padding: 10px; display: flex; flex-direction: column; gap: 10px; transition: 0.2s; }
+.ep-card:hover { border-color: rgba(0, 240, 255, 0.3); background: rgba(0,0,0,0.5); }
 .ep-cover-frame { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: 4px; overflow: hidden; }
 .ep-img-cover { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: 0.3s; }
 .ep-card:hover .ep-img-cover { opacity: 1; }
@@ -173,10 +203,10 @@ body {
 
 .mini-tracklist { display: flex; flex-direction: column; gap: 4px; }
 .mini-track-item { font-size: 0.7rem; font-family: var(--font-mono); padding: 5px; background: rgba(255,255,255,0.03); border-radius: 3px; cursor: pointer; transition: 0.2s; border-left: 2px solid transparent; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.mini-track-item:hover { background: rgba(255,255,255,0.08); }
+.mini-track-item:hover { background: rgba(255,255,255,0.08); color: var(--accent-cyan); }
 .active-track { border-left-color: var(--accent-cyan); color: var(--accent-cyan); background: rgba(0, 240, 255, 0.05); }
 
-/* LYRICS VAULT & STYLING DE LA PHRASE EN COURS */
+/* LYRICS VAULT & TIMESTAMPS NETTOYÉS */
 .lyrics-vault-card { flex: 1; display: flex; flex-direction: column; min-height: 250px; }
 .lyrics-container { 
   flex: 1; 
@@ -186,15 +216,15 @@ body {
   padding: 15px; 
   font-family: var(--font-mono); 
   font-size: 0.8rem; 
-  color: var(--text-muted); /* Les lignes inactives sont plus discrètes */
+  color: var(--text-muted); 
   overflow-y: auto; 
   line-height: 1.8; 
   white-space: pre-wrap; 
   box-shadow: inset 0 0 20px rgba(0,0,0,0.8); 
-  max-height: 350px; /* Évite l'expansion infinie qui piège le scroll */
+  max-height: 320px; 
 }
 
-/* Style boosté pour la ligne active (synchro / mise en valeur) */
+/* Ligne active épurée sans affichage de timestamp brut parasite */
 .lyrics-line-active {
   color: var(--accent-cyan) !important;
   font-size: 1.05rem !important;
@@ -260,7 +290,6 @@ body {
     max-height: 280px;
     margin: 0 auto 15px auto;
   }
-  /* Empêche le focus automatique des lyrics de bloquer le plein écran / scroll global sur mobile */
   .lyrics-container {
     max-height: 220px;
   }
