@@ -59,7 +59,6 @@ body {
 .brand-title { font-weight: 800; font-size: 1.1rem; letter-spacing: 2px; }
 .badge-ep { font-size: 0.65rem; background: rgba(0, 240, 255, 0.1); color: var(--accent-cyan); padding: 3px 6px; border-radius: 4px; border: 1px solid var(--accent-cyan); }
 
-/* LOGO AGRANDI */
 .header-logo-center {
   flex: 1;
   display: flex;
@@ -190,9 +189,57 @@ body {
 .embed-card-full { flex: 1; display: flex; flex-direction: column; }
 .spotify-wrapper-fixed { flex: 1; width: 100%; background: #000; border-radius: 6px; overflow: hidden; min-height: 400px; position: relative; }
 
-/* RESPONSIVE */
+/* =========================================
+   RESPONSIVE DESIGN SYSTEM (REFONTE MOBILE)
+   ========================================= */
+
 @media (max-width: 1024px) {
+  /* Breakpoint Tablette / Desktop étroit */
   .dashboard-grid { grid-template-columns: 1fr; }
-  .app-viewport { height: auto; }
+  .app-viewport { height: auto; padding: 10px; }
+  .dash-col { overflow-y: visible; padding-right: 0; }
   .ep-grid-3 { flex-direction: column; }
+}
+
+@media (max-width: 768px) {
+  /* Breakpoint Mobile STRICT */
+  .topbar {
+    flex-direction: column;
+    padding: 15px;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .brand-zone {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .header-logo-center {
+    order: -1; /* Remonte le logo tout en haut sur mobile */
+    margin-bottom: 5px;
+  }
+  
+  .header-logo-img {
+    height: 36px;
+  }
+  
+  .hosts-zone {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .track-meta h2 {
+    font-size: 1.2rem;
+  }
+
+  .spotify-wrapper-fixed {
+    min-height: 420px; /* Adapte la hauteur pour le layout compact Spotify mobile */
+  }
+  
+  .lyrics-vault-card {
+    min-height: 300px; /* Donne un peu plus d'espace de lecture sur mobile */
+  }
 }
