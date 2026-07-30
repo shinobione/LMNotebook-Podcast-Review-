@@ -308,25 +308,46 @@ body.audio-active::before {
   transition-duration: 0.001ms !important;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  #ambient-canvas {
-    display: none;
-  }
-
-  .player-cover-img,
-  .ep-img-cover,
-  .glass-card,
-  .btn-play,
-  .btn-secondary,
-  .btn-export,
-  .hub-pill {
-    transition: none !important;
-  }
+.lyrics-line { display: block; margin: 3px 0; transition: 0.2s; }
+.lyrics-line-active {
+  color: var(--accent-cyan) !important;
+  font-size: 0.82rem !important;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.9);
+  background: rgba(0, 240, 255, 0.12);
+  padding: 3px 8px;
+  border-left: 2px solid var(--accent-cyan);
+  border-right: 2px solid var(--accent-cyan);
+  border-radius: 4px;
+  display: inline-block;
+  width: 85%;
+  margin: 4px auto;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
 }
 
-@media (max-width: 768px) {
-  #ambient-canvas {
-    opacity: 0.6;
+/* COL 3 : SPOTIFY & HUBS */
+.embed-card-full { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.spotify-wrapper-fixed { flex: 1; width: 100%; background: #000; border-radius: 8px; overflow: hidden; min-height: 0; position: relative; box-shadow: inset 0 0 15px rgba(0,0,0,0.9); }
+.spotify-wrapper-fixed iframe { width: 100%; height: 100%; border: none; border-radius: 8px; }
+
+.hubs-card { flex-shrink: 0; }
+.hubs-row { display: flex; gap: 8px; }
+.hub-pill { flex: 1; text-align: center; padding: 6px; border-radius: 6px; font-size: 0.65rem; font-family: var(--font-mono); text-decoration: none; font-weight: bold; transition: 0.2s; }
+.spotify-pill { background: rgba(29, 185, 84, 0.15); border: 1px solid var(--spotify-green); color: var(--spotify-green); box-shadow: 0 0 8px rgba(29, 185, 84, 0.2); }
+.spotify-pill:hover { background: var(--spotify-green); color: #000; box-shadow: 0 0 15px var(--spotify-green); }
+.soundcloud-pill { background: rgba(255, 85, 0, 0.15); border: 1px solid #ff5500; color: #ff5500; box-shadow: 0 0 8px rgba(255, 85, 0, 0.2); }
+.soundcloud-pill:hover { background: #ff5500; color: #fff; box-shadow: 0 0 15px #ff5500; }
+
+/* SCROLLBARS */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: rgba(0,0,0,0.4); }
+::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; box-shadow: 0 0 6px var(--accent-cyan); }
+
+/* CORRECTION MOBILE ULTIME (MODE COMPACT SPOTIFY ET FLUX NATUREL) */
+@media (max-width: 1024px) {
+  html, body {
+    overflow-y: auto !important;
+    height: auto !important;
   }
 }
 
@@ -406,3 +427,62 @@ body.audio-active::before {
   .next-track-label { max-width: 60%; }
   .header-logo-img { width: 180px; }
 }
+
+/* TRANSPARENT LOGOMARK & SUBTLE CYBER POLISH */
+.header-logo-center::before {
+  content: "";
+  position: absolute;
+  inset: 8% -12%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(0, 240, 255, 0.2), transparent 68%);
+  filter: blur(12px);
+  animation: logo-breathe 4.5s ease-in-out infinite;
+}
+.header-logo-img {
+  /* Screen blending makes the original dark plate disappear without adding a binary asset. */
+  mix-blend-mode: screen;
+  filter: contrast(1.18) brightness(1.08) drop-shadow(0 0 7px rgba(255, 255, 255, 0.3)) drop-shadow(0 0 18px rgba(0, 240, 255, 0.65));
+  animation: logo-float 6s ease-in-out infinite;
+}
+.topbar::after {
+  content: "";
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  bottom: -1px;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+  opacity: 0.65;
+  animation: header-signal 3.8s ease-in-out infinite;
+}
+.glass-card { overflow: clip; }
+.glass-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 30%, rgba(0, 240, 255, 0.035) 48%, transparent 66%);
+  transform: translateX(-110%);
+  transition: transform 0.8s ease;
+}
+.glass-card { position: relative; }
+.glass-card:hover::before { transform: translateX(110%); }
+
+@keyframes logo-breathe {
+  0%, 100% { opacity: 0.45; transform: scale(0.94); }
+  50% { opacity: 0.9; transform: scale(1.05); }
+}
+@keyframes logo-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+@keyframes header-signal {
+  0%, 100% { opacity: 0.3; transform: scaleX(0.72); }
+  50% { opacity: 0.8; transform: scaleX(1); }
+}
+
+.reduced-motion .header-logo-center::before,
+.reduced-motion .header-logo-img,
+.reduced-motion .topbar::after { animation: none; }
