@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressContainer = document.getElementById('progress-container');
     const spotifyIframe = document.getElementById('spotify-iframe');
     const canvas = document.getElementById('rta-canvas');
+    const btnExportMp3 = document.getElementById('btn-export-mp3');
     
     // UI Elements
     const currentTrackTitle = document.getElementById('current-track-title');
@@ -19,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let audioCtx, analyser, dataArray;
     let isInitialized = false;
     let spotifyGhostMode = false;
-    let rawLyricsLines = []; // Stocke les lignes pour l'effet dynamique
+    let parsedLyrics = []; // Stocke les objets { time: secondes, text: texte }
 
     // --- 1. MOTEUR DSP & RTA ---
     function initDSP() {
@@ -144,17 +145,26 @@ document.addEventListener('DOMContentLoaded', () => {
             const percent = (audioEl.currentTime / audioEl.duration) * 100;
             progressBar.style.width = `${percent}%`;
 
-            // Synchro dynamique de la ligne de texte en cours selon l'avancement du morceau
-            if (rawLyricsLines.length > 0) {
-                const totalLines = rawLyricsLines.length;
-                const activeIndex = Math.floor((audioEl.currentTime / audioEl.duration) * totalLines);
+            // Synchronisation précise basée sur les timestamps LRC réels
+            if (parsedLyrics.length > 0) {
+                const currentTime = audioEl.currentTime;
+                let activeIndex = 0;
+
+                for (let i = 0; i < parsedLyrics.length; i++) {
+                    if (currentTime >= parsedLyrics[i].time) {
+                        activeIndex = i;
+                    } else {
+                        break;
+                    }
+                }
+
                 const lineElements = lyricsDisplay.querySelectorAll('.lyrics-line');
-                
                 lineElements.forEach((el, index) => {
                     if (index === activeIndex) {
-                        el.classList.add('lyrics-line-active');
-                        // Scroll uniquement à l'intérieur du conteneur box sans impacter le body/viewport
-                        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        if (!el.classList.contains('lyrics-line-active')) {
+                            el.classList.add('lyrics-line-active');
+                            el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        }
                     } else {
                         el.classList.remove('lyrics-line-active');
                     }
@@ -178,28 +188,52 @@ document.addEventListener('DOMContentLoaded', () => {
         progressBar.style.width = '0%';
     });
 
-    // --- 4. ROUTING AUDIO LOCAL & VAULT ---
+    // --- 4. ROUTING AUDIO LOCAL & PARSING LYRICS (LRC) ---
     const trackItems = document.querySelectorAll('.mini-track-item');
     
     async function updateLyrics(trackId) {
         lyricsDisplay.textContent = "Establishing uplink to Lyrics Vault...";
-        rawLyricsLines = [];
+        parsedLyrics = [];
         try {
             const response = await fetch(`assets/lyrics/${trackId}.txt`);
             if (response.ok) {
                 const text = await response.text();
-                // Nettoie et sépare les lignes pour les envelopper dans des spans interactifs
-                rawLyricsLines = text.split('\n').filter(line => line.trim() !== '');
+                const lines = text.split('\n');
                 lyricsDisplay.innerHTML = '';
                 
-                rawLyricsLines.forEach((line, idx) => {
-                    const span = document.createElement('span');
-                    span.className = 'lyrics-line';
-                    span.textContent = line;
-                    if (idx === 0) span.classList.add('lyrics-line-active');
-                    lyricsDisplay.appendChild(span);
-                    lyricsDisplay.appendChild(document.createElement('br'));
+                // Regex pour parser le format [MM:SS.ff] Texte
+                const regex = /^\[(\d{2}):(\d{2})\.(\d{2})\]\s*(.*)$/;
+
+                lines.forEach((line) => {
+                    const match = line.match(regex);
+                    if (match) {
+                        const minutes = parseInt(match[1], 10);
+                        const seconds = parseInt(match[2], 10);
+                        const centiseconds = parseInt(match[3], 10);
+                        const totalSeconds = minutes * 60 + seconds + centiseconds / 100;
+                        const lyricText = match[4].trim();
+
+                        parsedLyrics.push({ time: totalSeconds, text: lyricText });
+
+                        const span = document.createElement('span');
+                        span.className = 'lyrics-line';
+                        span.textContent = lyricText; // On masque le timestamp brut pour l'UI
+                        lyricsDisplay.appendChild(span);
+                        lyricsDisplay.appendChild(document.createElement('br'));
+                    } else if (line.trim() !== '') {
+                        // Fallback si une ligne n'a pas de timestamp
+                        parsedLyrics.push({ time: 0, text: line.trim() });
+                        const span = document.createElement('span');
+                        span.className = 'lyrics-line';
+                        span.textContent = line.trim();
+                        lyricsDisplay.appendChild(span);
+                        lyricsDisplay.appendChild(document.createElement('br'));
+                    }
                 });
+
+                if (parsedLyrics.length > 0) {
+                    lyricsDisplay.querySelectorAll('.lyrics-line')[0].classList.add('lyrics-line-active');
+                }
             } else {
                 lyricsDisplay.textContent = "// FILE NOT FOUND IN VAULT //\n\nEnsure " + trackId + ".txt exists in assets/lyrics/";
             }
@@ -211,7 +245,15 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadTrackData(trackId, epName, title) {
         muteSpotifyEmbed(); 
         
-        audioEl.src = `audio/${trackId}.mp3`;
+        const audioPath = `audio/${trackId}.mp3`;
+        audioEl.src = audioPath;
+        
+        // Liaison dynamique du bouton de téléchargement direct MP3
+        if (btnExportMp3) {
+            btnExportMp3.href = audioPath;
+            btnExportMp3.setAttribute('download', `${trackId}.mp3`);
+        }
+
         if(isInitialized) audioEl.play();
         btnPlayPause.textContent = isInitialized ? '⏸' : '▶';
         if(isInitialized) btnPlayPause.style.background = 'var(--accent-cyan)';
@@ -243,5 +285,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- 5. INITIALISATION SYSTEME AU BOOT ---
+    if (btnExportMp3) {
+        btnExportMp3.href = "audio/before-the-noise.mp3";
+        btnExportMp3.setAttribute('download', "before-the-noise.mp3");
+    }
     updateLyrics('before-the-noise');
 });
