@@ -4,10 +4,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnPlayPause = document.getElementById('btn-play-pause');
     const btnRewind = document.getElementById('btn-rewind');
     const btnForward = document.getElementById('btn-forward');
+    const btnExportMp3 = document.getElementById('btn-export-mp3');
     const progressBar = document.getElementById('progress-bar');
     const progressContainer = document.getElementById('progress-container');
     const spotifyIframe = document.getElementById('spotify-iframe');
-    const spotifyContainer = document.getElementById('spotify-container');
     const canvas = document.getElementById('rta-canvas');
     
     const currentTrackTitle = document.getElementById('current-track-title');
@@ -18,22 +18,107 @@ document.addEventListener('DOMContentLoaded', () => {
     const timeTotal = document.getElementById('time-total');
     
     const glitchTargets = document.querySelectorAll('.glitch-target');
+    const parallaxCards = document.querySelectorAll('.parallax-card');
+    const interactiveElements = document.querySelectorAll('.interactive-ui');
 
     let audioCtx, analyser, dataArray;
     let isInitialized = false;
     let spotifyGhostMode = false;
-    let audioEnergy = 0; // Capture la dynamique du master
+    let audioEnergy = 0; 
+    let isShockwaving = false;
+    let currentActiveTrackId = 'before-the-noise'; // Default track
 
     // ==========================================
-    // MODULE 1 : MOTEUR PARTICULES AUDIO-REACTIVES
+    // MODULE 0 : UI SOUND SYNTHESIZER
+    // ==========================================
+    const uiAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    function playUISound(type) {
+        if(uiAudioCtx.state === 'suspended') uiAudioCtx.resume();
+        const osc = uiAudioCtx.createOscillator();
+        const gainNode = uiAudioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(uiAudioCtx.destination);
+        
+        const now = uiAudioCtx.currentTime;
+        if (type === 'hover') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, now);
+            osc.frequency.exponentialRampToValueAtTime(1200, now + 0.05);
+            gainNode.gain.setValueAtTime(0.02, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+            osc.start(now); osc.stop(now + 0.05);
+        } else if (type === 'click') {
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(150, now);
+            osc.frequency.exponentialRampToValueAtTime(40, now + 0.1);
+            gainNode.gain.setValueAtTime(0.05, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+            osc.start(now); osc.stop(now + 0.1);
+        }
+    }
+
+    interactiveElements.forEach(el => {
+        el.addEventListener('mouseenter', () => playUISound('hover'));
+        el.addEventListener('mousedown', () => playUISound('click'));
+    });
+
+    // ==========================================
+    // MODULE 1 : CYBER CURSOR & 3D TILT
+    // ==========================================
+    const cursor = document.getElementById('cursor-main');
+    const trail = document.getElementById('cursor-trail');
+    let mouseX = 0, mouseY = 0;
+    let trailX = 0, trailY = 0;
+
+    if (window.matchMedia("(pointer: fine)").matches) {
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX; mouseY = e.clientY;
+            cursor.style.left = mouseX + 'px';
+            cursor.style.top = mouseY + 'px';
+        });
+
+        function animateTrail() {
+            trailX += (mouseX - trailX) * 0.15;
+            trailY += (mouseY - trailY) * 0.15;
+            trail.style.left = trailX + 'px';
+            trail.style.top = trailY + 'px';
+            requestAnimationFrame(animateTrail);
+        }
+        animateTrail();
+
+        interactiveElements.forEach(el => {
+            el.addEventListener('mouseenter', () => { cursor.classList.add('hovering'); trail.classList.add('hovering'); });
+            el.addEventListener('mouseleave', () => { cursor.classList.remove('hovering'); trail.classList.remove('hovering'); });
+        });
+
+        // 3D Parallax Calculation
+        parallaxCards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = ((y - centerY) / centerY) * -10; // Max 10 deg
+                const rotateY = ((x - centerX) / centerX) * 10;
+                
+                const inner = card.querySelector('.parallax-inner');
+                if(inner) inner.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                const inner = card.querySelector('.parallax-inner');
+                if(inner) inner.style.transform = `rotateX(0deg) rotateY(0deg)`;
+            });
+        });
+    }
+
+    // ==========================================
+    // MODULE 2 : AUDIO REACTIVE PARTICLES
     // ==========================================
     const bgCanvas = document.getElementById('bg-particles');
     const bgCtx = bgCanvas.getContext('2d');
     let particlesArray = [];
-    let mouse = { x: null, y: null, radius: 150 };
-
-    window.addEventListener('mousemove', (event) => { mouse.x = event.x; mouse.y = event.y; });
-    window.addEventListener('mouseout', () => { mouse.x = undefined; mouse.y = undefined; });
 
     class Particle {
         constructor(x, y, directionX, directionY, size, color) {
@@ -49,35 +134,13 @@ document.addEventListener('DOMContentLoaded', () => {
             bgCtx.fill();
         }
         update() {
-            if (mouse.x != null) {
-                let dx = mouse.x - this.x;
-                let dy = mouse.y - this.y;
-                let distance = Math.sqrt(dx * dx + dy * dy);
-                let forceDirectionX = dx / distance;
-                let forceDirectionY = dy / distance;
-                let force = (mouse.radius - distance) / mouse.radius;
-                
-                if (distance < mouse.radius) {
-                    this.x -= forceDirectionX * force * 5;
-                    this.y -= forceDirectionY * force * 5;
-                } else {
-                    if (this.x !== this.baseX) this.x -= (this.x - this.baseX) / 15;
-                    if (this.y !== this.baseY) this.y -= (this.y - this.baseY) / 15;
-                }
-            } else {
-                if (this.x !== this.baseX) this.x -= (this.x - this.baseX) / 15;
-                if (this.y !== this.baseY) this.y -= (this.y - this.baseY) / 15;
-            }
-            
-            // Interaction Audio : Plus ça tape, plus ça va vite et gros
-            const speedMultiplier = 1 + (audioEnergy * 0.02);
+            const speedMultiplier = 1 + (audioEnergy * 0.03);
             this.x += this.directionX * 0.2 * speedMultiplier;
             this.y += this.directionY * 0.2 * speedMultiplier;
             
             if(this.x < 0 || this.x > window.innerWidth) this.directionX = -this.directionX;
             if(this.y < 0 || this.y > window.innerHeight) this.directionY = -this.directionY;
 
-            // La taille grossit sur les subs
             const dynamicSize = this.baseSize + (audioEnergy * 0.05);
             this.draw(dynamicSize);
         }
@@ -87,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
         particlesArray = [];
         bgCanvas.width = window.innerWidth;
         bgCanvas.height = window.innerHeight;
-        let numberOfParticles = (bgCanvas.width * bgCanvas.height) / 7000; 
+        let numberOfParticles = (bgCanvas.width * bgCanvas.height) / 8000; 
         for (let i = 0; i < numberOfParticles; i++) {
             let size = (Math.random() * 1.5) + 0.5;
             let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
@@ -103,12 +166,11 @@ document.addEventListener('DOMContentLoaded', () => {
         bgCtx.clearRect(0, 0, innerWidth, innerHeight);
         for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); }
     }
-    initParticles();
-    animateParticles();
-    window.addEventListener('resize', () => { initParticles(); });
+    initParticles(); animateParticles();
+    window.addEventListener('resize', () => initParticles());
 
     // ==========================================
-    // MODULE 2 : DSP & RTA ENGINE
+    // MODULE 3 : DSP & EQ GLOW & SHOCKWAVE
     // ==========================================
     function initDSP() {
         if (isInitialized) return;
@@ -117,16 +179,12 @@ document.addEventListener('DOMContentLoaded', () => {
             analyser = audioCtx.createAnalyser();
             analyser.fftSize = 128;
             dataArray = new Uint8Array(analyser.frequencyBinCount);
-            
             const source = audioCtx.createMediaElementSource(audioEl);
             source.connect(analyser);
             analyser.connect(audioCtx.destination);
-            
             isInitialized = true;
             renderRTA();
-        } catch (e) {
-            console.error("DSP Routing Failed : ", e);
-        }
+        } catch (e) { console.error("DSP Routing Failed"); }
     }
 
     function renderRTA() {
@@ -140,19 +198,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!audioEl.paused) {
             analyser.getByteFrequencyData(dataArray);
-            // Moyenne des basses pour extraire l'énergie du Kick/Sub (bins 0 à 10)
-            for(let i=0; i<10; i++) localEnergy += dataArray[i];
-            audioEnergy = localEnergy / 10; 
+            for(let i=0; i<8; i++) localEnergy += dataArray[i]; // Focus on sub/kick bins
+            audioEnergy = localEnergy / 8; 
+            
+            // Dynamic EQ Glow based on bass energy
+            const glowIntensity = Math.min(0.3, audioEnergy / 1000);
+            document.documentElement.style.setProperty('--dynamic-glow', `rgba(0, 240, 255, ${glowIntensity})`);
+
+            // Bass-Drop Shockwave Trigger
+            if (audioEnergy > 210 && !isShockwaving) {
+                document.body.classList.add('matrix-shockwave');
+                isShockwaving = true;
+                setTimeout(() => { 
+                    document.body.classList.remove('matrix-shockwave'); 
+                    setTimeout(() => { isShockwaving = false; }, 100); // Debounce
+                }, 100);
+            }
+
         } else if (spotifyGhostMode) {
             for (let i = 0; i < dataArray.length; i++) {
                 let maxIntensity = i < 15 ? 255 : (i > 45 ? 120 : 180);
                 if (Math.random() > 0.85) dataArray[i] = Math.random() * maxIntensity;
                 else dataArray[i] = Math.max(0, dataArray[i] - 12);
             }
-            audioEnergy = 0; // Pas de feedback particules sur Spotify pour préserver l'UX
+            audioEnergy = 0; 
+            document.documentElement.style.setProperty('--dynamic-glow', `rgba(0, 240, 255, 0.05)`);
         } else {
             for(let i = 0; i < dataArray.length; i++) dataArray[i] = Math.max(0, dataArray[i] - 5);
             audioEnergy = Math.max(0, audioEnergy - 5);
+            document.documentElement.style.setProperty('--dynamic-glow', `rgba(0, 240, 255, 0.02)`);
         }
         
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -175,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // MODULE 3 : TYPEWRITER LYRICS FX
+    // MODULE 4 : TYPEWRITER LYRICS
     // ==========================================
     let typingInterval;
     function typeWriterEffect(textElement, rawText, speed = 15) {
@@ -186,7 +260,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (i < rawText.length) {
                 textElement.textContent += rawText.charAt(i);
                 i++;
-                // Autoscroll bottom
                 textElement.parentElement.scrollTop = textElement.parentElement.scrollHeight;
             } else {
                 clearInterval(typingInterval);
@@ -195,7 +268,34 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // MODULE 4 : TRANSPORT & EXCLUSION MUTUELLE
+    // MODULE 5 : EXPORT MP3 ONLY (STRICT)
+    // ==========================================
+    btnExportMp3.addEventListener('click', () => {
+        playUISound('click');
+        const originalText = btnExportMp3.textContent;
+        btnExportMp3.textContent = "[::] PROCESSING DATA...";
+        btnExportMp3.style.background = 'var(--accent-red)';
+        
+        setTimeout(() => {
+            const a = document.createElement('a');
+            a.href = `audio/${currentActiveTrackId}.mp3`;
+            a.download = `SHINOBIWAN_${currentActiveTrackId}_MASTER.mp3`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            btnExportMp3.textContent = "[✔] TRANSFER COMPLETE";
+            btnExportMp3.style.background = 'var(--spotify-green)';
+            
+            setTimeout(() => {
+                btnExportMp3.textContent = "[⭳] EXPORT MASTER MP3";
+                btnExportMp3.style.background = '';
+            }, 2000);
+        }, 600);
+    });
+
+    // ==========================================
+    // MODULE 6 : TRANSPORT & MUTUAL EXCLUSION
     // ==========================================
     function pauseLocalPlayer() {
         if (!audioEl.paused) {
@@ -209,9 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('blur', () => {
         setTimeout(() => {
             if (document.activeElement === spotifyIframe) {
-                pauseLocalPlayer();
-                initDSP(); 
-                spotifyGhostMode = true; 
+                pauseLocalPlayer(); initDSP(); spotifyGhostMode = true; 
             }
         }, 50);
     });
@@ -224,10 +322,6 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => { spotifyIframe.src = currentSrc; }, 50);
         }
     }
-
-    window.addEventListener('mousemove', () => {
-        if (document.activeElement === spotifyIframe) window.focus();
-    });
 
     btnPlayPause.addEventListener('click', () => {
         initDSP();
@@ -279,13 +373,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ==========================================
-    // MODULE 5 : ROUTING AUDIO & TRIGGER
+    // MODULE 7 : ROUTING AUDIO & GLITCH
     // ==========================================
     function triggerGlitch() {
         glitchTargets.forEach(el => {
-            el.classList.remove('is-glitching');
-            void el.offsetWidth;
-            el.classList.add('is-glitching');
+            el.classList.remove('is-glitching'); void el.offsetWidth; el.classList.add('is-glitching');
             setTimeout(() => { el.classList.remove('is-glitching'); }, 400); 
         });
     }
@@ -293,6 +385,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const trackItems = document.querySelectorAll('.mini-track-item');
     
     async function loadTrackData(trackId, epName, title) {
+        currentActiveTrackId = trackId; // Store for downloader
         muteSpotifyEmbed(); 
         triggerGlitch(); 
         
@@ -308,16 +401,13 @@ document.addEventListener('DOMContentLoaded', () => {
         currentTrackSubtitle.textContent = epName;
         
         playerCover.src = `assets/${trackId}.jpeg`; 
-        playerCover.onerror = function() { 
-            if (!this.src.endsWith('.png')) this.src = `assets/${trackId}.png`; 
-        };
+        playerCover.onerror = function() { if (!this.src.endsWith('.png')) this.src = `assets/${trackId}.png`; };
 
-        lyricsDisplay.textContent = "> INITIALIZING UPLINK...";
+        lyricsDisplay.textContent = "> ESTABLISHING SECURE UPLINK...";
         try {
             const response = await fetch(`assets/lyrics/${trackId}.txt`);
             if (response.ok) {
                 const text = await response.text();
-                // Activation du Terminal Effect
                 typeWriterEffect(lyricsDisplay, text, 10);
             } else {
                 typeWriterEffect(lyricsDisplay, `> ERROR 404: /vault/${trackId}.txt NOT FOUND`, 20);
