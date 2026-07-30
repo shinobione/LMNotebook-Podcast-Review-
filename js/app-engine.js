@@ -12,6 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const ambientCanvas = document.getElementById('ambient-canvas');
     const btnExportMp3 = document.getElementById('btn-export-mp3');
     const trackList = document.getElementById('track-list');
+    const waveformCanvas = document.getElementById('waveform-canvas');
+    const btnImmersive = document.getElementById('btn-immersive');
 
     const currentTrackTitle = document.getElementById('current-track-title');
     const currentTrackSubtitle = document.getElementById('current-track-subtitle');
@@ -99,6 +101,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let rtaAnimationId = null;
     let ambientAnimationId = null;
     let lastVisualLevel = 0;
+    let bassAverage = 0;
+    let lastBeatAt = 0;
+    const waveformCache = new Map();
+    let particlePrimary = '#00f0ff';
+    let particleSecondary = '#b026ff';
+    const TRACK_PALETTES = {
+        ep1: ['#00f0ff', '#b026ff'], ep2: ['#ffb36b', '#ff4fa3'], ep3: ['#ff3366', '#00d9ff']
+    };
 
     function createResponsiveImage(src, alt, className, isLazy = true) {
         const img = document.createElement('img');
@@ -211,10 +221,13 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.clearRect(0, 0, width, height);
 
             let audioLevel = 0;
+            let highLevel = 0;
             if (dataArray && (!audioEl.paused || spotifyGhostMode)) {
                 let sum = 0;
                 for (let i = 0; i < 12; i++) sum += dataArray[i];
                 audioLevel = (sum / 12) / 255;
+                for (let i = 28; i < Math.min(52, dataArray.length); i++) highLevel += dataArray[i];
+                highLevel /= Math.max(1, Math.min(52, dataArray.length) - 28) * 255;
             }
 
             particles.forEach(p => {
@@ -227,11 +240,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, p.radius + audioLevel * 2.5, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(0, 240, 255, ${p.baseAlpha + audioLevel * 0.5})`;
-                ctx.shadowBlur = 10 * (1 + audioLevel);
-                ctx.shadowColor = '#00f0ff';
+                const sparkle = highLevel > 0.35 && Math.random() > 0.82;
+                ctx.fillStyle = sparkle ? particleSecondary : particlePrimary;
+                ctx.globalAlpha = Math.min(1, p.baseAlpha + audioLevel * 0.45 + (sparkle ? highLevel * 0.35 : 0));
+                ctx.shadowBlur = (sparkle ? 18 : 10) * (1 + audioLevel);
+                ctx.shadowColor = sparkle ? particleSecondary : particlePrimary;
                 ctx.fill();
             });
+            ctx.globalAlpha = 1;
             ambientAnimationId = requestAnimationFrame(renderAmbient);
         }
 
@@ -254,6 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resizeObserver = new ResizeObserver(() => resizeCanvasToDisplaySize(canvas));
         resizeObserver.observe(canvas);
         renderRTA();
+        renderWaveform(audioEl.getAttribute('src'));
     }
 
     function renderRTA() {
@@ -276,11 +293,30 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let i = 0; i < dataArray.length; i++) dataArray[i] = Math.max(0, dataArray[i] - 6);
         }
 
-        let visualLevel = 0;
-        for (let i = 0; i < Math.min(16, dataArray.length); i++) visualLevel += dataArray[i];
-        visualLevel = visualLevel / (Math.min(16, dataArray.length) * 255);
-        if (Math.abs(visualLevel - lastVisualLevel) > 0.015 || visualLevel === 0) {
-            document.body.style.setProperty('--audio-level', visualLevel.toFixed(3));
+        const averageBand = (start, end) => {
+            let sum = 0;
+            const safeEnd = Math.min(end, dataArray.length);
+            for (let i = start; i < safeEnd; i++) sum += dataArray[i];
+            return sum / (Math.max(1, safeEnd - start) * 255);
+        };
+        const bass = averageBand(0, 8);
+        const mids = averageBand(8, 28);
+        const highs = averageBand(28, 64);
+        const visualLevel = bass * 0.55 + mids * 0.3 + highs * 0.15;
+        bassAverage = bassAverage * 0.92 + bass * 0.08;
+        const now = performance.now();
+        if (!audioEl.paused && bass > bassAverage * 1.35 && bass > 0.24 && now - lastBeatAt > 180) {
+            document.body.classList.remove('beat-hit');
+            void document.body.offsetWidth;
+            document.body.classList.add('beat-hit');
+            lastBeatAt = now;
+        }
+        if (Math.abs(visualLevel - lastVisualLevel) > 0.012 || visualLevel === 0) {
+            const style = document.body.style;
+            style.setProperty('--audio-level', visualLevel.toFixed(3));
+            style.setProperty('--bass-level', bass.toFixed(3));
+            style.setProperty('--mid-level', mids.toFixed(3));
+            style.setProperty('--high-level', highs.toFixed(3));
             lastVisualLevel = visualLevel;
         }
 
@@ -479,6 +515,59 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+
+    async function renderWaveform(audioUrl) {
+        if (!waveformCanvas || !audioCtx) return;
+        const token = audioUrl;
+        let peaks = waveformCache.get(audioUrl);
+        if (!peaks) {
+            try {
+                const response = await fetch(audioUrl);
+                const buffer = await audioCtx.decodeAudioData(await response.arrayBuffer());
+                const channel = buffer.getChannelData(0);
+                const bins = 180;
+                const step = Math.max(1, Math.floor(channel.length / bins));
+                peaks = Array.from({ length: bins }, (_, index) => {
+                    let peak = 0;
+                    for (let i = index * step; i < Math.min(channel.length, (index + 1) * step); i += 16) peak = Math.max(peak, Math.abs(channel[i]));
+                    return peak;
+                });
+                waveformCache.set(audioUrl, peaks);
+            } catch (error) {
+                console.warn('Waveform generation failed.', error);
+                return;
+            }
+        }
+        if (audioEl.getAttribute('src') !== token) return;
+        const rect = waveformCanvas.getBoundingClientRect();
+        const dpr = Math.min(devicePixelRatio || 1, 2);
+        waveformCanvas.width = Math.max(1, rect.width * dpr);
+        waveformCanvas.height = Math.max(1, rect.height * dpr);
+        const context = waveformCanvas.getContext('2d');
+        context.clearRect(0, 0, waveformCanvas.width, waveformCanvas.height);
+        context.fillStyle = 'rgba(226,232,240,.3)';
+        const width = waveformCanvas.width / peaks.length;
+        peaks.forEach((peak, index) => {
+            const height = Math.max(1, peak * waveformCanvas.height * .9);
+            context.fillRect(index * width, (waveformCanvas.height - height) / 2, Math.max(1, width - 1), height);
+        });
+    }
+
+    function applyTrackPalette(track) {
+        const [primary, secondary] = TRACK_PALETTES[track.epId] || TRACK_PALETTES.ep1;
+        document.body.style.setProperty('--track-accent', primary);
+        document.body.style.setProperty('--track-secondary', secondary);
+        particlePrimary = primary;
+        particleSecondary = secondary;
+    }
+
+    function toggleImmersive(force) {
+        const active = typeof force === 'boolean' ? force : !document.body.classList.contains('immersive-mode');
+        document.body.classList.toggle('immersive-mode', active);
+        btnImmersive.setAttribute('aria-pressed', String(active));
+        btnImmersive.textContent = active ? '× QUITTER IMMERSIF' : '◉ MODE IMMERSIF';
+    }
+
     function selectAdjacentTrack(offset, autoplay) {
         const currentIndex = TRACK_ORDER.indexOf(currentTrackId);
         const nextIndex = (currentIndex + offset + TRACK_ORDER.length) % TRACK_ORDER.length;
@@ -497,11 +586,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!track) return;
         currentTrackId = trackId;
         updateTrackContext(trackId);
+        applyTrackPalette(track);
+        document.body.classList.add('track-changing');
+        setTimeout(() => document.body.classList.remove('track-changing'), 480);
 
         if (autoplay) resetSpotifyEmbed();
         else spotifyGhostMode = false;
         audioEl.src = track.audio;
         audioEl.load();
+        renderWaveform(track.audio);
 
         if (btnExportMp3) {
             btnExportMp3.href = track.audio;
@@ -538,6 +631,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isInitialized) initDSP();
         if (audioCtx && audioCtx.state === 'suspended') await audioCtx.resume();
         loadTrackData(item.dataset.track, true);
+    });
+
+    btnImmersive.addEventListener('click', () => toggleImmersive());
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && document.body.classList.contains('immersive-mode')) toggleImmersive(false);
     });
 
     document.addEventListener('visibilitychange', () => {
