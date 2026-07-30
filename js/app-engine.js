@@ -9,18 +9,69 @@ document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('rta-canvas');
     const ambientCanvas = document.getElementById('ambient-canvas');
     const btnExportMp3 = document.getElementById('btn-export-mp3');
-    
+    const trackList = document.getElementById('track-list');
+
     const currentTrackTitle = document.getElementById('current-track-title');
     const currentTrackSubtitle = document.getElementById('current-track-subtitle');
+    const currentEpTag = document.getElementById('current-ep-tag');
     const playerCover = document.getElementById('player-cover');
     const lyricsDisplay = document.getElementById('lyrics-display');
     const timeCurrent = document.getElementById('time-current');
     const timeTotal = document.getElementById('time-total');
-    
-    let audioCtx, analyser, dataArray;
-    let isInitialized = false;
-    let spotifyGhostMode = false;
-    let parsedLyrics = []; 
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const mobileMotion = window.matchMedia('(max-width: 768px)');
+    const spotifyEmbedSrc = spotifyIframe ? spotifyIframe.src : '';
+    let spotifyResetTimer = null;
+
+    const EPS = [
+        {
+            id: 'ep1',
+            label: 'EP 01',
+            title: 'NEON HEARTBREAKS',
+            epName: 'Neon Heartbreaks EP',
+            tagClass: 'cyan-tag',
+            cover: 'assets/neon-heartbreaks.jpeg',
+            tracks: [
+                { id: 'before-the-noise', title: 'Before the Noise', cover: 'assets/before-the-noise.jpeg', coverFallback: 'assets/before-the-noise.jpeg', audio: 'audio/before-the-noise.mp3', lyrics: 'assets/lyrics/before-the-noise.txt' },
+                { id: 'low-bitrate-love', title: 'Low Bitrate Love', cover: 'assets/low-bitrate-love.jpeg', coverFallback: 'assets/low-bitrate-love.jpeg', audio: 'audio/low-bitrate-love.mp3', lyrics: 'assets/lyrics/low-bitrate-love.txt' },
+                { id: 'real-love-doesnt-rush', title: "Real love doesn't rush", cover: 'assets/real-love-doesnt-rush.jpeg', coverFallback: 'assets/real-love-doesnt-rush.jpeg', audio: 'audio/real-love-doesnt-rush.mp3', lyrics: 'assets/lyrics/real-love-doesnt-rush.txt' }
+            ]
+        },
+        {
+            id: 'ep2',
+            label: 'EP 02',
+            title: 'SAIGON LETTERS',
+            epName: 'Love Letters from Saigon',
+            tagClass: 'purple-tag',
+            cover: 'assets/love-letters.jpeg',
+            tracks: [
+                { id: 'saigon-bound', title: 'Saigon Bound', cover: 'assets/saigon-bound.png', coverFallback: 'assets/saigon-bound.png', audio: 'audio/saigon-bound.mp3', lyrics: 'assets/lyrics/saigon-bound.txt' },
+                { id: 'tinh-bolero-cho-tran', title: 'Tình Bolero Cho Trân', cover: 'assets/tinh-bolero-cho-tran.png', coverFallback: 'assets/tinh-bolero-cho-tran.png', audio: 'audio/tinh-bolero-cho-tran.mp3', lyrics: 'assets/lyrics/tinh-bolero-cho-tran.txt' },
+                { id: 'jusquau-dernier-souffle', title: "Jusqu'au Dernier Souffle", cover: 'assets/jusquau-dernier-souffle.jpeg', coverFallback: 'assets/jusquau-dernier-souffle.jpeg', audio: 'audio/jusquau-dernier-souffle.mp3', lyrics: 'assets/lyrics/jusquau-dernier-souffle.txt' }
+            ]
+        },
+        {
+            id: 'ep3',
+            label: 'EP 03',
+            title: 'COAL TO DIAMOND',
+            epName: 'Coal to Diamond',
+            tagClass: 'red-tag',
+            cover: 'assets/coal-to-diamond.jpeg',
+            tracks: [
+                { id: 'thick', title: 'THICK', cover: 'assets/thick.jpeg', coverFallback: 'assets/thick.jpeg', audio: 'audio/thick.mp3', lyrics: 'assets/lyrics/thick.txt' },
+                { id: 'the-throne-resonates', title: 'THE THRONE RESONATES', cover: 'assets/the-throne-resonates.jpeg', coverFallback: 'assets/the-throne-resonates.jpeg', audio: 'audio/the-throne-resonates.mp3', lyrics: 'assets/lyrics/the-throne-resonates.txt' },
+                { id: 'carved-from-pressure', title: 'Carved from Pressure', cover: 'assets/carved-from-pressure.jpeg', coverFallback: 'assets/carved-from-pressure.jpeg', audio: 'audio/carved-from-pressure.mp3', lyrics: 'assets/lyrics/carved-from-pressure.txt' }
+            ]
+        }
+    ];
+
+    const TRACKS = EPS.reduce((tracks, ep, epIndex) => {
+        ep.tracks.forEach((track, trackIndex) => {
+            tracks[track.id] = { ...track, epId: ep.id, epName: ep.epName, epTag: ep.label, trackNumber: trackIndex + 1, activeByDefault: epIndex === 0 && trackIndex === 0 };
+        });
+        return tracks;
+    }, {});
 
     const FALLBACK_LYRICS = {
         "before-the-noise": "[00:00.00] // BEFORE THE NOISE //\n[00:04.50] Neon lights bleeding through the dashboard glass\n[00:10.20] Chasing shadows while the city builds too fast\n[00:16.80] We lived in moments that cracked\n[00:23.10] When kicked straight back to life\n[00:29.40] And the memories rush in\n[00:36.00] Ooh... Ooh... Mmmh\n[00:45.00] Cut the static, find the baseline drop\n[00:52.30] This underground machine is never gonna stop.",
@@ -34,32 +85,121 @@ document.addEventListener('DOMContentLoaded', () => {
         "carved-from-pressure": "[00:00.00] // CARVED FROM PRESSURE //\n[00:06.00] Coal to diamond under tectonic weight\n[00:14.00] We carved our name directly into fate\n[00:22.00] No fractures found, absolute glass\n[00:30.00] Watching the fragile illusions pass."
     };
 
-    // --- 1. PARTICULES AMBIANTES AUDIO-RÉACTIVES ---
-    function initAmbientParticles() {
-        if (!ambientCanvas) return;
-        const ctx = ambientCanvas.getContext('2d');
-        let width = ambientCanvas.width = window.innerWidth;
-        let height = ambientCanvas.height = window.innerHeight;
-        
-        window.addEventListener('resize', () => {
-            width = ambientCanvas.width = window.innerWidth;
-            height = ambientCanvas.height = window.innerHeight;
+    let audioCtx, analyser, dataArray, resizeObserver;
+    let isInitialized = false;
+    let spotifyGhostMode = false;
+    let parsedLyrics = [];
+    let rtaAnimationId = null;
+    let ambientAnimationId = null;
+
+    function createResponsiveImage(src, alt, className, isLazy = true) {
+        const img = document.createElement('img');
+        img.src = src;
+        img.srcset = `${src} 1x`;
+        img.sizes = '(max-width: 1024px) 100vw, 33vw';
+        img.alt = alt;
+        img.className = className;
+        img.decoding = 'async';
+        if (isLazy) img.loading = 'lazy';
+        return img;
+    }
+
+    function renderTrackList() {
+        if (!trackList) return;
+        trackList.innerHTML = '';
+        const fragment = document.createDocumentFragment();
+
+        EPS.forEach(ep => {
+            const epCard = document.createElement('article');
+            epCard.className = `ep-card${ep.id === 'ep1' ? ' active' : ''}`;
+            epCard.dataset.epTarget = ep.id;
+
+            const coverFrame = document.createElement('div');
+            coverFrame.className = 'ep-cover-frame';
+
+            const tag = document.createElement('span');
+            tag.className = `ep-tag-mini ${ep.tagClass}`;
+            tag.textContent = ep.label;
+
+            coverFrame.appendChild(tag);
+            coverFrame.appendChild(createResponsiveImage(ep.cover, `${ep.title} cover`, 'ep-img-cover'));
+
+            const details = document.createElement('div');
+            details.className = 'ep-details';
+
+            const title = document.createElement('h4');
+            title.textContent = ep.title;
+
+            const miniTrackList = document.createElement('div');
+            miniTrackList.className = 'mini-tracklist';
+
+            ep.tracks.forEach((track, index) => {
+                const item = document.createElement('button');
+                item.type = 'button';
+                item.className = `mini-track-item${track.id === 'before-the-noise' ? ' active-track' : ''}`;
+                item.dataset.track = track.id;
+                item.setAttribute('aria-label', `Lire ${track.title}`);
+                item.textContent = `${index + 1}. ${track.title}`;
+                miniTrackList.appendChild(item);
+            });
+
+            details.append(title, miniTrackList);
+            epCard.append(coverFrame, details);
+            fragment.appendChild(epCard);
         });
 
-        const particles = [];
-        for (let i = 0; i < 70; i++) {
-            particles.push({
-                x: Math.random() * width,
-                y: Math.random() * height,
-                vx: (Math.random() - 0.5) * 0.7,
-                vy: (Math.random() - 0.5) * 0.7,
-                radius: Math.random() * 2.2 + 0.8,
-                baseAlpha: Math.random() * 0.5 + 0.2
-            });
+        trackList.appendChild(fragment);
+    }
+
+    function setMotionState() {
+        document.documentElement.classList.toggle('reduced-motion', prefersReducedMotion.matches);
+    }
+
+    function resizeCanvasToDisplaySize(targetCanvas) {
+        if (!targetCanvas) return;
+        const rect = targetCanvas.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const width = Math.max(1, Math.round(rect.width * dpr));
+        const height = Math.max(1, Math.round(rect.height * dpr));
+        if (targetCanvas.width !== width || targetCanvas.height !== height) {
+            targetCanvas.width = width;
+            targetCanvas.height = height;
+        }
+    }
+
+    function initAmbientParticles() {
+        if (!ambientCanvas || prefersReducedMotion.matches) return;
+        const ctx = ambientCanvas.getContext('2d');
+        let width = 0;
+        let height = 0;
+
+        function resizeAmbientCanvas() {
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            width = ambientCanvas.width = Math.round(window.innerWidth * dpr);
+            height = ambientCanvas.height = Math.round(window.innerHeight * dpr);
+            ambientCanvas.style.width = `${window.innerWidth}px`;
+            ambientCanvas.style.height = `${window.innerHeight}px`;
         }
 
+        resizeAmbientCanvas();
+        window.addEventListener('resize', resizeAmbientCanvas, { passive: true });
+
+        const particleCount = mobileMotion.matches ? 32 : 70;
+        const particles = Array.from({ length: particleCount }, () => ({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            vx: (Math.random() - 0.5) * 0.7,
+            vy: (Math.random() - 0.5) * 0.7,
+            radius: Math.random() * 2.2 + 0.8,
+            baseAlpha: Math.random() * 0.5 + 0.2
+        }));
+
         function renderAmbient() {
-            requestAnimationFrame(renderAmbient);
+            if (document.hidden || prefersReducedMotion.matches) {
+                ambientAnimationId = requestAnimationFrame(renderAmbient);
+                return;
+            }
+
             ctx.clearRect(0, 0, width, height);
 
             let audioLevel = 0;
@@ -72,8 +212,10 @@ document.addEventListener('DOMContentLoaded', () => {
             particles.forEach(p => {
                 p.x += p.vx * (1 + audioLevel * 2);
                 p.y += p.vy * (1 + audioLevel * 2);
-                if (p.x < 0) p.x = width; if (p.x > width) p.x = 0;
-                if (p.y < 0) p.y = height; if (p.y > height) p.y = 0;
+                if (p.x < 0) p.x = width;
+                if (p.x > width) p.x = 0;
+                if (p.y < 0) p.y = height;
+                if (p.y > height) p.y = 0;
 
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, p.radius + audioLevel * 2.5, 0, Math.PI * 2);
@@ -82,37 +224,40 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.shadowColor = '#00f0ff';
                 ctx.fill();
             });
+            ambientAnimationId = requestAnimationFrame(renderAmbient);
         }
+
         renderAmbient();
     }
-    initAmbientParticles();
 
-    // --- 2. DSP & RTA ---
     function initDSP() {
         if (isInitialized) return;
-        try {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            analyser = audioCtx.createAnalyser();
-            analyser.fftSize = 128;
-            dataArray = new Uint8Array(analyser.frequencyBinCount);
-            
-            const source = audioCtx.createMediaElementSource(audioEl);
-            source.connect(analyser);
-            analyser.connect(audioCtx.destination);
-            isInitialized = true;
-            renderRTA();
-        } catch (e) {
-            console.error("DSP Error:", e);
-        }
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 128;
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+        const source = audioCtx.createMediaElementSource(audioEl);
+        source.connect(analyser);
+        analyser.connect(audioCtx.destination);
+        isInitialized = true;
+
+        resizeCanvasToDisplaySize(canvas);
+        resizeObserver = new ResizeObserver(() => resizeCanvasToDisplaySize(canvas));
+        resizeObserver.observe(canvas);
+        renderRTA();
     }
 
     function renderRTA() {
-        if (!canvas) return;
+        if (!canvas || !dataArray) return;
+        if (document.hidden || prefersReducedMotion.matches) {
+            rtaAnimationId = requestAnimationFrame(renderRTA);
+            return;
+        }
+
         const ctx = canvas.getContext('2d');
-        canvas.width = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
-        requestAnimationFrame(renderRTA);
-        
+        rtaAnimationId = requestAnimationFrame(renderRTA);
+
         if (!audioEl.paused) {
             analyser.getByteFrequencyData(dataArray);
         } else if (spotifyGhostMode) {
@@ -122,15 +267,16 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             for (let i = 0; i < dataArray.length; i++) dataArray[i] = Math.max(0, dataArray[i] - 6);
         }
-        
+
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         const barWidth = (canvas.width / dataArray.length) * 2.5;
         let x = 0;
-        
+
         for (let i = 0; i < dataArray.length; i++) {
-            let barHeight = (dataArray[i] / 255) * canvas.height;
-            const r = barHeight * 2.8, g = 240 * (1 - (i/dataArray.length)), b = 255;
-            ctx.fillStyle = `rgb(${r},${g},${b})`;
+            const barHeight = (dataArray[i] / 255) * canvas.height;
+            const r = barHeight * 2.8;
+            const g = 240 * (1 - (i / dataArray.length));
+            ctx.fillStyle = `rgb(${r},${g},255)`;
             ctx.shadowBlur = 6;
             ctx.shadowColor = '#00f0ff';
             ctx.fillRect(x, canvas.height - barHeight, barWidth - 1, barHeight);
@@ -138,12 +284,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- 3. MUTUAL EXCLUSION ---
     function pauseLocalPlayer() {
         if (!audioEl.paused) {
             audioEl.pause();
             btnPlayPause.textContent = '▶';
             btnPlayPause.style.background = 'var(--spotify-green)';
+            btnPlayPause.setAttribute('aria-label', 'Lire le morceau sélectionné');
+            setLocalAudioActive(false);
         }
     }
 
@@ -151,48 +298,67 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             if (document.activeElement === spotifyIframe) {
                 pauseLocalPlayer();
-                initDSP();
+                if (!isInitialized) initDSP();
                 spotifyGhostMode = true;
             }
         }, 50);
     });
 
-    function muteSpotifyEmbed() {
+    function resetSpotifyEmbed() {
         spotifyGhostMode = false;
-        if (spotifyIframe) {
-            const src = spotifyIframe.src;
-            spotifyIframe.src = "";
-            setTimeout(() => { spotifyIframe.src = src; }, 50);
-        }
+        if (!spotifyIframe || !spotifyEmbedSrc) return;
+
+        clearTimeout(spotifyResetTimer);
+        spotifyIframe.src = 'about:blank';
+        spotifyResetTimer = setTimeout(() => {
+            spotifyIframe.src = spotifyEmbedSrc;
+        }, 80);
     }
 
-    // --- 4. CONTROLS & TIMELINE ---
-    btnPlayPause.addEventListener('click', () => {
-        initDSP();
-        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    function setLocalAudioActive(isActive) {
+        document.body.classList.toggle('audio-active', isActive);
+    }
+
+    audioEl.addEventListener('ended', () => setLocalAudioActive(false));
+    audioEl.addEventListener('pause', () => {
+        if (!spotifyGhostMode) setLocalAudioActive(false);
+    });
+    audioEl.addEventListener('play', () => setLocalAudioActive(true));
+
+    function formatTime(t) {
+        return Number.isNaN(t) ? '00:00' : `${Math.floor(t / 60).toString().padStart(2, '0')}:${Math.floor(t % 60).toString().padStart(2, '0')}`;
+    }
+
+    btnPlayPause.addEventListener('click', async () => {
+        if (!isInitialized) initDSP();
+        if (audioCtx && audioCtx.state === 'suspended') await audioCtx.resume();
         if (audioEl.paused) {
-            muteSpotifyEmbed();
-            audioEl.play();
+            resetSpotifyEmbed();
+            await audioEl.play();
             btnPlayPause.textContent = '⏸';
             btnPlayPause.style.background = 'var(--accent-cyan)';
+            btnPlayPause.setAttribute('aria-label', 'Mettre en pause');
+            setLocalAudioActive(true);
         } else {
             audioEl.pause();
             btnPlayPause.textContent = '▶';
             btnPlayPause.style.background = 'var(--spotify-green)';
+            btnPlayPause.setAttribute('aria-label', 'Lire le morceau sélectionné');
+            setLocalAudioActive(false);
         }
     });
 
     btnRewind.addEventListener('click', () => { audioEl.currentTime = Math.max(0, audioEl.currentTime - 10); });
-    btnForward.addEventListener('click', () => { audioEl.currentTime = Math.min(audioEl.duration, audioEl.currentTime + 10); });
+    btnForward.addEventListener('click', () => { audioEl.currentTime = Math.min(audioEl.duration || 0, audioEl.currentTime + 10); });
 
-    progressContainer.addEventListener('click', (e) => {
+    progressContainer.addEventListener('click', e => {
         const rect = progressContainer.getBoundingClientRect();
         const pos = (e.clientX - rect.left) / rect.width;
-        if (!isNaN(audioEl.duration)) audioEl.currentTime = pos * audioEl.duration;
+        if (!Number.isNaN(audioEl.duration)) audioEl.currentTime = pos * audioEl.duration;
     });
 
     audioEl.addEventListener('timeupdate', () => {
-        if (!isNaN(audioEl.duration)) {
+        if (!Number.isNaN(audioEl.duration)) {
             progressBar.style.width = `${(audioEl.currentTime / audioEl.duration) * 100}%`;
 
             if (parsedLyrics.length > 0) {
@@ -208,7 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (!el.classList.contains('lyrics-line-active')) {
                             el.classList.add('lyrics-line-active');
                             const targetTop = el.offsetTop - lyricsDisplay.clientHeight / 2 + el.clientHeight / 2;
-                            lyricsDisplay.scrollTo({ top: targetTop, behavior: 'smooth' });
+                            lyricsDisplay.scrollTo({ top: targetTop, behavior: prefersReducedMotion.matches ? 'auto' : 'smooth' });
                         }
                     } else {
                         el.classList.remove('lyrics-line-active');
@@ -216,24 +382,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         }
-        const fmt = (t) => isNaN(t) ? "00:00" : `${Math.floor(t/60).toString().padStart(2,'0')}:${Math.floor(t%60).toString().padStart(2,'0')}`;
-        timeCurrent.textContent = fmt(audioEl.currentTime);
-        timeTotal.textContent = fmt(audioEl.duration);
+        timeCurrent.textContent = formatTime(audioEl.currentTime);
+        timeTotal.textContent = formatTime(audioEl.duration);
     });
 
-    // --- 5. PARSER & LOADER ---
     function processLyricsText(rawText) {
         parsedLyrics = [];
         lyricsDisplay.innerHTML = '';
         const lines = rawText.split('\n');
-        
+        const fragment = document.createDocumentFragment();
+
         lines.forEach(line => {
             if (!line.trim()) return;
             const match = line.match(/\[(\d{2}):(\d{2})(?:\.(\d+))?\]/);
             let timeSec = 0;
             let txt = line;
             if (match) {
-                timeSec = parseInt(match[1]) * 60 + parseInt(match[2]) + (match[3] ? parseInt(match[3].padEnd(3,'0').slice(0,3))/1000 : 0);
+                timeSec = parseInt(match[1], 10) * 60 + parseInt(match[2], 10) + (match[3] ? parseInt(match[3].padEnd(3, '0').slice(0, 3), 10) / 1000 : 0);
                 txt = line.replace(/\[.*?\]/g, '').trim();
             } else {
                 txt = line.trim();
@@ -242,9 +407,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const span = document.createElement('span');
             span.className = 'lyrics-line';
             span.textContent = txt;
-            lyricsDisplay.appendChild(span);
-            lyricsDisplay.appendChild(document.createElement('br'));
+            fragment.appendChild(span);
+            fragment.appendChild(document.createElement('br'));
         });
+
+        lyricsDisplay.appendChild(fragment);
 
         if (parsedLyrics.length > 0) {
             lyricsDisplay.querySelectorAll('.lyrics-line')[0].classList.add('lyrics-line-active');
@@ -252,55 +419,92 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function loadLyrics(trackId) {
-        lyricsDisplay.textContent = "Loading vault data...";
+    async function loadLyrics(track) {
+        lyricsDisplay.textContent = 'Loading vault data...';
         try {
-            const res = await fetch(`assets/lyrics/${trackId}.txt`);
+            const res = await fetch(track.lyrics);
             if (res.ok) {
                 processLyricsText(await res.text());
                 return;
             }
-        } catch (e) {}
-        
-        if (FALLBACK_LYRICS[trackId]) {
-            processLyricsText(FALLBACK_LYRICS[trackId]);
+        } catch (e) {
+            console.warn('Lyrics fetch failed, using fallback copy.', e);
+        }
+
+        if (FALLBACK_LYRICS[track.id]) {
+            processLyricsText(FALLBACK_LYRICS[track.id]);
         } else {
-            processLyricsText(`[00:00.00] // ${trackId.toUpperCase()} //\n[00:05.00] Audio stream active and synchronized.`);
+            processLyricsText(`[00:00.00] // ${track.id.toUpperCase()} //\n[00:05.00] Audio stream active and synchronized.`);
         }
     }
 
-    function loadTrackData(trackId, epName, title) {
-        muteSpotifyEmbed();
-        const audioPath = `audio/${trackId}.mp3`;
-        audioEl.src = audioPath;
-        if (btnExportMp3) {
-            btnExportMp3.href = audioPath;
-            btnExportMp3.setAttribute('download', `${trackId}.mp3`);
-        }
-        if (isInitialized) audioEl.play();
-        btnPlayPause.textContent = isInitialized ? '⏸' : '▶';
-        btnPlayPause.style.background = isInitialized ? 'var(--accent-cyan)' : 'var(--spotify-green)';
-        
-        currentTrackTitle.textContent = title;
-        currentTrackSubtitle.textContent = epName;
-        playerCover.src = `assets/${trackId}.jpeg`;
-        playerCover.onerror = function() { this.src = `assets/${trackId}.png`; };
-        loadLyrics(trackId);
-    }
-
-    document.querySelectorAll('.mini-track-item').forEach(item => {
-        item.addEventListener('click', (e) => {
-            document.querySelectorAll('.mini-track-item').forEach(t => t.classList.remove('active-track'));
-            e.target.classList.add('active-track');
-            initDSP();
-            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-            loadTrackData(e.target.getAttribute('data-track'), e.target.getAttribute('data-ep'), e.target.textContent.repeat ? e.target.textContent.replace(/^\d+\.\s*/, '') : e.target.textContent);
+    function setActiveTrack(trackId) {
+        document.querySelectorAll('.mini-track-item').forEach(item => {
+            const isActive = item.dataset.track === trackId;
+            item.classList.toggle('active-track', isActive);
+            item.setAttribute('aria-pressed', String(isActive));
         });
+
+        document.querySelectorAll('.ep-card').forEach(card => {
+            card.classList.toggle('active', card.dataset.epTarget === TRACKS[trackId].epId);
+        });
+    }
+
+    async function loadTrackData(trackId, autoplay = isInitialized) {
+        const track = TRACKS[trackId];
+        if (!track) return;
+
+        if (autoplay) resetSpotifyEmbed();
+        else spotifyGhostMode = false;
+        audioEl.src = track.audio;
+        audioEl.load();
+
+        if (btnExportMp3) {
+            btnExportMp3.href = track.audio;
+            btnExportMp3.setAttribute('download', `${track.id}.mp3`);
+        }
+
+        currentTrackTitle.textContent = track.title;
+        currentTrackSubtitle.textContent = track.epName;
+        currentEpTag.textContent = track.epTag;
+        playerCover.src = track.cover;
+        playerCover.srcset = `${track.cover} 1x`;
+        playerCover.alt = `${track.title} cover`;
+        playerCover.onerror = function onCoverError() { this.src = track.coverFallback; };
+        setActiveTrack(trackId);
+        loadLyrics(track);
+
+        if (autoplay) {
+            await audioEl.play();
+            btnPlayPause.textContent = '⏸';
+            btnPlayPause.style.background = 'var(--accent-cyan)';
+            btnPlayPause.setAttribute('aria-label', 'Mettre en pause');
+            setLocalAudioActive(true);
+        } else {
+            btnPlayPause.textContent = '▶';
+            btnPlayPause.style.background = 'var(--spotify-green)';
+            btnPlayPause.setAttribute('aria-label', 'Lire le morceau sélectionné');
+            setLocalAudioActive(false);
+        }
+    }
+
+    trackList.addEventListener('click', async e => {
+        const item = e.target.closest('.mini-track-item');
+        if (!item) return;
+        if (!isInitialized) initDSP();
+        if (audioCtx && audioCtx.state === 'suspended') await audioCtx.resume();
+        loadTrackData(item.dataset.track, true);
     });
 
-    if (btnExportMp3) {
-        btnExportMp3.href = "audio/before-the-noise.mp3";
-        btnExportMp3.setAttribute('download', "before-the-noise.mp3");
-    }
-    loadLyrics('before-the-noise');
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            resizeCanvasToDisplaySize(canvas);
+        }
+    });
+
+    prefersReducedMotion.addEventListener('change', setMotionState);
+    setMotionState();
+    renderTrackList();
+    initAmbientParticles();
+    loadTrackData('before-the-noise', false);
 });

@@ -31,7 +31,8 @@ html, body {
 #ambient-canvas {
   position: fixed;
   top: 0; left: 0; width: 100vw; height: 100vh;
-  z-index: -3; pointer-events: none;
+  z-index: 0; pointer-events: none;
+  opacity: 0.9;
 }
 
 .cyber-grid-overlay {
@@ -40,11 +41,30 @@ html, body {
   background-image: linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
                     linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
   background-size: 30px 30px;
-  z-index: -2;
+  z-index: 1;
   pointer-events: none;
 }
 
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at center, rgba(0, 240, 255, 0.12), transparent 45%);
+  opacity: 0;
+  transform: scale(0.92);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+body.audio-active::before {
+  opacity: 0.55;
+  transform: scale(1);
+}
+
 .app-viewport {
+  position: relative;
+  z-index: 2;
   width: 100vw;
   height: 100vh;
   max-width: 1800px;
@@ -268,5 +288,44 @@ html, body {
   .spotify-wrapper-fixed iframe {
     min-height: 155px !important;
     height: 155px !important;
+  }
+}
+
+/* PERFORMANCE & ACCESSIBILITY MOTION GUARDS */
+.mini-track-item {
+  appearance: none;
+  width: 100%;
+  text-align: left;
+  color: inherit;
+}
+
+.reduced-motion *,
+.reduced-motion *::before,
+.reduced-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+  transition-duration: 0.001ms !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #ambient-canvas {
+    display: none;
+  }
+
+  .player-cover-img,
+  .ep-img-cover,
+  .glass-card,
+  .btn-play,
+  .btn-secondary,
+  .btn-export,
+  .hub-pill {
+    transition: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  #ambient-canvas {
+    opacity: 0.6;
   }
 }
