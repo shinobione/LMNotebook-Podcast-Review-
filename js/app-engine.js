@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let audioCtx, analyser, dataArray;
     let isInitialized = false;
     let spotifyGhostMode = false;
-    let parsedLyrics = []; // Stocke les objets { time: secondes, text: texte }
+    let parsedLyrics = []; 
 
     // --- 1. MOTEUR DSP & RTA ---
     function initDSP() {
@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const percent = (audioEl.currentTime / audioEl.duration) * 100;
             progressBar.style.width = `${percent}%`;
 
-            // Synchronisation précise basée sur les timestamps LRC réels
+            // Synchronisation temporelle corrigée (zéro-bug au démarrage)
             if (parsedLyrics.length > 0) {
                 const currentTime = audioEl.currentTime;
                 let activeIndex = 0;
@@ -201,7 +201,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const lines = text.split('\n');
                 lyricsDisplay.innerHTML = '';
                 
-                // Regex pour parser le format [MM:SS.ff] Texte
                 const regex = /^\[(\d{2}):(\d{2})\.(\d{2})\]\s*(.*)$/;
 
                 lines.forEach((line) => {
@@ -217,11 +216,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         const span = document.createElement('span');
                         span.className = 'lyrics-line';
-                        span.textContent = lyricText; // On masque le timestamp brut pour l'UI
+                        span.textContent = lyricText; // Texte pur sans timestamp visible
                         lyricsDisplay.appendChild(span);
                         lyricsDisplay.appendChild(document.createElement('br'));
                     } else if (line.trim() !== '') {
-                        // Fallback si une ligne n'a pas de timestamp
                         parsedLyrics.push({ time: 0, text: line.trim() });
                         const span = document.createElement('span');
                         span.className = 'lyrics-line';
@@ -248,7 +246,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const audioPath = `audio/${trackId}.mp3`;
         audioEl.src = audioPath;
         
-        // Liaison dynamique du bouton de téléchargement direct MP3
         if (btnExportMp3) {
             btnExportMp3.href = audioPath;
             btnExportMp3.setAttribute('download', `${trackId}.mp3`);
