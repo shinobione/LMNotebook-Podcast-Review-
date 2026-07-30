@@ -162,8 +162,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (index === activeIndex) {
                         if (!el.classList.contains('lyrics-line-active')) {
                             el.classList.add('lyrics-line-active');
-                            // CENTRAGE PARFAIT DE LA LIGNE ACTIVE DANS LE VAULT
-                            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            
+                            // CENTRAGE INTERNE SANS PIÉGER LE SCROLL GLOBAL DE LA PAGE MOBILE
+                            const targetTop = el.offsetTop - lyricsDisplay.clientHeight / 2 + el.clientHeight / 2;
+                            lyricsDisplay.scrollTo({ top: targetTop, behavior: 'smooth' });
                         }
                     } else {
                         el.classList.remove('lyrics-line-active');
@@ -231,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (parsedLyrics.length > 0) {
                     const firstLine = lyricsDisplay.querySelectorAll('.lyrics-line')[0];
                     firstLine.classList.add('lyrics-line-active');
-                    firstLine.scrollIntoView({ behavior: 'auto', block: 'center' });
+                    lyricsDisplay.scrollTo({ top: 0, behavior: 'auto' });
                 }
             } else {
                 lyricsDisplay.textContent = "// FILE NOT FOUND IN VAULT //\n\nEnsure " + trackId + ".txt exists in assets/lyrics/";
