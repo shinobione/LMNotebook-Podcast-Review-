@@ -21,6 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const mobileMotion = window.matchMedia('(max-width: 768px)');
+    const spotifyEmbedSrc = spotifyIframe ? spotifyIframe.src : '';
+    let spotifyResetTimer = null;
 
     const EPS = [
         {
@@ -288,6 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btnPlayPause.textContent = '▶';
             btnPlayPause.style.background = 'var(--spotify-green)';
             btnPlayPause.setAttribute('aria-label', 'Lire le morceau sélectionné');
+            setLocalAudioActive(false);
         }
     }
 
@@ -301,9 +304,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 50);
     });
 
-    function deactivateSpotifyGhostMode() {
+    function resetSpotifyEmbed() {
         spotifyGhostMode = false;
+        if (!spotifyIframe || !spotifyEmbedSrc) return;
+
+        clearTimeout(spotifyResetTimer);
+        spotifyIframe.src = 'about:blank';
+        spotifyResetTimer = setTimeout(() => {
+            spotifyIframe.src = spotifyEmbedSrc;
+        }, 80);
     }
+
+    function setLocalAudioActive(isActive) {
+        document.body.classList.toggle('audio-active', isActive);
+    }
+
+    audioEl.addEventListener('ended', () => setLocalAudioActive(false));
+    audioEl.addEventListener('pause', () => {
+        if (!spotifyGhostMode) setLocalAudioActive(false);
+    });
+    audioEl.addEventListener('play', () => setLocalAudioActive(true));
 
     function formatTime(t) {
         return Number.isNaN(t) ? '00:00' : `${Math.floor(t / 60).toString().padStart(2, '0')}:${Math.floor(t % 60).toString().padStart(2, '0')}`;
@@ -313,16 +333,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isInitialized) initDSP();
         if (audioCtx && audioCtx.state === 'suspended') await audioCtx.resume();
         if (audioEl.paused) {
-            deactivateSpotifyGhostMode();
+            resetSpotifyEmbed();
             await audioEl.play();
             btnPlayPause.textContent = '⏸';
             btnPlayPause.style.background = 'var(--accent-cyan)';
             btnPlayPause.setAttribute('aria-label', 'Mettre en pause');
+            setLocalAudioActive(true);
         } else {
             audioEl.pause();
             btnPlayPause.textContent = '▶';
             btnPlayPause.style.background = 'var(--spotify-green)';
             btnPlayPause.setAttribute('aria-label', 'Lire le morceau sélectionné');
+            setLocalAudioActive(false);
         }
     });
 
@@ -432,7 +454,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const track = TRACKS[trackId];
         if (!track) return;
 
-        deactivateSpotifyGhostMode();
+        if (autoplay) resetSpotifyEmbed();
+        else spotifyGhostMode = false;
         audioEl.src = track.audio;
         audioEl.load();
 
@@ -456,10 +479,12 @@ document.addEventListener('DOMContentLoaded', () => {
             btnPlayPause.textContent = '⏸';
             btnPlayPause.style.background = 'var(--accent-cyan)';
             btnPlayPause.setAttribute('aria-label', 'Mettre en pause');
+            setLocalAudioActive(true);
         } else {
             btnPlayPause.textContent = '▶';
             btnPlayPause.style.background = 'var(--spotify-green)';
             btnPlayPause.setAttribute('aria-label', 'Lire le morceau sélectionné');
+            setLocalAudioActive(false);
         }
     }
 
