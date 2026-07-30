@@ -7,26 +7,30 @@
   <link rel="stylesheet" href="css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="cyber-theme">
+  <!-- CYBER CURSOR (Desktop Only) -->
+  <div class="cyber-cursor" id="cursor-main"></div>
+  <div class="cyber-cursor-trail" id="cursor-trail"></div>
+
   <!-- EFFETS GLOBAUX -->
-  <div class="glow-bg"></div>
+  <div class="glow-bg" id="dynamic-glow-bg"></div>
   <canvas id="bg-particles"></canvas>
   <div class="crt-overlay"></div>
 
-  <div class="app-viewport">
+  <div class="app-viewport" id="main-viewport">
     <!-- TOPBAR -->
-    <header class="topbar">
+    <header class="topbar interactive-ui">
       <div class="brand-zone">
         <div class="live-dot"></div>
         <span class="brand-title glitch-hover">SHINOBIWAN</span>
-        <span class="badge-ep">SYSTEM LAUNCHPAD v2.0</span>
+        <span class="badge-ep">SYSTEM LAUNCHPAD v3.0</span>
       </div>
       <div class="header-logo-center">
         <img src="assets/logo.png" alt="SHINOBIWAN" class="header-logo-img glitch-hover">
       </div>
       <div class="hosts-zone">
-        <div class="host-pill"><span class="icon-green">⚡</span> DAW ENGINE ACTIVE</div>
-        <div class="host-pill"><span class="icon-cyan">✔</span> VERIFIED ARTIST</div>
+        <div class="host-pill interactive-ui"><span class="icon-green">⚡</span> DAW ENGINE ACTIVE</div>
+        <div class="host-pill interactive-ui"><span class="icon-cyan">✔</span> VERIFIED ARTIST</div>
       </div>
     </header>
 
@@ -41,8 +45,10 @@
             <span class="tech-id" id="current-ep-tag">NB-EP #01</span>
           </div>
           
-          <div class="hero-cover-frame glitch-target" id="cover-frame">
-            <img src="assets/before-the-noise.jpeg" alt="Current Track Cover" id="player-cover" class="player-cover-img">
+          <div class="hero-cover-frame glitch-target parallax-card" id="cover-frame">
+            <div class="parallax-inner">
+              <img src="assets/before-the-noise.jpeg" alt="Current Track Cover" id="player-cover" class="player-cover-img">
+            </div>
           </div>
           
           <div class="track-meta">
@@ -58,15 +64,20 @@
               <span id="time-total">00:00</span>
             </div>
             
-            <div class="progress-container" id="progress-container">
+            <div class="progress-container interactive-ui" id="progress-container">
               <div class="progress-bar" id="progress-bar"></div>
             </div>
 
             <div class="controls-row">
-              <button class="btn-secondary" id="btn-rewind">↺ -10s</button>
-              <button class="btn-play" id="btn-play-pause">▶</button>
-              <button class="btn-secondary" id="btn-forward">↻ +10s</button>
+              <button class="btn-secondary interactive-ui" id="btn-rewind">↺ -10s</button>
+              <button class="btn-play interactive-ui" id="btn-play-pause">▶</button>
+              <button class="btn-secondary interactive-ui" id="btn-forward">↻ +10s</button>
             </div>
+            
+            <!-- MODULE EXPORT DIRECT -->
+            <button class="btn-download interactive-ui" id="btn-export-mp3">
+               [⭳] EXPORT MASTER MP3
+            </button>
           </div>
         </div>
 
@@ -74,14 +85,14 @@
           <div class="card-head-compact">
             <h3>☍ Streaming Hubs</h3>
           </div>
-          <a href="https://open.spotify.com/artist/6W08IttKpZns5zG7BYTz8e" target="_blank" rel="noopener noreferrer" class="profile-item spotify">
+          <a href="https://open.spotify.com/artist/6W08IttKpZns5zG7BYTz8e" target="_blank" rel="noopener noreferrer" class="profile-item spotify interactive-ui">
             <div class="p-icon">S</div>
             <div class="p-info">
               <strong>Spotify Catalog</strong>
               <span>Direct Discography & Top Tracks</span>
             </div>
           </a>
-          <a href="https://soundcloud.com/shinobiwan-1" target="_blank" rel="noopener noreferrer" class="profile-item soundcloud">
+          <a href="https://soundcloud.com/shinobiwan-1" target="_blank" rel="noopener noreferrer" class="profile-item soundcloud interactive-ui">
             <div class="p-icon">SC</div>
             <div class="p-info">
               <strong>SoundCloud HQ Lab</strong>
@@ -99,57 +110,63 @@
           </div>
           <div class="ep-grid-3">
             <!-- EP 1 -->
-            <div class="ep-card active">
-              <div class="ep-cover-frame">
-                <span class="ep-tag-mini cyan-tag">PRIMARY EP</span>
-                <img src="assets/neon-heartbreaks.jpeg" alt="Neon Heartbreaks" class="ep-img-cover">
-              </div>
-              <div class="ep-details">
-                <h4>NEON HEARTBREAKS</h4>
-                <div class="ep-desc">Rain-soaked synthwave cityscape. Analog basslines & cyber hooks.</div>
-                <div class="mini-tracklist">
-                  <div class="mini-track-item active-track" data-track="before-the-noise" data-ep="Neon Heartbreaks EP">1. Before the Noise</div>
-                  <div class="mini-track-item" data-track="low-bitrate-love" data-ep="Neon Heartbreaks EP">2. Low Bitrate Love</div>
-                  <div class="mini-track-item" data-track="real-love-doesnt-rush" data-ep="Neon Heartbreaks EP">3. Real love doesn't rush</div>
+            <div class="ep-card parallax-card active">
+              <div class="parallax-inner">
+                <div class="ep-cover-frame">
+                  <span class="ep-tag-mini cyan-tag">PRIMARY EP</span>
+                  <img src="assets/neon-heartbreaks.jpeg" alt="Neon Heartbreaks" class="ep-img-cover">
+                </div>
+                <div class="ep-details">
+                  <h4>NEON HEARTBREAKS</h4>
+                  <div class="ep-desc">Rain-soaked synthwave cityscape. Analog basslines & cyber hooks.</div>
+                  <div class="mini-tracklist">
+                    <div class="mini-track-item interactive-ui active-track" data-track="before-the-noise" data-ep="Neon Heartbreaks EP">1. Before the Noise</div>
+                    <div class="mini-track-item interactive-ui" data-track="low-bitrate-love" data-ep="Neon Heartbreaks EP">2. Low Bitrate Love</div>
+                    <div class="mini-track-item interactive-ui" data-track="real-love-doesnt-rush" data-ep="Neon Heartbreaks EP">3. Real love doesn't rush</div>
+                  </div>
                 </div>
               </div>
             </div>
             <!-- EP 2 -->
-            <div class="ep-card">
-              <div class="ep-cover-frame">
-                <span class="ep-tag-mini purple-tag">CONCEPT</span>
-                <img src="assets/love-letters.jpeg" alt="Love Letters from Saigon" class="ep-img-cover">
-              </div>
-              <div class="ep-details">
-                <h4>LOVE LETTERS FROM SAIGON</h4>
-                <div class="ep-desc">Trilingual narrative synthpop, organic lo-fi & tropical neon warmth.</div>
-                <div class="mini-tracklist">
-                  <div class="mini-track-item" data-track="saigon-bound" data-ep="Love Letters from Saigon">1. Saigon Bound</div>
-                  <div class="mini-track-item" data-track="tinh-bolero-cho-tran" data-ep="Love Letters from Saigon">2. Tình Bolero Cho Trân</div>
-                  <div class="mini-track-item" data-track="jusquau-dernier-souffle" data-ep="Love Letters from Saigon">3. Jusqu'au Dernier Souffle</div>
+            <div class="ep-card parallax-card">
+              <div class="parallax-inner">
+                <div class="ep-cover-frame">
+                  <span class="ep-tag-mini purple-tag">CONCEPT</span>
+                  <img src="assets/love-letters.jpeg" alt="Love Letters from Saigon" class="ep-img-cover">
+                </div>
+                <div class="ep-details">
+                  <h4>LOVE LETTERS FROM SAIGON</h4>
+                  <div class="ep-desc">Trilingual narrative synthpop, organic lo-fi & tropical neon warmth.</div>
+                  <div class="mini-tracklist">
+                    <div class="mini-track-item interactive-ui" data-track="saigon-bound" data-ep="Love Letters from Saigon">1. Saigon Bound</div>
+                    <div class="mini-track-item interactive-ui" data-track="tinh-bolero-cho-tran" data-ep="Love Letters from Saigon">2. Tình Bolero Cho Trân</div>
+                    <div class="mini-track-item interactive-ui" data-track="jusquau-dernier-souffle" data-ep="Love Letters from Saigon">3. Jusqu'au Dernier Souffle</div>
+                  </div>
                 </div>
               </div>
             </div>
             <!-- EP 3 -->
-            <div class="ep-card">
-              <div class="ep-cover-frame">
-                <span class="ep-tag-mini red-tag">INDUSTRIAL</span>
-                <img src="assets/coal-to-diamond.jpeg" alt="Coal to Diamond" class="ep-img-cover">
-              </div>
-              <div class="ep-details">
-                <h4>COAL TO DIAMOND</h4>
-                <div class="ep-desc">Obsidian design, Blade Cut industrial bass, distortion dynamics.</div>
-                <div class="mini-tracklist">
-                  <div class="mini-track-item" data-track="thick" data-ep="Coal to Diamond">1. THICK</div>
-                  <div class="mini-track-item" data-track="the-throne-resonates" data-ep="Coal to Diamond">2. THE THRONE RESONATES</div>
-                  <div class="mini-track-item" data-track="carved-from-pressure" data-ep="Coal to Diamond">3. Carved from Pressure</div>
+            <div class="ep-card parallax-card">
+              <div class="parallax-inner">
+                <div class="ep-cover-frame">
+                  <span class="ep-tag-mini red-tag">INDUSTRIAL</span>
+                  <img src="assets/coal-to-diamond.jpeg" alt="Coal to Diamond" class="ep-img-cover">
+                </div>
+                <div class="ep-details">
+                  <h4>COAL TO DIAMOND</h4>
+                  <div class="ep-desc">Obsidian design, Blade Cut industrial bass, distortion dynamics.</div>
+                  <div class="mini-tracklist">
+                    <div class="mini-track-item interactive-ui" data-track="thick" data-ep="Coal to Diamond">1. THICK</div>
+                    <div class="mini-track-item interactive-ui" data-track="the-throne-resonates" data-ep="Coal to Diamond">2. THE THRONE RESONATES</div>
+                    <div class="mini-track-item interactive-ui" data-track="carved-from-pressure" data-ep="Coal to Diamond">3. Carved from Pressure</div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="glass-card lyrics-vault-card glow-panel">
+        <div class="glass-card lyrics-vault-card glow-panel interactive-ui">
           <div class="card-head-compact flex-between">
             <h3>Dynamic Lyrics Vault</h3>
             <span class="badge-tech cyan-border glitch-hover">SYNC READY</span>
@@ -159,10 +176,10 @@
           </div>
         </div>
         
-        <div class="glass-card dsp-card">
+        <div class="glass-card dsp-card interactive-ui">
            <div class="card-head-compact flex-between">
             <h3>Real-Time DAW Canvas RTA Spectrum</h3>
-            <span class="badge-tech green-border">LIVE DSP 60 FPS</span>
+            <span class="badge-tech green-border" id="dsp-badge">LIVE DSP 60 FPS</span>
           </div>
           <div class="rta-spectrum-container">
             <canvas id="rta-canvas"></canvas>
@@ -179,7 +196,7 @@
 
       <!-- COL 3 : EXTERNAL EMBED / SPOTIFY -->
       <section class="dash-col col-right">
-        <div class="glass-card embed-card-full">
+        <div class="glass-card embed-card-full interactive-ui">
            <div class="card-head-compact">
             <h3><span class="live-dot green-dot pulse-dot"></span> Top Discography Player</h3>
           </div>
