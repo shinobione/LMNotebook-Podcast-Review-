@@ -30,7 +30,7 @@
     <!-- MAIN DASHBOARD -->
     <main class="dashboard-grid">
       
-      <!-- COL 1 : ACTIVE PLAYBACK -->
+      <!-- COL 1 : ACTIVE PLAYBACK + RTA SPECTRUM RESTAURÉ EN HAUT -->
       <section class="dash-col col-left">
         <div class="glass-card main-player">
           <div class="card-head-compact">
@@ -69,6 +69,24 @@
               <a href="#" id="btn-export-mp3" class="btn-export" download>
                 <span>[💾] EXPORT MASTER MP3</span>
               </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- RTA SPECTRUM REMONTÉ DANS LA COLONNE DE GAUCHE -->
+        <div class="glass-card dsp-card">
+           <div class="card-head-compact flex-between">
+            <h3>RTA Spectrum</h3>
+            <span class="badge-tech green-border">60 FPS</span>
+          </div>
+          <div class="rta-spectrum-container">
+            <canvas id="rta-canvas"></canvas>
+            <div class="rta-labels">
+              <span>20Hz</span>
+              <span>250Hz</span>
+              <span>2kHz</span>
+              <span>8kHz</span>
+              <span>20kHz</span>
             </div>
           </div>
         </div>
@@ -159,23 +177,6 @@
           </div>
           <div class="lyrics-container" id="lyrics-display">
             Initializing vault connection...
-          </div>
-        </div>
-        
-        <div class="glass-card dsp-card">
-           <div class="card-head-compact flex-between">
-            <h3>Real-Time DAW Canvas RTA Spectrum</h3>
-            <span class="badge-tech green-border">LIVE DSP 60 FPS</span>
-          </div>
-          <div class="rta-spectrum-container">
-            <canvas id="rta-canvas"></canvas>
-            <div class="rta-labels">
-              <span>20Hz</span>
-              <span>250Hz</span>
-              <span>2kHz</span>
-              <span>8kHz</span>
-              <span>20kHz</span>
-            </div>
           </div>
         </div>
       </section>
