@@ -120,6 +120,18 @@ body {
 .btn-secondary { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; cursor: pointer; transition: 0.2s; }
 .btn-secondary:hover { background: rgba(255,255,255,0.2); border-color: var(--accent-cyan); box-shadow: 0 0 10px rgba(0, 240, 255, 0.3); }
 
+/* PLATFORMS (PATCHED & UPGRADED) */
+.profile-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(0,0,0,0.5); border-radius: 6px; text-decoration: none; color: inherit; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); margin-bottom: 10px; position: relative; overflow: hidden; }
+.profile-item::before { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); transition: 0.5s; transform: skewX(-20deg); }
+.profile-item:hover::before { left: 150%; }
+.profile-item:hover { transform: translateX(5px); box-shadow: -5px 0 15px rgba(0, 240, 255, 0.2); border-color: rgba(0, 240, 255, 0.3); background: rgba(0, 240, 255, 0.05); }
+.p-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem; box-shadow: 0 0 10px rgba(0,0,0,0.5); z-index: 1; }
+.spotify .p-icon { background: var(--spotify-green); color: #000; box-shadow: 0 0 15px rgba(29, 185, 84, 0.4); }
+.soundcloud .p-icon { background: #ff5500; color: #fff; box-shadow: 0 0 15px rgba(255, 85, 0, 0.4); }
+.p-info { z-index: 1; }
+.p-info strong { display: block; font-size: 0.9rem; margin-bottom: 2px; }
+.p-info span { font-size: 0.7rem; color: var(--text-muted); }
+
 /* CATALOG COL 2 */
 .ep-grid-3 { display: flex; gap: 15px; margin-bottom: 15px; }
 .ep-card { flex: 1; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05); border-radius: 6px; padding: 10px; display: flex; flex-direction: column; gap: 10px; transition: 0.3s; }
