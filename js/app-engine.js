@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let audioCtx, analyser, dataArray;
     let isInitialized = false;
+    let spotifyGhostMode = false; // Flag pour l'animation simulée
 
     // --- 1. MOTEUR DSP & RTA ---
     function initDSP() {
@@ -48,9 +49,28 @@ document.addEventListener('DOMContentLoaded', () => {
         
         requestAnimationFrame(renderRTA);
         
-        if (!audioEl.paused) analyser.getByteFrequencyData(dataArray);
-        else for(let i = 0; i < dataArray.length; i++) dataArray[i] = Math.max(0, dataArray[i] - 5);
+        // ROUTING VISUEL : Flux Réel vs Flux Ghost (Spotify)
+        if (!audioEl.paused) {
+            analyser.getByteFrequencyData(dataArray);
+        } else if (spotifyGhostMode) {
+            // Algorithme de simulation (Ghost DSP)
+            for (let i = 0; i < dataArray.length; i++) {
+                // Pondération : kick/sub (basses freq) tapent plus fort que le top end
+                let maxIntensity = i < 15 ? 255 : (i > 45 ? 120 : 180);
+                // Génération de transients aléatoires
+                if (Math.random() > 0.85) {
+                    dataArray[i] = Math.random() * maxIntensity;
+                } else {
+                    // Release / Decay naturel
+                    dataArray[i] = Math.max(0, dataArray[i] - 12);
+                }
+            }
+        } else {
+            // Silence complet
+            for(let i = 0; i < dataArray.length; i++) dataArray[i] = Math.max(0, dataArray[i] - 5);
+        }
         
+        // RENDER DRAW CALLS
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         const barWidth = (canvas.width / dataArray.length) * 2.5;
         let x = 0;
@@ -76,18 +96,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // WORKAROUND : Détection du clic dans l'iframe via la perte de focus de la fenêtre parente
+    // TRIGGER : Détection d'interaction avec Spotify via la perte de focus
     window.addEventListener('blur', () => {
-        // Petit délai pour laisser le navigateur mettre à jour document.activeElement
         setTimeout(() => {
             if (document.activeElement === spotifyIframe) {
                 pauseLocalPlayer();
+                initDSP(); // On force l'init du canvas si ce n'est pas fait
+                spotifyGhostMode = true; // Activation du faux RTA
             }
         }, 50);
     });
 
-    // WORKAROUND : Flush de l'iframe Spotify lors du lancement du master local
+    // TRIGGER : Reset Spotify via recharge de l'iframe
     function muteSpotifyEmbed() {
+        spotifyGhostMode = false; // Coupe le faux RTA
         if (spotifyIframe) {
             const currentSrc = spotifyIframe.src;
             spotifyIframe.src = "";
@@ -95,11 +117,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Restaure le focus sur la fenêtre principale quand on bouge la souris (aide au trigger 'blur' consécutif)
     window.addEventListener('mousemove', () => {
-        if (document.activeElement === spotifyIframe) {
-            window.focus();
-        }
+        if (document.activeElement === spotifyIframe) window.focus();
     });
 
     // --- 3. TRANSPORT CONTROLS ---
@@ -125,9 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
     progressContainer.addEventListener('click', (e) => {
         const rect = progressContainer.getBoundingClientRect();
         const clickPosition = (e.clientX - rect.left) / rect.width;
-        if (!isNaN(audioEl.duration)) {
-            audioEl.currentTime = clickPosition * audioEl.duration;
-        }
+        if (!isNaN(audioEl.duration)) audioEl.currentTime = clickPosition * audioEl.duration;
     });
 
     audioEl.addEventListener('timeupdate', () => {
@@ -135,7 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const percent = (audioEl.currentTime / audioEl.duration) * 100;
             progressBar.style.width = `${percent}%`;
         }
-
         const formatTime = (time) => {
             if (isNaN(time)) return "00:00";
             const mins = Math.floor(time / 60);
@@ -152,11 +168,11 @@ document.addEventListener('DOMContentLoaded', () => {
         progressBar.style.width = '0%';
     });
 
-    // --- 4. DYNAMIC TRACK ROUTING ---
+    // --- 4. ROUTING AUDIO LOCAL ---
     const trackItems = document.querySelectorAll('.mini-track-item');
     
     async function loadTrackData(trackId, epName, title) {
-        muteSpotifyEmbed();
+        muteSpotifyEmbed(); // Coupe l'iframe externe
         
         audioEl.src = `audio/${trackId}.mp3`;
         if(isInitialized) audioEl.play();
@@ -168,9 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         playerCover.src = `assets/${trackId}.jpeg`; 
         playerCover.onerror = function() { 
-            if (!this.src.endsWith('.png')) {
-                this.src = `assets/${trackId}.png`; 
-            }
+            if (!this.src.endsWith('.png')) this.src = `assets/${trackId}.png`; 
         };
 
         lyricsDisplay.textContent = "Establishing uplink to Lyrics Vault...";
