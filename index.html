@@ -8,18 +8,21 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
+  <!-- EFFETS GLOBAUX -->
   <div class="glow-bg"></div>
+  <canvas id="bg-particles"></canvas>
+  <div class="crt-overlay"></div>
 
   <div class="app-viewport">
     <!-- TOPBAR -->
     <header class="topbar">
       <div class="brand-zone">
         <div class="live-dot"></div>
-        <span class="brand-title">SHINOBIWAN</span>
+        <span class="brand-title glitch-hover">SHINOBIWAN</span>
         <span class="badge-ep">SYSTEM LAUNCHPAD v2.0</span>
       </div>
       <div class="header-logo-center">
-        <img src="assets/logo.png" alt="SHINOBIWAN" class="header-logo-img">
+        <img src="assets/logo.png" alt="SHINOBIWAN" class="header-logo-img glitch-hover">
       </div>
       <div class="hosts-zone">
         <div class="host-pill"><span class="icon-green">⚡</span> DAW ENGINE ACTIVE</div>
@@ -34,16 +37,16 @@
       <section class="dash-col col-left">
         <div class="glass-card main-player">
           <div class="card-head-compact">
-            <span class="badge-tag"><span class="live-dot"></span> ACTIVE PLAYBACK</span>
+            <span class="badge-tag"><span class="live-dot pulse-dot"></span> ACTIVE PLAYBACK</span>
             <span class="tech-id" id="current-ep-tag">NB-EP #01</span>
           </div>
           
-          <div class="hero-cover-frame">
+          <div class="hero-cover-frame glitch-target" id="cover-frame">
             <img src="assets/before-the-noise.jpeg" alt="Current Track Cover" id="player-cover" class="player-cover-img">
           </div>
           
           <div class="track-meta">
-            <h2 id="current-track-title">Before the Noise</h2>
+            <h2 id="current-track-title" class="glitch-target">Before the Noise</h2>
             <div class="subtitle" id="current-track-subtitle">Neon Heartbreaks EP</div>
           </div>
           
@@ -146,10 +149,10 @@
           </div>
         </div>
 
-        <div class="glass-card lyrics-vault-card">
+        <div class="glass-card lyrics-vault-card glow-panel">
           <div class="card-head-compact flex-between">
             <h3>Dynamic Lyrics Vault</h3>
-            <span class="badge-tech cyan-border">SYNC READY</span>
+            <span class="badge-tech cyan-border glitch-hover">SYNC READY</span>
           </div>
           <div class="lyrics-container" id="lyrics-display">
             Initializing vault connection...
@@ -178,7 +181,7 @@
       <section class="dash-col col-right">
         <div class="glass-card embed-card-full">
            <div class="card-head-compact">
-            <h3><span class="live-dot green-dot"></span> Top Discography Player</h3>
+            <h3><span class="live-dot green-dot pulse-dot"></span> Top Discography Player</h3>
           </div>
           <div class="spotify-wrapper-fixed" id="spotify-container">
             <iframe 
