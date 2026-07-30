@@ -17,39 +17,34 @@ document.addEventListener('DOMContentLoaded', () => {
     const timeCurrent = document.getElementById('time-current');
     const timeTotal = document.getElementById('time-total');
     
-    // Nœuds pour le Glitch Effect
     const glitchTargets = document.querySelectorAll('.glitch-target');
 
     let audioCtx, analyser, dataArray;
     let isInitialized = false;
     let spotifyGhostMode = false;
+    let audioEnergy = 0; // Capture la dynamique du master
 
     // ==========================================
-    // MODULE 1 : MOTEUR PARTICULES BACKGROUND
+    // MODULE 1 : MOTEUR PARTICULES AUDIO-REACTIVES
     // ==========================================
     const bgCanvas = document.getElementById('bg-particles');
     const bgCtx = bgCanvas.getContext('2d');
     let particlesArray = [];
     let mouse = { x: null, y: null, radius: 150 };
 
-    window.addEventListener('mousemove', (event) => {
-        mouse.x = event.x;
-        mouse.y = event.y;
-    });
-    window.addEventListener('mouseout', () => {
-        mouse.x = undefined; mouse.y = undefined;
-    });
+    window.addEventListener('mousemove', (event) => { mouse.x = event.x; mouse.y = event.y; });
+    window.addEventListener('mouseout', () => { mouse.x = undefined; mouse.y = undefined; });
 
     class Particle {
         constructor(x, y, directionX, directionY, size, color) {
             this.x = x; this.y = y; 
             this.directionX = directionX; this.directionY = directionY; 
-            this.size = size; this.color = color;
+            this.baseSize = size; this.color = color;
             this.baseX = this.x; this.baseY = this.y;
         }
-        draw() {
+        draw(currentSize) {
             bgCtx.beginPath();
-            bgCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+            bgCtx.arc(this.x, this.y, currentSize, 0, Math.PI * 2, false);
             bgCtx.fillStyle = this.color;
             bgCtx.fill();
         }
@@ -61,29 +56,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 let forceDirectionX = dx / distance;
                 let forceDirectionY = dy / distance;
                 let force = (mouse.radius - distance) / mouse.radius;
-                let directionX = forceDirectionX * force * 5;
-                let directionY = forceDirectionY * force * 5;
-
+                
                 if (distance < mouse.radius) {
-                    this.x -= directionX;
-                    this.y -= directionY;
+                    this.x -= forceDirectionX * force * 5;
+                    this.y -= forceDirectionY * force * 5;
                 } else {
-                    if (this.x !== this.baseX) { let dx = this.x - this.baseX; this.x -= dx / 15; }
-                    if (this.y !== this.baseY) { let dy = this.y - this.baseY; this.y -= dy / 15; }
+                    if (this.x !== this.baseX) this.x -= (this.x - this.baseX) / 15;
+                    if (this.y !== this.baseY) this.y -= (this.y - this.baseY) / 15;
                 }
             } else {
-                if (this.x !== this.baseX) { let dx = this.x - this.baseX; this.x -= dx / 15; }
-                if (this.y !== this.baseY) { let dy = this.y - this.baseY; this.y -= dy / 15; }
+                if (this.x !== this.baseX) this.x -= (this.x - this.baseX) / 15;
+                if (this.y !== this.baseY) this.y -= (this.y - this.baseY) / 15;
             }
-            // Mouvement orbital naturel très lent
-            this.x += this.directionX * 0.2;
-            this.y += this.directionY * 0.2;
             
-            // Rebond bords
+            // Interaction Audio : Plus ça tape, plus ça va vite et gros
+            const speedMultiplier = 1 + (audioEnergy * 0.02);
+            this.x += this.directionX * 0.2 * speedMultiplier;
+            this.y += this.directionY * 0.2 * speedMultiplier;
+            
             if(this.x < 0 || this.x > window.innerWidth) this.directionX = -this.directionX;
             if(this.y < 0 || this.y > window.innerHeight) this.directionY = -this.directionY;
 
-            this.draw();
+            // La taille grossit sur les subs
+            const dynamicSize = this.baseSize + (audioEnergy * 0.05);
+            this.draw(dynamicSize);
         }
     }
 
@@ -91,16 +87,14 @@ document.addEventListener('DOMContentLoaded', () => {
         particlesArray = [];
         bgCanvas.width = window.innerWidth;
         bgCanvas.height = window.innerHeight;
-        // Densité des particules (plus la division est petite, plus il y a de poussières)
-        let numberOfParticles = (bgCanvas.width * bgCanvas.height) / 8000; 
+        let numberOfParticles = (bgCanvas.width * bgCanvas.height) / 7000; 
         for (let i = 0; i < numberOfParticles; i++) {
-            let size = (Math.random() * 2) + 0.5;
+            let size = (Math.random() * 1.5) + 0.5;
             let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
             let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
             let directionX = (Math.random() * 2) - 1;
             let directionY = (Math.random() * 2) - 1;
-            let color = 'rgba(0, 240, 255, 0.4)';
-            particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+            particlesArray.push(new Particle(x, y, directionX, directionY, size, 'rgba(0, 240, 255, 0.4)'));
         }
     }
     
@@ -114,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', () => { initParticles(); });
 
     // ==========================================
-    // MODULE 2 : DSP & AUDIO ENGINE (LOCAL + GHOST)
+    // MODULE 2 : DSP & RTA ENGINE
     // ==========================================
     function initDSP() {
         if (isInitialized) return;
@@ -142,16 +136,23 @@ document.addEventListener('DOMContentLoaded', () => {
         canvas.height = canvas.offsetHeight;
         requestAnimationFrame(renderRTA);
         
+        let localEnergy = 0;
+
         if (!audioEl.paused) {
             analyser.getByteFrequencyData(dataArray);
+            // Moyenne des basses pour extraire l'énergie du Kick/Sub (bins 0 à 10)
+            for(let i=0; i<10; i++) localEnergy += dataArray[i];
+            audioEnergy = localEnergy / 10; 
         } else if (spotifyGhostMode) {
             for (let i = 0; i < dataArray.length; i++) {
                 let maxIntensity = i < 15 ? 255 : (i > 45 ? 120 : 180);
                 if (Math.random() > 0.85) dataArray[i] = Math.random() * maxIntensity;
                 else dataArray[i] = Math.max(0, dataArray[i] - 12);
             }
+            audioEnergy = 0; // Pas de feedback particules sur Spotify pour préserver l'UX
         } else {
             for(let i = 0; i < dataArray.length; i++) dataArray[i] = Math.max(0, dataArray[i] - 5);
+            audioEnergy = Math.max(0, audioEnergy - 5);
         }
         
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -164,18 +165,37 @@ document.addEventListener('DOMContentLoaded', () => {
             const g = 240 * (1 - (i/dataArray.length));
             const b = 255;
             
-            // Effet Neon sur les barres
             ctx.shadowBlur = 10;
             ctx.shadowColor = `rgba(${r},${g},${b}, 0.8)`;
             ctx.fillStyle = `rgb(${r},${g},${b})`;
             ctx.fillRect(x, canvas.height - barHeight, barWidth - 1, barHeight);
             x += barWidth;
         }
-        ctx.shadowBlur = 0; // Reset
+        ctx.shadowBlur = 0;
     }
 
     // ==========================================
-    // MODULE 3 : TRANSPORT & EXCLUSION MUTUELLE
+    // MODULE 3 : TYPEWRITER LYRICS FX
+    // ==========================================
+    let typingInterval;
+    function typeWriterEffect(textElement, rawText, speed = 15) {
+        clearInterval(typingInterval);
+        textElement.textContent = '';
+        let i = 0;
+        typingInterval = setInterval(() => {
+            if (i < rawText.length) {
+                textElement.textContent += rawText.charAt(i);
+                i++;
+                // Autoscroll bottom
+                textElement.parentElement.scrollTop = textElement.parentElement.scrollHeight;
+            } else {
+                clearInterval(typingInterval);
+            }
+        }, speed);
+    }
+
+    // ==========================================
+    // MODULE 4 : TRANSPORT & EXCLUSION MUTUELLE
     // ==========================================
     function pauseLocalPlayer() {
         if (!audioEl.paused) {
@@ -259,14 +279,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ==========================================
-    // MODULE 4 : ROUTING AUDIO & GLITCH TRIGGER
+    // MODULE 5 : ROUTING AUDIO & TRIGGER
     // ==========================================
     function triggerGlitch() {
         glitchTargets.forEach(el => {
             el.classList.remove('is-glitching');
-            void el.offsetWidth; // Force DOM reflow pour restart l'animation CSS
+            void el.offsetWidth;
             el.classList.add('is-glitching');
-            setTimeout(() => { el.classList.remove('is-glitching'); }, 400); // Durée = keyframe
+            setTimeout(() => { el.classList.remove('is-glitching'); }, 400); 
         });
     }
 
@@ -274,7 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     async function loadTrackData(trackId, epName, title) {
         muteSpotifyEmbed(); 
-        triggerGlitch(); // GLITCH EFFECT INJECTION
+        triggerGlitch(); 
         
         audioEl.src = `audio/${trackId}.mp3`;
         if(isInitialized) audioEl.play();
@@ -292,17 +312,18 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!this.src.endsWith('.png')) this.src = `assets/${trackId}.png`; 
         };
 
-        lyricsDisplay.textContent = "Establishing uplink to Lyrics Vault...";
+        lyricsDisplay.textContent = "> INITIALIZING UPLINK...";
         try {
             const response = await fetch(`assets/lyrics/${trackId}.txt`);
             if (response.ok) {
                 const text = await response.text();
-                lyricsDisplay.textContent = text;
+                // Activation du Terminal Effect
+                typeWriterEffect(lyricsDisplay, text, 10);
             } else {
-                lyricsDisplay.textContent = "// FILE NOT FOUND IN VAULT //\n\nEnsure " + trackId + ".txt exists in assets/lyrics/";
+                typeWriterEffect(lyricsDisplay, `> ERROR 404: /vault/${trackId}.txt NOT FOUND`, 20);
             }
         } catch (error) {
-            lyricsDisplay.textContent = "// CONNECTION ERROR //\n\nLocal file fetch blocked by CORS or file missing.";
+            typeWriterEffect(lyricsDisplay, "> CRITICAL ERROR: CORS BLOCKED FETCH", 20);
         }
     }
 
