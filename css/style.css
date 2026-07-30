@@ -24,7 +24,7 @@ html, body {
   font-family: var(--font-ui);
   width: 100vw;
   height: 100vh;
-  overflow: hidden; /* Zéro scroll sur PC */
+  overflow: hidden;
 }
 
 /* EFFETS VISUELS AMBIANTS */
@@ -161,14 +161,15 @@ html, body {
 #rta-canvas { width: 100%; height: 100%; display: block; }
 .rta-labels { position: absolute; bottom: 2px; left: 4px; right: 4px; display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.4rem; color: rgba(255,255,255,0.4); pointer-events: none; }
 
-/* COL 2 : CATALOG & LYRICS VAULT (FORMAT 1:1) */
+/* COL 2 : CATALOG & LYRICS VAULT (FORMAT 1:1 STRICT POUR TOUTES LES COVERS) */
 .catalog-showcase-card { flex-shrink: 0; }
 .ep-grid-3 { display: flex; gap: 8px; }
 .ep-card { flex: 1; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 6px; transition: 0.3s; }
 .ep-card:hover { border-color: rgba(0, 240, 255, 0.5); background: rgba(0,0,0,0.6); box-shadow: 0 0 15px rgba(0, 240, 255, 0.15); }
 
-.ep-cover-frame { position: relative; width: 100%; aspect-ratio: 1; border-radius: 5px; overflow: hidden; }
-.ep-img-cover { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: 0.3s; }
+/* FORÇAGE STRICT 1:1 ET COUVERTURE TOTALE DE LA ZONE */
+.ep-cover-frame { position: relative; width: 100%; aspect-ratio: 1 / 1 !important; border-radius: 5px; overflow: hidden; background: #000; }
+.ep-img-cover { width: 100% !important; height: 100% !important; object-fit: cover !important; opacity: 0.85; transition: 0.3s; display: block; }
 .ep-card:hover .ep-img-cover { opacity: 1; transform: scale(1.04); }
 
 .ep-tag-mini { position: absolute; top: 3px; left: 3px; font-size: 0.45rem; padding: 2px 4px; border-radius: 3px; font-weight: bold; z-index: 2; }
@@ -235,7 +236,7 @@ html, body {
 ::-webkit-scrollbar-track { background: rgba(0,0,0,0.4); }
 ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; box-shadow: 0 0 6px var(--accent-cyan); }
 
-/* CORRECTION MOBILE ABSOLUE (RESPONSIVE VIEWPORT) */
+/* CORRECTION MOBILE ULTIME (MODE COMPACT SPOTIFY ET FLUX NATUREL) */
 @media (max-width: 1024px) {
   html, body {
     overflow-y: auto !important;
@@ -259,7 +260,13 @@ html, body {
   .ep-grid-3 {
     flex-direction: column !important;
   }
+  /* Passage de l'embed Spotify en mode compact horizontal sur mobile pour éviter les immenses cadres vides */
   .spotify-wrapper-fixed {
-    min-height: 400px !important;
+    min-height: 155px !important;
+    height: 155px !important;
+  }
+  .spotify-wrapper-fixed iframe {
+    min-height: 155px !important;
+    height: 155px !important;
   }
 }
