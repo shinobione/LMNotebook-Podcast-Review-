@@ -98,6 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let parsedLyrics = [];
     let rtaAnimationId = null;
     let ambientAnimationId = null;
+    let lastVisualLevel = 0;
 
     function createResponsiveImage(src, alt, className, isLazy = true) {
         const img = document.createElement('img');
@@ -273,6 +274,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             for (let i = 0; i < dataArray.length; i++) dataArray[i] = Math.max(0, dataArray[i] - 6);
+        }
+
+        let visualLevel = 0;
+        for (let i = 0; i < Math.min(16, dataArray.length); i++) visualLevel += dataArray[i];
+        visualLevel = visualLevel / (Math.min(16, dataArray.length) * 255);
+        if (Math.abs(visualLevel - lastVisualLevel) > 0.015 || visualLevel === 0) {
+            document.body.style.setProperty('--audio-level', visualLevel.toFixed(3));
+            lastVisualLevel = visualLevel;
         }
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);

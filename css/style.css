@@ -325,29 +325,9 @@ body.audio-active::before {
   box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
 }
 
-/* COL 3 : SPOTIFY & HUBS */
-.embed-card-full { flex: 1; display: flex; flex-direction: column; min-height: 0; }
-.spotify-wrapper-fixed { flex: 1; width: 100%; background: #000; border-radius: 8px; overflow: hidden; min-height: 0; position: relative; box-shadow: inset 0 0 15px rgba(0,0,0,0.9); }
-.spotify-wrapper-fixed iframe { width: 100%; height: 100%; border: none; border-radius: 8px; }
-
-.hubs-card { flex-shrink: 0; }
-.hubs-row { display: flex; gap: 8px; }
-.hub-pill { flex: 1; text-align: center; padding: 6px; border-radius: 6px; font-size: 0.65rem; font-family: var(--font-mono); text-decoration: none; font-weight: bold; transition: 0.2s; }
-.spotify-pill { background: rgba(29, 185, 84, 0.15); border: 1px solid var(--spotify-green); color: var(--spotify-green); box-shadow: 0 0 8px rgba(29, 185, 84, 0.2); }
-.spotify-pill:hover { background: var(--spotify-green); color: #000; box-shadow: 0 0 15px var(--spotify-green); }
-.soundcloud-pill { background: rgba(255, 85, 0, 0.15); border: 1px solid #ff5500; color: #ff5500; box-shadow: 0 0 8px rgba(255, 85, 0, 0.2); }
-.soundcloud-pill:hover { background: #ff5500; color: #fff; box-shadow: 0 0 15px #ff5500; }
-
-/* SCROLLBARS */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: rgba(0,0,0,0.4); }
-::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; box-shadow: 0 0 6px var(--accent-cyan); }
-
-/* CORRECTION MOBILE ULTIME (MODE COMPACT SPOTIFY ET FLUX NATUREL) */
-@media (max-width: 1024px) {
-  html, body {
-    overflow-y: auto !important;
-    height: auto !important;
+@media (max-width: 768px) {
+  #ambient-canvas {
+    opacity: 0.6;
   }
 }
 
@@ -440,9 +420,9 @@ body.audio-active::before {
   animation: logo-breathe 4.5s ease-in-out infinite;
 }
 .header-logo-img {
-  /* Screen blending makes the original dark plate disappear without adding a binary asset. */
+  /* Crush the dark plate to true black, then screen-blend it out of the header. */
   mix-blend-mode: screen;
-  filter: contrast(1.18) brightness(1.08) drop-shadow(0 0 7px rgba(255, 255, 255, 0.3)) drop-shadow(0 0 18px rgba(0, 240, 255, 0.65));
+  filter: grayscale(1) contrast(4) brightness(1.16);
   animation: logo-float 6s ease-in-out infinite;
 }
 .topbar::after {
@@ -473,6 +453,72 @@ body.audio-active::before {
 @keyframes logo-breathe {
   0%, 100% { opacity: 0.45; transform: scale(0.94); }
   50% { opacity: 0.9; transform: scale(1.05); }
+}
+@keyframes logo-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+@keyframes header-signal {
+  0%, 100% { opacity: 0.3; transform: scaleX(0.72); }
+  50% { opacity: 0.8; transform: scaleX(1); }
+}
+.glass-card { overflow: clip; }
+.glass-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 30%, rgba(0, 240, 255, 0.035) 48%, transparent 66%);
+  transform: translateX(-110%);
+  transition: transform 0.8s ease;
+}
+.glass-card { position: relative; }
+.glass-card:hover::before { transform: translateX(110%); }
+
+.reduced-motion .header-logo-center::before,
+.reduced-motion .header-logo-img,
+.reduced-motion .topbar::after { animation: none; }
+
+
+/* AUDIO-REACTIVE VISUAL SYSTEM — one CSS variable is fed by the existing analyser. */
+body { --audio-level: 0; }
+body.audio-active .hero-cover-frame {
+  border-color: rgba(0, 240, 255, calc(0.3 + var(--audio-level) * 0.65));
+  box-shadow:
+    0 0 calc(18px + var(--audio-level) * 34px) rgba(0, 240, 255, calc(0.18 + var(--audio-level) * 0.4)),
+    0 0 calc(36px + var(--audio-level) * 50px) rgba(176, 38, 255, calc(var(--audio-level) * 0.22));
+}
+.hero-cover-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  border: 1px solid transparent;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(255,255,255,.28), transparent 20%, transparent 72%, rgba(0,240,255,.28)) border-box;
+  mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: calc(.22 + var(--audio-level) * .78);
+}
+body.audio-active .player-cover-img {
+  transform: scale(calc(1 + var(--audio-level) * .018));
+  filter: saturate(calc(1 + var(--audio-level) * .35)) brightness(calc(1 + var(--audio-level) * .08));
+}
+body.audio-active .progress-bar {
+  box-shadow: 0 0 calc(10px + var(--audio-level) * 22px) var(--accent-cyan);
+}
+body.audio-active .topbar::after {
+  opacity: calc(.35 + var(--audio-level) * .65);
+  filter: drop-shadow(0 0 calc(4px + var(--audio-level) * 12px) var(--accent-cyan));
+}
+body.audio-active .main-player {
+  border-color: rgba(0, 240, 255, calc(.35 + var(--audio-level) * .5));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body { --audio-level: 0 !important; }
+  body.audio-active .player-cover-img { transform: none; filter: none; }
 }
 @keyframes logo-float {
   0%, 100% { transform: translateY(0); }
