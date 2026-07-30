@@ -162,7 +162,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (index === activeIndex) {
                         if (!el.classList.contains('lyrics-line-active')) {
                             el.classList.add('lyrics-line-active');
-                            el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                            // CENTRAGE PARFAIT DE LA LIGNE ACTIVE DANS LE VAULT
+                            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
                         }
                     } else {
                         el.classList.remove('lyrics-line-active');
@@ -203,7 +204,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 lines.forEach((line) => {
                     if (line.trim() === '') return;
 
-                    // Extraction universelle du timestamp [mm:ss.ff] et nettoyage total du texte
                     const timeMatch = line.match(/\[(\d{2}):(\d{2})(?:\.(\d+))?\]/);
                     let totalSeconds = 0;
                     let lyricText = line;
@@ -229,7 +229,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (parsedLyrics.length > 0) {
-                    lyricsDisplay.querySelectorAll('.lyrics-line')[0].classList.add('lyrics-line-active');
+                    const firstLine = lyricsDisplay.querySelectorAll('.lyrics-line')[0];
+                    firstLine.classList.add('lyrics-line-active');
+                    firstLine.scrollIntoView({ behavior: 'auto', block: 'center' });
                 }
             } else {
                 lyricsDisplay.textContent = "// FILE NOT FOUND IN VAULT //\n\nEnsure " + trackId + ".txt exists in assets/lyrics/";
