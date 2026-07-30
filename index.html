@@ -30,7 +30,7 @@
     <!-- MAIN DASHBOARD -->
     <main class="dashboard-grid">
       
-      <!-- COL 1 : ACTIVE PLAYBACK, RTA, STREAMING & LYRICS -->
+      <!-- COL 1 : ACTIVE PLAYBACK, RTA & STREAMING -->
       <section class="dash-col col-left">
         <div class="glass-card main-player">
           <div class="card-head-compact">
@@ -111,20 +111,9 @@
             </div>
           </a>
         </div>
-
-        <!-- DYNAMIC LYRICS VAULT (Désormais en Colonne 1) -->
-        <div class="glass-card lyrics-vault-card">
-          <div class="card-head-compact flex-between">
-            <h3>Dynamic Lyrics Vault</h3>
-            <span class="badge-tech cyan-border">SYNC READY</span>
-          </div>
-          <div class="lyrics-container" id="lyrics-display">
-            Initializing vault connection...
-          </div>
-        </div>
       </section>
 
-      <!-- COL 2 : CATALOG / DISCOGRAPHY SHOWCASE -->
+      <!-- COL 2 : CATALOG & DYNAMIC LYRICS VAULT -->
       <section class="dash-col col-center">
         <div class="glass-card catalog-showcase-card">
           <div class="card-head-compact">
@@ -179,6 +168,17 @@
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- DYNAMIC LYRICS VAULT -->
+        <div class="glass-card lyrics-vault-card">
+          <div class="card-head-compact flex-between">
+            <h3>Dynamic Lyrics Vault</h3>
+            <span class="badge-tech cyan-border">SYNC READY</span>
+          </div>
+          <div class="lyrics-container" id="lyrics-display">
+            Initializing vault connection...
           </div>
         </div>
       </section>
