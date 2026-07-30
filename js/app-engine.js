@@ -200,32 +200,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 const lines = text.split('\n');
                 lyricsDisplay.innerHTML = '';
                 
-                const regex = /^\[(\d{2}):(\d{2})\.(\d{2})\]\s*(.*)$/;
-
                 lines.forEach((line) => {
-                    const match = line.match(regex);
-                    if (match) {
-                        const minutes = parseInt(match[1], 10);
-                        const seconds = parseInt(match[2], 10);
-                        const centiseconds = parseInt(match[3], 10);
-                        const totalSeconds = minutes * 60 + seconds + centiseconds / 100;
-                        const lyricText = match[4].trim();
+                    if (line.trim() === '') return;
 
-                        parsedLyrics.push({ time: totalSeconds, text: lyricText });
+                    // Extraction universelle du timestamp [mm:ss.ff] et nettoyage total du texte
+                    const timeMatch = line.match(/\[(\d{2}):(\d{2})(?:\.(\d+))?\]/);
+                    let totalSeconds = 0;
+                    let lyricText = line;
 
-                        const span = document.createElement('span');
-                        span.className = 'lyrics-line';
-                        span.textContent = lyricText;
-                        lyricsDisplay.appendChild(span);
-                        lyricsDisplay.appendChild(document.createElement('br'));
-                    } else if (line.trim() !== '') {
-                        parsedLyrics.push({ time: 0, text: line.trim() });
-                        const span = document.createElement('span');
-                        span.className = 'lyrics-line';
-                        span.textContent = line.trim();
-                        lyricsDisplay.appendChild(span);
-                        lyricsDisplay.appendChild(document.createElement('br'));
+                    if (timeMatch) {
+                        const mins = parseInt(timeMatch[1], 10);
+                        const secs = parseInt(timeMatch[2], 10);
+                        const msStr = timeMatch[3] ? timeMatch[3].padEnd(3, '0').slice(0, 3) : '0';
+                        const ms = parseInt(msStr, 10);
+                        totalSeconds = mins * 60 + secs + ms / 1000;
+                        lyricText = line.replace(/\[.*?\]/g, '').trim();
+                    } else {
+                        lyricText = line.trim();
                     }
+
+                    parsedLyrics.push({ time: totalSeconds, text: lyricText });
+
+                    const span = document.createElement('span');
+                    span.className = 'lyrics-line';
+                    span.textContent = lyricText;
+                    lyricsDisplay.appendChild(span);
+                    lyricsDisplay.appendChild(document.createElement('br'));
                 });
 
                 if (parsedLyrics.length > 0) {
