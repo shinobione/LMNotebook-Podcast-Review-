@@ -270,3 +270,42 @@ html, body {
     height: 155px !important;
   }
 }
+
+/* PERFORMANCE & ACCESSIBILITY MOTION GUARDS */
+.mini-track-item {
+  appearance: none;
+  width: 100%;
+  text-align: left;
+  color: inherit;
+}
+
+.reduced-motion *,
+.reduced-motion *::before,
+.reduced-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+  transition-duration: 0.001ms !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #ambient-canvas {
+    display: none;
+  }
+
+  .player-cover-img,
+  .ep-img-cover,
+  .glass-card,
+  .btn-play,
+  .btn-secondary,
+  .btn-export,
+  .hub-pill {
+    transition: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  #ambient-canvas {
+    opacity: 0.45;
+  }
+}
