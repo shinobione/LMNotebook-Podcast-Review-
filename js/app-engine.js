@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnPlayPause = document.getElementById('btn-play-pause');
     const btnRewind = document.getElementById('btn-rewind');
     const btnForward = document.getElementById('btn-forward');
+    const btnPrevious = document.getElementById('btn-previous');
+    const btnNext = document.getElementById('btn-next');
     const progressBar = document.getElementById('progress-bar');
     const progressContainer = document.getElementById('progress-container');
     const spotifyIframe = document.getElementById('spotify-iframe');
@@ -18,6 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const lyricsDisplay = document.getElementById('lyrics-display');
     const timeCurrent = document.getElementById('time-current');
     const timeTotal = document.getElementById('time-total');
+    const trackPosition = document.getElementById('track-position');
+    const nextTrackTitle = document.getElementById('next-track-title');
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const mobileMotion = window.matchMedia('(max-width: 768px)');
@@ -72,6 +76,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         return tracks;
     }, {});
+
+    const TRACK_ORDER = EPS.flatMap(ep => ep.tracks.map(track => track.id));
+    let currentTrackId = TRACK_ORDER[0];
 
     const FALLBACK_LYRICS = {
         "before-the-noise": "[00:00.00] // BEFORE THE NOISE //\n[00:04.50] Neon lights bleeding through the dashboard glass\n[00:10.20] Chasing shadows while the city builds too fast\n[00:16.80] We lived in moments that cracked\n[00:23.10] When kicked straight back to life\n[00:29.40] And the memories rush in\n[00:36.00] Ooh... Ooh... Mmmh\n[00:45.00] Cut the static, find the baseline drop\n[00:52.30] This underground machine is never gonna stop.",
@@ -319,7 +326,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.toggle('audio-active', isActive);
     }
 
-    audioEl.addEventListener('ended', () => setLocalAudioActive(false));
+    audioEl.addEventListener('ended', () => {
+        setLocalAudioActive(false);
+        selectAdjacentTrack(1, true);
+    });
     audioEl.addEventListener('pause', () => {
         if (!spotifyGhostMode) setLocalAudioActive(false);
     });
@@ -350,6 +360,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnRewind.addEventListener('click', () => { audioEl.currentTime = Math.max(0, audioEl.currentTime - 10); });
     btnForward.addEventListener('click', () => { audioEl.currentTime = Math.min(audioEl.duration || 0, audioEl.currentTime + 10); });
+    btnPrevious.addEventListener('click', () => {
+        if (audioEl.currentTime > 3) {
+            audioEl.currentTime = 0;
+            return;
+        }
+        selectAdjacentTrack(-1, !audioEl.paused);
+    });
+    btnNext.addEventListener('click', () => selectAdjacentTrack(1, !audioEl.paused));
 
     progressContainer.addEventListener('click', e => {
         const rect = progressContainer.getBoundingClientRect();
@@ -373,7 +391,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (index === activeIndex) {
                         if (!el.classList.contains('lyrics-line-active')) {
                             el.classList.add('lyrics-line-active');
-                            const targetTop = el.offsetTop - lyricsDisplay.clientHeight / 2 + el.clientHeight / 2;
+                            const centeredTop = el.offsetTop - lyricsDisplay.clientHeight / 2 + el.clientHeight / 2;
+                            const maxTop = Math.max(0, lyricsDisplay.scrollHeight - lyricsDisplay.clientHeight);
+                            const targetTop = Math.min(maxTop, Math.max(0, centeredTop));
                             lyricsDisplay.scrollTo({ top: targetTop, behavior: prefersReducedMotion.matches ? 'auto' : 'smooth' });
                         }
                     } else {
@@ -450,9 +470,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    function selectAdjacentTrack(offset, autoplay) {
+        const currentIndex = TRACK_ORDER.indexOf(currentTrackId);
+        const nextIndex = (currentIndex + offset + TRACK_ORDER.length) % TRACK_ORDER.length;
+        return loadTrackData(TRACK_ORDER[nextIndex], autoplay);
+    }
+
+    function updateTrackContext(trackId) {
+        const currentIndex = TRACK_ORDER.indexOf(trackId);
+        const followingId = TRACK_ORDER[(currentIndex + 1) % TRACK_ORDER.length];
+        trackPosition.textContent = `Morceau ${currentIndex + 1} / ${TRACK_ORDER.length}`;
+        nextTrackTitle.textContent = TRACKS[followingId].title;
+    }
+
     async function loadTrackData(trackId, autoplay = isInitialized) {
         const track = TRACKS[trackId];
         if (!track) return;
+        currentTrackId = trackId;
+        updateTrackContext(trackId);
 
         if (autoplay) resetSpotifyEmbed();
         else spotifyGhostMode = false;
