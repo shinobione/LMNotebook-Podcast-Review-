@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // MODULE CONSOLE AUDIO FX (PULP FX LIVE)
+    // MODULE CONSOLE AUDIO FX (PULP FX LIVE) - FIXED ROUTING
     // ==========================================
     class AudioFXRack {
         constructor(context, sourceNode) {
@@ -113,11 +113,14 @@ document.addEventListener('DOMContentLoaded', () => {
             this.distortionNode = this.audioCtx.createWaveShaper();
             this.distortionNode.curve = this.makeDistortionCurve(0);
 
-            // Chainage DSP : Source -> Filter -> Distortion -> Analyser
+            // Routing complet : Source -> Filter -> Distortion -> Analyser -> OUT (Master Destination)
             this.source.disconnect();
             this.source.connect(this.filterNode);
             this.filterNode.connect(this.distortionNode);
             this.distortionNode.connect(analyser);
+            
+            // MAGGIE IS BACK : On rebranche la sortie de l'analyser vers tes enceintes !
+            analyser.connect(this.audioCtx.destination);
         }
 
         toggleUnderwater(active) {
