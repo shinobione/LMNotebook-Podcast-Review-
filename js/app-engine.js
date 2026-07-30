@@ -22,14 +22,19 @@ document.addEventListener('DOMContentLoaded', () => {
     let spotifyGhostMode = false;
     let parsedLyrics = []; 
 
-    // --- DICTIONNAIRE DE SECOURS LYRICS (FALLBACK ROBUSTE GITHUB PAGES) ---
     const FALLBACK_LYRICS = {
         "before-the-noise": "[00:00.00] // BEFORE THE NOISE //\n[00:04.50] Neon lights bleeding through the dashboard glass\n[00:10.20] Chasing shadows while the city builds too fast\n[00:16.80] We lived in moments that cracked\n[00:23.10] When kicked straight back to life\n[00:29.40] And the memories rush in\n[00:36.00] Ooh... Ooh... Mmmh\n[00:45.00] Cut the static, find the baseline drop\n[00:52.30] This underground machine is never gonna stop.",
         "low-bitrate-love": "[00:00.00] // LOW BITRATE LOVE //\n[00:05.00] Compressed frequencies across the wire\n[00:12.40] You whispered digital dreams in synthetic fire\n[00:20.10] Low bitrate love, high voltage pain\n[00:28.50] Running through the data stream in my brain.",
-        "real-love-doesnt-rush": "[00:00.00] // REAL LOVE DOESN'T RUSH //\n[00:06.00] Slow burn vinyl cracking in the dark\n[00:14.20] Taking time to build a permanent spark\n[00:22.50] Real love doesn't rush the tempo\n[00:31.00] Keeping it deep, keeping it memo."
+        "real-love-doesnt-rush": "[00:00.00] // REAL LOVE DOESN'T RUSH //\n[00:06.00] Slow burn vinyl cracking in the dark\n[00:14.20] Taking time to build a permanent spark\n[00:22.50] Real love doesn't rush the tempo\n[00:31.00] Keeping it deep, keeping it memo.",
+        "saigon-bound": "[00:00.00] // SAIGON BOUND //\n[00:05.00] Motorbike hum under tropical rain\n[00:12.00] Neon crossing through Ben Thanh vein\n[00:20.00] Saigon bound, heartbeats aligned\n[00:28.00] Leaving the static and cold behind.",
+        "tinh-bolero-cho-tran": "[00:00.00] // TÌNH BOLERO CHO TRÂN //\n[00:06.00] Tiếng guitar vọng qua phố xưa\n[00:14.00] Gửi trọn niềm đau vào trong cơn mưa\n[00:22.00] Tình Bolero cho người phương xa\n[00:30.00] Ngọt ngào câu hát đậm đà thiết tha.",
+        "jusquau-dernier-souffle": "[00:00.00] // JUSQU'AU DERNIER SOUFFLE //\n[00:05.00] Regard croisé au coin de la rue\n[00:12.00] Des promesses qu'on n'a pas revues\n[00:20.00] Jusqu'au dernier souffle et dernier éclat\n[00:28.00] Je garderai ta flamme gravée en moi.",
+        "thick": "[00:00.00] // THICK //\n[00:04.00] Blunt force trauma bumping the club\n[00:10.00] Billion-watt beat hitting big on the track\n[00:17.00] Bold with the bounce, never backing it back\n[00:24.00] Bury the rhythm, the body, the bone\n[00:31.00] Big bad weight sitting fat on the throne.",
+        "the-throne-resonates": "[00:00.00] // THE THRONE RESONATES //\n[00:05.00] Heavy metal sub frequencies low\n[00:13.00] Watch the obsidian kingdom grow\n[00:21.00] The throne resonates with every shockwave\n[00:29.00] Built from the pressure inside the cave.",
+        "carved-from-pressure": "[00:00.00] // CARVED FROM PRESSURE //\n[00:06.00] Coal to diamond under tectonic weight\n[00:14.00] We carved our name directly into fate\n[00:22.00] No fractures found, absolute glass\n[00:30.00] Watching the fragile illusions pass."
     };
 
-    // --- 1. AMBIENT PARTICLE BACKGROUND ---
+    // --- 1. PARTICULES AMBIANTES AUDIO-RÉACTIVES ---
     function initAmbientParticles() {
         if (!ambientCanvas) return;
         const ctx = ambientCanvas.getContext('2d');
@@ -42,14 +47,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         const particles = [];
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < 70; i++) {
             particles.push({
                 x: Math.random() * width,
                 y: Math.random() * height,
-                vx: (Math.random() - 0.5) * 0.6,
-                vy: (Math.random() - 0.5) * 0.6,
-                radius: Math.random() * 2 + 1,
-                baseAlpha: Math.random() * 0.4 + 0.2
+                vx: (Math.random() - 0.5) * 0.7,
+                vy: (Math.random() - 0.5) * 0.7,
+                radius: Math.random() * 2.2 + 0.8,
+                baseAlpha: Math.random() * 0.5 + 0.2
             });
         }
 
@@ -60,19 +65,21 @@ document.addEventListener('DOMContentLoaded', () => {
             let audioLevel = 0;
             if (dataArray && (!audioEl.paused || spotifyGhostMode)) {
                 let sum = 0;
-                for (let i = 0; i < 10; i++) sum += dataArray[i];
-                audioLevel = (sum / 10) / 255;
+                for (let i = 0; i < 12; i++) sum += dataArray[i];
+                audioLevel = (sum / 12) / 255;
             }
 
             particles.forEach(p => {
-                p.x += p.vx * (1 + audioLevel * 1.5);
-                p.y += p.vy * (1 + audioLevel * 1.5);
+                p.x += p.vx * (1 + audioLevel * 2);
+                p.y += p.vy * (1 + audioLevel * 2);
                 if (p.x < 0) p.x = width; if (p.x > width) p.x = 0;
                 if (p.y < 0) p.y = height; if (p.y > height) p.y = 0;
 
                 ctx.beginPath();
-                ctx.arc(p.x, p.y, p.radius + audioLevel * 2, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(0, 240, 255, ${p.baseAlpha + audioLevel * 0.4})`;
+                ctx.arc(p.x, p.y, p.radius + audioLevel * 2.5, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(0, 240, 255, ${p.baseAlpha + audioLevel * 0.5})`;
+                ctx.shadowBlur = 10 * (1 + audioLevel);
+                ctx.shadowColor = '#00f0ff';
                 ctx.fill();
             });
         }
@@ -110,10 +117,10 @@ document.addEventListener('DOMContentLoaded', () => {
             analyser.getByteFrequencyData(dataArray);
         } else if (spotifyGhostMode) {
             for (let i = 0; i < dataArray.length; i++) {
-                dataArray[i] = Math.random() > 0.8 ? Math.random() * 200 : Math.max(0, dataArray[i] - 10);
+                dataArray[i] = Math.random() > 0.82 ? Math.random() * 220 : Math.max(0, dataArray[i] - 12);
             }
         } else {
-            for (let i = 0; i < dataArray.length; i++) dataArray[i] = Math.max(0, dataArray[i] - 5);
+            for (let i = 0; i < dataArray.length; i++) dataArray[i] = Math.max(0, dataArray[i] - 6);
         }
         
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -122,8 +129,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         for (let i = 0; i < dataArray.length; i++) {
             let barHeight = (dataArray[i] / 255) * canvas.height;
-            const r = barHeight * 3, g = 240 * (1 - (i/dataArray.length)), b = 255;
+            const r = barHeight * 2.8, g = 240 * (1 - (i/dataArray.length)), b = 255;
             ctx.fillStyle = `rgb(${r},${g},${b})`;
+            ctx.shadowBlur = 6;
+            ctx.shadowColor = '#00f0ff';
             ctx.fillRect(x, canvas.height - barHeight, barWidth - 1, barHeight);
             x += barWidth;
         }
@@ -253,7 +262,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (e) {}
         
-        // Fallback direct si fetch échoue (GitHub Pages path)
         if (FALLBACK_LYRICS[trackId]) {
             processLyricsText(FALLBACK_LYRICS[trackId]);
         } else {
@@ -286,7 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.target.classList.add('active-track');
             initDSP();
             if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-            loadTrackData(e.target.getAttribute('data-track'), e.target.getAttribute('data-ep'), e.target.textContent.replace(/^\d+\.\s*/, ''));
+            loadTrackData(e.target.getAttribute('data-track'), e.target.getAttribute('data-ep'), e.target.textContent.repeat ? e.target.textContent.replace(/^\d+\.\s*/, '') : e.target.textContent);
         });
     });
 
