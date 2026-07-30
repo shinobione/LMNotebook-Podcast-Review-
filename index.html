@@ -20,7 +20,7 @@
         <span class="badge-ep">SYSTEM LAUNCHPAD v2.0</span>
       </div>
       <div class="header-logo-center">
-        <img src="assets/logo.png" srcset="assets/logo.png 1x" sizes="96px" alt="SHINOBIWAN" class="header-logo-img" width="96" height="32" decoding="async">
+        <img src="assets/logo.png" srcset="assets/logo.png 1x" sizes="(max-width: 768px) 180px, 250px" alt="SHINOBIWAN" class="header-logo-img" width="250" height="84" decoding="async">
       </div>
       <div class="hosts-zone">
         <div class="host-pill"><span class="icon-green">⚡</span> DAW ACTIVE</div>
@@ -36,13 +36,21 @@
             <span class="tech-id" id="current-ep-tag">NB-EP #01</span>
           </div>
           
-          <div class="hero-cover-frame">
+          <div class="hero-cover-stage">
+            <span class="energy-ring ring-one" aria-hidden="true"></span>
+            <span class="energy-ring ring-two" aria-hidden="true"></span>
+            <div class="hero-cover-frame">
             <img src="assets/before-the-noise.jpeg" srcset="assets/before-the-noise.jpeg 1x" sizes="(max-width: 1024px) 100vw, 300px" alt="Before the Noise cover" id="player-cover" class="player-cover-img" width="640" height="640" decoding="async" fetchpriority="high">
+            </div>
           </div>
           
           <div class="track-meta">
             <h2 id="current-track-title">Before the Noise</h2>
             <div class="subtitle" id="current-track-subtitle">Neon Heartbreaks EP</div>
+            <div class="track-context" aria-live="polite">
+              <span id="track-position">Morceau 1 / 9</span>
+              <span class="next-track-label">Suivant : <strong id="next-track-title">Low Bitrate Love</strong></span>
+            </div>
           </div>
           
           <audio id="audio-element" src="audio/before-the-noise.mp3" preload="metadata" crossorigin="anonymous"></audio>
@@ -53,17 +61,23 @@
               <span id="time-total">00:00</span>
             </div>
             
-            <div class="progress-container" id="progress-container">
+            <div class="progress-container" id="progress-container" aria-label="Position dans le morceau">
+              <canvas id="waveform-canvas" aria-hidden="true"></canvas>
               <div class="progress-bar" id="progress-bar"></div>
             </div>
 
             <div class="controls-row">
-              <button class="btn-secondary" id="btn-rewind" aria-label="Reculer de 10 secondes">↺ -10s</button>
+              <button class="btn-track-nav" id="btn-previous" aria-label="Morceau précédent" title="Morceau précédent">⏮</button>
+              <button class="btn-secondary" id="btn-rewind" aria-label="Reculer de 10 secondes">↺ <span>-10s</span></button>
+              <span class="vu-meter vu-left" aria-hidden="true"><i></i><i></i><i></i></span>
               <button class="btn-play" id="btn-play-pause" aria-label="Lire le morceau sélectionné">▶</button>
-              <button class="btn-secondary" id="btn-forward" aria-label="Avancer de 10 secondes">↻ +10s</button>
+              <span class="vu-meter vu-right" aria-hidden="true"><i></i><i></i><i></i></span>
+              <button class="btn-secondary" id="btn-forward" aria-label="Avancer de 10 secondes">↻ <span>+10s</span></button>
+              <button class="btn-track-nav" id="btn-next" aria-label="Morceau suivant" title="Morceau suivant">⏭</button>
             </div>
 
             <div class="export-row">
+              <button type="button" id="btn-immersive" class="btn-immersive" aria-pressed="false">◉ MODE IMMERSIF</button>
               <a href="#" id="btn-export-mp3" class="btn-export" download>
                 <span>[💾] EXPORT MASTER MP3</span>
               </a>
