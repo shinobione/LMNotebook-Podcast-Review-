@@ -883,8 +883,12 @@ document.addEventListener('DOMContentLoaded', () => {
             toolPanel.innerHTML = `<strong>SHARE ${TRACKS[currentTrackId].title.toUpperCase()}</strong><div class="share-actions"><button type="button" data-share="native">SHARE ↗</button><button type="button" data-share="copy">COPY LINK</button></div>`;
         } else {
             const saved = loadVisualPreferences();
-            toolPanel.innerHTML = `<strong>VISUAL PROFILE</strong><label class="visual-setting">Quality<select id="visual-quality"><option value="low">LOW</option><option value="balanced">BALANCED</option><option value="ultra">ULTRA</option></select></label><label class="visual-setting">Audio visuals<input id="visual-enabled" type="checkbox"></label>`;
-            toolPanel.querySelector('#visual-quality').value = saved.quality;
+            toolPanel.innerHTML = `<div class="visual-panel-head"><div><strong>VISUAL ENGINE</strong><small>Performance profile</small></div><button type="button" data-close-tool aria-label="Close visual settings">×</button></div><div class="visual-profiles" role="radiogroup" aria-label="Visual quality"><button type="button" data-quality="low" role="radio"><span>◌</span><b>LOW</b><small>Battery</small></button><button type="button" data-quality="balanced" role="radio"><span>◉</span><b>BALANCED</b><small>Default</small></button><button type="button" data-quality="ultra" role="radio"><span>✦</span><b>ULTRA</b><small>Maximum</small></button></div><label class="visual-toggle"><span><b>AUDIO REACTIVE FX</b><small>Canvas, aura and particles</small></span><input id="visual-enabled" type="checkbox"><i aria-hidden="true"></i></label>`;
+            toolPanel.querySelectorAll('[data-quality]').forEach(button => {
+                const selected = button.dataset.quality === saved.quality;
+                button.classList.toggle('selected', selected);
+                button.setAttribute('aria-checked', String(selected));
+            });
             toolPanel.querySelector('#visual-enabled').checked = saved.enabled;
         }
     }
@@ -954,6 +958,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     Object.entries(toolButtons).forEach(([tool, button]) => button.addEventListener('click', () => renderToolPanel(tool)));
     toolPanel.addEventListener('click', async event => {
+        if (event.target.closest('[data-close-tool]')) {
+            renderToolPanel(activeTool);
+            return;
+        }
+        const qualityButton = event.target.closest('[data-quality]');
+        if (qualityButton) {
+            const enabled = toolPanel.querySelector('#visual-enabled')?.checked ?? true;
+            applyVisualPreferences({ quality: qualityButton.dataset.quality, enabled });
+            toolPanel.querySelectorAll('[data-quality]').forEach(button => {
+                const selected = button === qualityButton;
+                button.classList.toggle('selected', selected);
+                button.setAttribute('aria-checked', String(selected));
+            });
+            return;
+        }
         const playButton = event.target.closest('[data-play-next]');
         if (playButton) {
             await loadTrackData(playButton.dataset.playNext, true);
@@ -971,9 +990,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     toolPanel.addEventListener('change', event => {
-        if (!event.target.matches('#visual-quality, #visual-enabled')) return;
+        if (!event.target.matches('#visual-enabled')) return;
+        const selectedQuality = toolPanel.querySelector('[data-quality].selected')?.dataset.quality || 'balanced';
         applyVisualPreferences({
-            quality: toolPanel.querySelector('#visual-quality').value,
+            quality: selectedQuality,
             enabled: toolPanel.querySelector('#visual-enabled').checked
         });
     });
