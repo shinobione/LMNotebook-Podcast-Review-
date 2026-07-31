@@ -972,6 +972,18 @@ body.live-stage .main-player, body.live-stage .lyrics-vault-card { opacity: 1; f
 body.album-switching .album-transition { animation-duration: 1.55s; }
 
 @media (max-width: 768px) {
+  /* Flatten the dashboard columns so the spectrum can sit directly between
+     the local player and album selection in the mobile reading order. */
+  body:not(.live-stage) .dashboard-grid > .dash-col {
+    display: contents !important;
+  }
+  body:not(.live-stage) .main-player { order: 1; }
+  body:not(.live-stage) .dsp-card { order: 2; }
+  body:not(.live-stage) .catalog-showcase-card { order: 3; }
+  body:not(.live-stage) .lyrics-vault-card { order: 4; }
+  body:not(.live-stage) .embed-card-full { order: 5; }
+  body:not(.live-stage) .hubs-card { order: 6; }
+
   .album-swipe-nav {
     display: grid;
     grid-template-columns: 44px 1fr 44px;
