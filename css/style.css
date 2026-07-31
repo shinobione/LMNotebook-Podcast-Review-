@@ -960,6 +960,9 @@ body.live-stage .main-player, body.live-stage .lyrics-vault-card { opacity: 1; f
 /* MOBILE PLAYBACK & DISCOVERY POLISH */
 .album-swipe-nav { display: none; }
 .col-right .dsp-card { height: 150px; min-height: 120px; }
+/* Only the first spectrum is valid. This also suppresses duplicated legacy
+   markup that may still be present in an older cached/deployed document. */
+.col-right .dsp-card ~ .dsp-card { display: none !important; }
 .embed-card-full .card-head-compact h3 { font-size: .62rem; }
 .spotify-wrapper-fixed iframe {
   width: 106%;
@@ -970,6 +973,28 @@ body.live-stage .main-player, body.live-stage .lyrics-vault-card { opacity: 1; f
 
 /* Kept last intentionally: this duration supersedes earlier theme declarations. */
 body.album-switching .album-transition { animation-duration: 1.55s; }
+
+/* ULTRA is deliberately much louder than BALANCED, not just a mild filter. */
+body.visual-ultra #audio-fx-canvas {
+  opacity: 1;
+  filter: saturate(2.15) brightness(1.42) contrast(1.18) drop-shadow(0 0 18px var(--track-accent));
+}
+body.visual-ultra #ambient-canvas {
+  opacity: 1;
+  filter: saturate(1.8) brightness(1.35) contrast(1.12);
+}
+body.visual-ultra.audio-active::before {
+  opacity: .92;
+  transform: scale(1.12);
+  background: radial-gradient(circle at center, color-mix(in srgb, var(--track-accent) 34%, transparent), transparent 62%);
+}
+body.visual-ultra.audio-active .energy-ring {
+  opacity: calc(.24 + var(--bass-level) * .76);
+  border-width: 2px;
+  box-shadow: 0 0 42px color-mix(in srgb, var(--track-accent) 85%, transparent), inset 0 0 26px color-mix(in srgb, var(--track-secondary) 35%, transparent);
+}
+body.visual-ultra.audio-active .ring-two { opacity: calc(.18 + var(--mid-level) * .62); }
+body.visual-ultra.audio-active .cyber-grid-overlay { opacity: calc(.58 + var(--audio-level) * .42); }
 
 @media (max-width: 768px) {
   /* Flatten the dashboard columns so the spectrum can sit directly between
