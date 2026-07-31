@@ -10,10 +10,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const spotifyIframe = document.getElementById('spotify-iframe');
     const canvas = document.getElementById('rta-canvas');
     const ambientCanvas = document.getElementById('ambient-canvas');
+    const audioFxCanvas = document.getElementById('audio-fx-canvas');
     const btnExportMp3 = document.getElementById('btn-export-mp3');
     const trackList = document.getElementById('track-list');
     const waveformCanvas = document.getElementById('waveform-canvas');
     const btnImmersive = document.getElementById('btn-immersive');
+    const btnLiveStage = document.getElementById('btn-live-stage');
 
     const currentTrackTitle = document.getElementById('current-track-title');
     const currentTrackSubtitle = document.getElementById('current-track-subtitle');
@@ -103,6 +105,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let lastVisualLevel = 0;
     let bassAverage = 0;
     let lastBeatAt = 0;
+    let lastSuperHitAt = 0;
+    let fxAnimationId = null;
+    let currentPeaks = [];
+    let currentDropMarkers = [];
+    let reactiveBass = 0;
+    let reactiveMids = 0;
+    let reactiveHighs = 0;
+    let lightningLife = 0;
     const waveformCache = new Map();
     let particlePrimary = '#00f0ff';
     let particleSecondary = '#b026ff';
@@ -254,6 +264,83 @@ document.addEventListener('DOMContentLoaded', () => {
         renderAmbient();
     }
 
+    function initAudioFx() {
+        if (!audioFxCanvas || fxAnimationId) return;
+        const context = audioFxCanvas.getContext('2d');
+        const resize = () => {
+            const dpr = Math.min(devicePixelRatio || 1, 1.5);
+            audioFxCanvas.width = Math.round(innerWidth * dpr);
+            audioFxCanvas.height = Math.round(innerHeight * dpr);
+            audioFxCanvas.style.width = `${innerWidth}px`;
+            audioFxCanvas.style.height = `${innerHeight}px`;
+            context.setTransform(dpr, 0, 0, dpr, 0, 0);
+        };
+        resize();
+        window.addEventListener('resize', resize, { passive: true });
+
+        const renderFx = now => {
+            fxAnimationId = requestAnimationFrame(renderFx);
+            if (document.hidden || prefersReducedMotion.matches || audioEl.paused) {
+                context.clearRect(0, 0, innerWidth, innerHeight);
+                return;
+            }
+            context.clearRect(0, 0, innerWidth, innerHeight);
+            const rect = document.querySelector('.hero-cover-stage').getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            const radius = Math.min(rect.width, rect.height) * .52;
+
+            if (document.body.classList.contains('immersive-mode') || document.body.classList.contains('live-stage')) {
+                context.save();
+                context.globalAlpha = .12 + reactiveBass * .12;
+                context.strokeStyle = particlePrimary;
+                for (let depth = 0; depth < 9; depth++) {
+                    const phase = ((now * .00008 * (1 + reactiveBass * 2) + depth / 9) % 1);
+                    const size = 40 + phase * Math.max(innerWidth, innerHeight) * .72;
+                    context.strokeRect(innerWidth / 2 - size, innerHeight / 2 - size * .55, size * 2, size * 1.1);
+                }
+                context.restore();
+            }
+
+            context.save();
+            context.translate(cx, cy);
+            const bars = Math.min(64, dataArray ? dataArray.length : 0);
+            for (let index = 0; index < bars; index++) {
+                const angle = index / bars * Math.PI * 2 - Math.PI / 2;
+                const value = (dataArray[index] || 0) / 255;
+                const length = 4 + value * Math.min(46, rect.width * .13);
+                context.strokeStyle = index < 20 ? particlePrimary : particleSecondary;
+                context.globalAlpha = .22 + value * .7;
+                context.lineWidth = 1 + value * 1.5;
+                context.beginPath();
+                context.moveTo(Math.cos(angle) * radius, Math.sin(angle) * radius);
+                context.lineTo(Math.cos(angle) * (radius + length), Math.sin(angle) * (radius + length));
+                context.stroke();
+            }
+            context.restore();
+
+            if (lightningLife > .02) {
+                context.save();
+                context.strokeStyle = '#eaffff';
+                context.shadowBlur = 16;
+                context.shadowColor = particlePrimary;
+                context.globalAlpha = lightningLife;
+                context.lineWidth = 1.4;
+                context.beginPath();
+                let x = rect.left;
+                context.moveTo(x, rect.top + Math.random() * rect.height);
+                for (let step = 1; step <= 9; step++) {
+                    x = rect.left + rect.width * step / 9;
+                    context.lineTo(x, rect.top + rect.height * step / 9 + (Math.random() - .5) * 34);
+                }
+                context.stroke();
+                context.restore();
+                lightningLife *= .78;
+            }
+        };
+        fxAnimationId = requestAnimationFrame(renderFx);
+    }
+
     function initDSP() {
         if (isInitialized) return;
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -270,6 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resizeObserver = new ResizeObserver(() => resizeCanvasToDisplaySize(canvas));
         resizeObserver.observe(canvas);
         renderRTA();
+        initAudioFx();
         renderWaveform(audioEl.getAttribute('src'));
     }
 
@@ -303,6 +391,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const mids = averageBand(8, 28);
         const highs = averageBand(28, 64);
         const visualLevel = bass * 0.55 + mids * 0.3 + highs * 0.15;
+        reactiveBass = bass;
+        reactiveMids = mids;
+        reactiveHighs = highs;
         bassAverage = bassAverage * 0.92 + bass * 0.08;
         const now = performance.now();
         if (!audioEl.paused && bass > bassAverage * 1.35 && bass > 0.24 && now - lastBeatAt > 180) {
@@ -310,6 +401,12 @@ document.addEventListener('DOMContentLoaded', () => {
             void document.body.offsetWidth;
             document.body.classList.add('beat-hit');
             lastBeatAt = now;
+        }
+        if (!audioEl.paused && bass > 0.58 && highs > 0.22 && now - lastSuperHitAt > 650) {
+            lightningLife = 1;
+            document.body.classList.add('super-hit');
+            setTimeout(() => document.body.classList.remove('super-hit'), 180);
+            lastSuperHitAt = now;
         }
         if (Math.abs(visualLevel - lastVisualLevel) > 0.012 || visualLevel === 0) {
             const style = document.body.style;
@@ -447,6 +544,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         }
+        drawWaveform();
+        updateDropAnticipation();
         timeCurrent.textContent = formatTime(audioEl.currentTime);
         timeTotal.textContent = formatTime(audioEl.duration);
     });
@@ -516,6 +615,46 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
+    function drawWaveform() {
+        if (!waveformCanvas || !currentPeaks.length) return;
+        const rect = waveformCanvas.getBoundingClientRect();
+        const dpr = Math.min(devicePixelRatio || 1, 2);
+        waveformCanvas.width = Math.max(1, Math.round(rect.width * dpr));
+        waveformCanvas.height = Math.max(1, Math.round(rect.height * dpr));
+        const context = waveformCanvas.getContext('2d');
+        const progress = Number.isFinite(audioEl.duration) ? audioEl.currentTime / audioEl.duration : 0;
+        const width = waveformCanvas.width / currentPeaks.length;
+        context.clearRect(0, 0, waveformCanvas.width, waveformCanvas.height);
+        currentPeaks.forEach((peak, index) => {
+            const played = index / currentPeaks.length <= progress;
+            const height = Math.max(1, peak * waveformCanvas.height * .88);
+            context.fillStyle = played ? particlePrimary : 'rgba(226,232,240,.28)';
+            context.shadowBlur = played ? 5 : 0;
+            context.shadowColor = particlePrimary;
+            context.fillRect(index * width, (waveformCanvas.height - height) / 2, Math.max(1, width - 1), height);
+        });
+        context.shadowBlur = 0;
+        context.fillStyle = particleSecondary;
+        currentDropMarkers.forEach(index => context.fillRect(index * width, 0, Math.max(1, dpr), waveformCanvas.height * .22));
+        const headX = progress * waveformCanvas.width;
+        context.fillStyle = '#fff';
+        context.shadowBlur = 12;
+        context.shadowColor = particlePrimary;
+        context.beginPath();
+        context.arc(headX, waveformCanvas.height / 2, 2.5 * dpr + reactiveBass * 2, 0, Math.PI * 2);
+        context.fill();
+    }
+
+    function updateDropAnticipation() {
+        if (!currentDropMarkers.length || !Number.isFinite(audioEl.duration)) return;
+        const currentBin = audioEl.currentTime / audioEl.duration * currentPeaks.length;
+        const nextDrop = currentDropMarkers.find(index => index >= currentBin);
+        const binsAhead = nextDrop === undefined ? Infinity : nextDrop - currentBin;
+        const anticipation = binsAhead < 12 ? Math.max(0, 1 - binsAhead / 12) : 0;
+        document.body.style.setProperty('--drop-build', anticipation.toFixed(3));
+        document.body.classList.toggle('drop-imminent', anticipation > .08);
+    }
+
     async function renderWaveform(audioUrl) {
         if (!waveformCanvas || !audioCtx) return;
         const token = audioUrl;
@@ -539,18 +678,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         if (audioEl.getAttribute('src') !== token) return;
-        const rect = waveformCanvas.getBoundingClientRect();
-        const dpr = Math.min(devicePixelRatio || 1, 2);
-        waveformCanvas.width = Math.max(1, rect.width * dpr);
-        waveformCanvas.height = Math.max(1, rect.height * dpr);
-        const context = waveformCanvas.getContext('2d');
-        context.clearRect(0, 0, waveformCanvas.width, waveformCanvas.height);
-        context.fillStyle = 'rgba(226,232,240,.3)';
-        const width = waveformCanvas.width / peaks.length;
-        peaks.forEach((peak, index) => {
-            const height = Math.max(1, peak * waveformCanvas.height * .9);
-            context.fillRect(index * width, (waveformCanvas.height - height) / 2, Math.max(1, width - 1), height);
-        });
+        currentPeaks = peaks;
+        const threshold = peaks.reduce((sum, peak) => sum + peak, 0) / peaks.length * 1.65;
+        currentDropMarkers = peaks.map((peak, index) => peak > threshold && index > 2 && peak > peaks[index - 1] && peak >= (peaks[index + 1] || 0) ? index : -1).filter(index => index >= 0);
+        drawWaveform();
     }
 
     function applyTrackPalette(track) {
@@ -566,6 +697,16 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.toggle('immersive-mode', active);
         btnImmersive.setAttribute('aria-pressed', String(active));
         btnImmersive.textContent = active ? '× QUITTER IMMERSIF' : '◉ MODE IMMERSIF';
+    }
+
+    async function toggleLiveStage() {
+        const active = !document.body.classList.contains('live-stage');
+        document.body.classList.toggle('live-stage', active);
+        document.body.classList.toggle('immersive-mode', active || document.body.classList.contains('immersive-mode'));
+        btnLiveStage.setAttribute('aria-pressed', String(active));
+        btnLiveStage.textContent = active ? '× QUITTER LIVE' : '◇ LIVE STAGE';
+        if (active && document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen().catch(() => {});
+        if (!active && document.fullscreenElement) await document.exitFullscreen().catch(() => {});
     }
 
     function selectAdjacentTrack(offset, autoplay) {
@@ -634,8 +775,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     btnImmersive.addEventListener('click', () => toggleImmersive());
+    btnLiveStage.addEventListener('click', toggleLiveStage);
     document.addEventListener('keydown', event => {
-        if (event.key === 'Escape' && document.body.classList.contains('immersive-mode')) toggleImmersive(false);
+        if (event.key === 'Escape' && document.body.classList.contains('live-stage')) {
+            document.body.classList.remove('live-stage');
+            btnLiveStage.setAttribute('aria-pressed', 'false');
+            btnLiveStage.textContent = '◇ LIVE STAGE';
+        } else if (event.key === 'Escape' && document.body.classList.contains('immersive-mode')) toggleImmersive(false);
+        if (document.body.classList.contains('live-stage') && event.code === 'Space' && !event.repeat) {
+            event.preventDefault();
+            btnPlayPause.click();
+        }
+        if (document.body.classList.contains('live-stage') && event.key === 'ArrowRight') selectAdjacentTrack(1, !audioEl.paused);
+        if (document.body.classList.contains('live-stage') && event.key === 'ArrowLeft') selectAdjacentTrack(-1, !audioEl.paused);
+    });
+
+    document.addEventListener('fullscreenchange', () => {
+        if (!document.fullscreenElement && document.body.classList.contains('live-stage')) {
+            document.body.classList.remove('live-stage');
+            btnLiveStage.setAttribute('aria-pressed', 'false');
+            btnLiveStage.textContent = '◇ LIVE STAGE';
+        }
     });
 
     document.addEventListener('visibilitychange', () => {

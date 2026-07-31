@@ -10,6 +10,7 @@
 </head>
 <body>
   <canvas id="ambient-canvas"></canvas>
+  <canvas id="audio-fx-canvas" aria-hidden="true"></canvas>
   <div class="cyber-grid-overlay"></div>
 
   <div class="app-viewport">
@@ -77,7 +78,10 @@
             </div>
 
             <div class="export-row">
-              <button type="button" id="btn-immersive" class="btn-immersive" aria-pressed="false">◉ MODE IMMERSIF</button>
+              <div class="experience-controls">
+                <button type="button" id="btn-immersive" class="btn-immersive" aria-pressed="false">◉ IMMERSIF</button>
+                <button type="button" id="btn-live-stage" class="btn-immersive btn-live-stage" aria-pressed="false">◇ LIVE STAGE</button>
+              </div>
               <a href="#" id="btn-export-mp3" class="btn-export" download>
                 <span>[💾] EXPORT MASTER MP3</span>
               </a>
