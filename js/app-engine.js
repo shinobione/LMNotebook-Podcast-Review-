@@ -23,11 +23,13 @@ document.addEventListener('DOMContentLoaded', () => {
         button.remove();
         if (controls && !controls.children.length) controls.remove();
     });
-    btnImmersive.innerHTML = '<span aria-hidden="true">◈</span> LIVE EXPERIENCE';
+    const immersiveIcon = document.createElement('span');
+    immersiveIcon.setAttribute('aria-hidden', 'true');
+    immersiveIcon.textContent = '◈';
+    btnImmersive.replaceChildren(immersiveIcon, ' LIVE EXPERIENCE');
     const btnExitLive = document.getElementById('btn-exit-live');
     const headerTrack = document.getElementById('header-track');
     const headerEngine = document.getElementById('header-engine');
-    const albumTransition = document.getElementById('album-transition');
     const transitionTitle = document.getElementById('transition-title');
     const toolPanel = document.getElementById('tool-panel');
     const toolButtons = {
@@ -35,13 +37,28 @@ document.addEventListener('DOMContentLoaded', () => {
         share: document.getElementById('btn-share'),
         visuals: document.getElementById('btn-visuals')
     };
-    const playbackIcons = {
-        play: '<svg class="playback-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.25 5.6v12.8L18 12z"/></svg>',
-        pause: '<svg class="playback-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="5.5" width="3.5" height="13" rx="1"/><rect x="13.5" y="5.5" width="3.5" height="13" rx="1"/></svg>'
-    };
+    function createPlaybackIcon(isPlaying) {
+        const svgNamespace = 'http://www.w3.org/2000/svg';
+        const svg = document.createElementNS(svgNamespace, 'svg');
+        svg.classList.add('playback-icon');
+        svg.setAttribute('viewBox', '0 0 24 24');
+        svg.setAttribute('aria-hidden', 'true');
+        if (isPlaying) {
+            [7, 13.5].forEach(x => {
+                const bar = document.createElementNS(svgNamespace, 'rect');
+                Object.entries({ x, y: 5.5, width: 3.5, height: 13, rx: 1 }).forEach(([name, value]) => bar.setAttribute(name, String(value)));
+                svg.appendChild(bar);
+            });
+        } else {
+            const triangle = document.createElementNS(svgNamespace, 'path');
+            triangle.setAttribute('d', 'M8.25 5.6v12.8L18 12z');
+            svg.appendChild(triangle);
+        }
+        return svg;
+    }
 
     function setPlaybackButton(isPlaying) {
-        btnPlayPause.innerHTML = isPlaying ? playbackIcons.pause : playbackIcons.play;
+        btnPlayPause.replaceChildren(createPlaybackIcon(isPlaying));
         btnPlayPause.classList.toggle('is-playing', isPlaying);
         btnPlayPause.setAttribute('aria-label', isPlaying ? 'Pause playback' : 'Play selected track');
     }
@@ -153,6 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const EP_ENGINES = { ep1: 'WAVE ENGINE', ep2: 'LOVE SIGNAL', ep3: 'HEAVY BASS' };
     let activeTool = '';
     let transitionTimer = 0;
+    let transitionAnimationFrameId = null;
     let beatAnimationFrameId = null;
     let trackLoadGeneration = 0;
     let trackFetchController = null;
@@ -171,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderTrackList() {
         if (!trackList) return;
-        trackList.innerHTML = '';
+        trackList.replaceChildren();
         const fragment = document.createDocumentFragment();
 
         EPS.forEach(ep => {
@@ -717,7 +735,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function processLyricsText(rawText) {
         parsedLyrics = [];
-        lyricsDisplay.innerHTML = '';
+        lyricsDisplay.replaceChildren();
         const lines = rawText.split('\n');
         const fragment = document.createDocumentFragment();
 
@@ -907,11 +925,14 @@ document.addEventListener('DOMContentLoaded', () => {
     function triggerAlbumTransition(track) {
         if (prefersReducedMotion.matches) return;
         clearTimeout(transitionTimer);
+        if (transitionAnimationFrameId !== null) cancelAnimationFrame(transitionAnimationFrameId);
         transitionTitle.textContent = `ENTERING ${track.epName.toUpperCase()}`;
         document.body.classList.remove('album-switching');
-        void albumTransition.offsetWidth;
-        document.body.classList.add('album-switching');
-        transitionTimer = setTimeout(() => document.body.classList.remove('album-switching'), 1600);
+        transitionAnimationFrameId = requestAnimationFrame(() => {
+            transitionAnimationFrameId = null;
+            document.body.classList.add('album-switching');
+            transitionTimer = setTimeout(() => document.body.classList.remove('album-switching'), 1600);
+        });
     }
 
     function updateHeader(track) {
@@ -922,6 +943,100 @@ document.addEventListener('DOMContentLoaded', () => {
     function getUpcomingTracks() {
         const index = TRACK_ORDER.indexOf(currentTrackId);
         return [1, 2, 3].map(offset => TRACKS[TRACK_ORDER[(index + offset) % TRACK_ORDER.length]]);
+    }
+
+    function createToolButton(text, dataAttribute, value) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.dataset[dataAttribute] = value;
+        button.textContent = text;
+        return button;
+    }
+
+    function renderQueuePanel() {
+        const heading = document.createElement('strong');
+        heading.textContent = 'UP NEXT';
+        const fragment = document.createDocumentFragment();
+        fragment.appendChild(heading);
+
+        getUpcomingTracks().forEach((track, index) => {
+            const item = document.createElement('div');
+            item.className = 'queue-item';
+            const position = document.createElement('span');
+            position.textContent = `0${index + 1}`;
+            const title = document.createElement('b');
+            title.textContent = track.title;
+            item.append(position, title, createToolButton('PLAY', 'playNext', track.id));
+            fragment.appendChild(item);
+        });
+
+        toolPanel.replaceChildren(fragment);
+    }
+
+    function renderSharePanel() {
+        const heading = document.createElement('strong');
+        heading.textContent = `SHARE ${TRACKS[currentTrackId].title.toUpperCase()}`;
+        const actions = document.createElement('div');
+        actions.className = 'share-actions';
+        actions.append(
+            createToolButton('SHARE ↗', 'share', 'native'),
+            createToolButton('COPY LINK', 'share', 'copy')
+        );
+        toolPanel.replaceChildren(heading, actions);
+    }
+
+    function renderVisualPanel(saved) {
+        const heading = document.createElement('div');
+        heading.className = 'visual-panel-head';
+        const headingCopy = document.createElement('div');
+        const title = document.createElement('strong');
+        title.textContent = 'VISUAL ENGINE';
+        const subtitle = document.createElement('small');
+        subtitle.textContent = 'Performance profile';
+        headingCopy.append(title, subtitle);
+        const closeButton = createToolButton('×', 'closeTool', '');
+        closeButton.setAttribute('aria-label', 'Close visual settings');
+        heading.append(headingCopy, closeButton);
+
+        const profiles = document.createElement('div');
+        profiles.className = 'visual-profiles';
+        profiles.setAttribute('role', 'radiogroup');
+        profiles.setAttribute('aria-label', 'Visual quality');
+        [
+            ['low', '◌', 'LOW', 'Battery'],
+            ['balanced', '◉', 'BALANCED', 'Default'],
+            ['ultra', '✦', 'ULTRA', 'Maximum']
+        ].forEach(([quality, icon, label, detail]) => {
+            const button = createToolButton('', 'quality', quality);
+            button.setAttribute('role', 'radio');
+            button.setAttribute('aria-checked', String(quality === saved.quality));
+            button.classList.toggle('selected', quality === saved.quality);
+            const iconNode = document.createElement('span');
+            iconNode.textContent = icon;
+            const labelNode = document.createElement('b');
+            labelNode.textContent = label;
+            const detailNode = document.createElement('small');
+            detailNode.textContent = detail;
+            button.append(iconNode, labelNode, detailNode);
+            profiles.appendChild(button);
+        });
+
+        const toggle = document.createElement('label');
+        toggle.className = 'visual-toggle';
+        const toggleCopy = document.createElement('span');
+        const toggleTitle = document.createElement('b');
+        toggleTitle.textContent = 'AUDIO REACTIVE FX';
+        const toggleDetail = document.createElement('small');
+        toggleDetail.textContent = 'Canvas, aura and particles';
+        toggleCopy.append(toggleTitle, toggleDetail);
+        const checkbox = document.createElement('input');
+        checkbox.id = 'visual-enabled';
+        checkbox.type = 'checkbox';
+        checkbox.checked = saved.enabled;
+        const indicator = document.createElement('i');
+        indicator.setAttribute('aria-hidden', 'true');
+        toggle.append(toggleCopy, checkbox, indicator);
+        toolPanel.replaceChildren(heading, profiles, toggle);
     }
 
     function applyVisualPreferences({ quality = 'balanced', enabled = true } = {}) {
@@ -951,18 +1066,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!activeTool) return;
 
         if (activeTool === 'queue') {
-            toolPanel.innerHTML = `<strong>UP NEXT</strong>${getUpcomingTracks().map((track, index) => `<div class="queue-item"><span>0${index + 1}</span><b>${track.title}</b><button type="button" data-play-next="${track.id}">PLAY</button></div>`).join('')}`;
+            renderQueuePanel();
         } else if (activeTool === 'share') {
-            toolPanel.innerHTML = `<strong>SHARE ${TRACKS[currentTrackId].title.toUpperCase()}</strong><div class="share-actions"><button type="button" data-share="native">SHARE ↗</button><button type="button" data-share="copy">COPY LINK</button></div>`;
+            renderSharePanel();
         } else {
-            const saved = loadVisualPreferences();
-            toolPanel.innerHTML = `<div class="visual-panel-head"><div><strong>VISUAL ENGINE</strong><small>Performance profile</small></div><button type="button" data-close-tool aria-label="Close visual settings">×</button></div><div class="visual-profiles" role="radiogroup" aria-label="Visual quality"><button type="button" data-quality="low" role="radio"><span>◌</span><b>LOW</b><small>Battery</small></button><button type="button" data-quality="balanced" role="radio"><span>◉</span><b>BALANCED</b><small>Default</small></button><button type="button" data-quality="ultra" role="radio"><span>✦</span><b>ULTRA</b><small>Maximum</small></button></div><label class="visual-toggle"><span><b>AUDIO REACTIVE FX</b><small>Canvas, aura and particles</small></span><input id="visual-enabled" type="checkbox"><i aria-hidden="true"></i></label>`;
-            toolPanel.querySelectorAll('[data-quality]').forEach(button => {
-                const selected = button.dataset.quality === saved.quality;
-                button.classList.toggle('selected', selected);
-                button.setAttribute('aria-checked', String(selected));
-            });
-            toolPanel.querySelector('#visual-enabled').checked = saved.enabled;
+            renderVisualPanel(loadVisualPreferences());
         }
     }
 
