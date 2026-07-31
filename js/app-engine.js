@@ -3,13 +3,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnPlayPause = document.getElementById('btn-play-pause');
     const btnRewind = document.getElementById('btn-rewind');
     const btnForward = document.getElementById('btn-forward');
+    const btnPrevious = document.getElementById('btn-previous');
+    const btnNext = document.getElementById('btn-next');
     const progressBar = document.getElementById('progress-bar');
     const progressContainer = document.getElementById('progress-container');
     const spotifyIframe = document.getElementById('spotify-iframe');
     const canvas = document.getElementById('rta-canvas');
     const ambientCanvas = document.getElementById('ambient-canvas');
+    const audioFxCanvas = document.getElementById('audio-fx-canvas');
     const btnExportMp3 = document.getElementById('btn-export-mp3');
     const trackList = document.getElementById('track-list');
+    const waveformCanvas = document.getElementById('waveform-canvas');
+    const btnImmersive = document.getElementById('btn-immersive');
+    const btnLiveStage = document.getElementById('btn-live-stage');
 
     const currentTrackTitle = document.getElementById('current-track-title');
     const currentTrackSubtitle = document.getElementById('current-track-subtitle');
@@ -18,6 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const lyricsDisplay = document.getElementById('lyrics-display');
     const timeCurrent = document.getElementById('time-current');
     const timeTotal = document.getElementById('time-total');
+    const trackPosition = document.getElementById('track-position');
+    const nextTrackTitle = document.getElementById('next-track-title');
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const mobileMotion = window.matchMedia('(max-width: 768px)');
@@ -73,6 +81,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return tracks;
     }, {});
 
+    const TRACK_ORDER = EPS.flatMap(ep => ep.tracks.map(track => track.id));
+    let currentTrackId = TRACK_ORDER[0];
+
     const FALLBACK_LYRICS = {
         "before-the-noise": "[00:00.00] // BEFORE THE NOISE //\n[00:04.50] Neon lights bleeding through the dashboard glass\n[00:10.20] Chasing shadows while the city builds too fast\n[00:16.80] We lived in moments that cracked\n[00:23.10] When kicked straight back to life\n[00:29.40] And the memories rush in\n[00:36.00] Ooh... Ooh... Mmmh\n[00:45.00] Cut the static, find the baseline drop\n[00:52.30] This underground machine is never gonna stop.",
         "low-bitrate-love": "[00:00.00] // LOW BITRATE LOVE //\n[00:05.00] Compressed frequencies across the wire\n[00:12.40] You whispered digital dreams in synthetic fire\n[00:20.10] Low bitrate love, high voltage pain\n[00:28.50] Running through the data stream in my brain.",
@@ -91,6 +102,23 @@ document.addEventListener('DOMContentLoaded', () => {
     let parsedLyrics = [];
     let rtaAnimationId = null;
     let ambientAnimationId = null;
+    let lastVisualLevel = 0;
+    let bassAverage = 0;
+    let lastBeatAt = 0;
+    let lastSuperHitAt = 0;
+    let fxAnimationId = null;
+    let currentPeaks = [];
+    let currentDropMarkers = [];
+    let reactiveBass = 0;
+    let reactiveMids = 0;
+    let reactiveHighs = 0;
+    let lightningLife = 0;
+    const waveformCache = new Map();
+    let particlePrimary = '#00f0ff';
+    let particleSecondary = '#b026ff';
+    const TRACK_PALETTES = {
+        ep1: ['#00f0ff', '#b026ff'], ep2: ['#ffb36b', '#ff4fa3'], ep3: ['#ff3366', '#00d9ff']
+    };
 
     function createResponsiveImage(src, alt, className, isLazy = true) {
         const img = document.createElement('img');
@@ -203,10 +231,13 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.clearRect(0, 0, width, height);
 
             let audioLevel = 0;
+            let highLevel = 0;
             if (dataArray && (!audioEl.paused || spotifyGhostMode)) {
                 let sum = 0;
                 for (let i = 0; i < 12; i++) sum += dataArray[i];
                 audioLevel = (sum / 12) / 255;
+                for (let i = 28; i < Math.min(52, dataArray.length); i++) highLevel += dataArray[i];
+                highLevel /= Math.max(1, Math.min(52, dataArray.length) - 28) * 255;
             }
 
             particles.forEach(p => {
@@ -219,15 +250,95 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, p.radius + audioLevel * 2.5, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(0, 240, 255, ${p.baseAlpha + audioLevel * 0.5})`;
-                ctx.shadowBlur = 10 * (1 + audioLevel);
-                ctx.shadowColor = '#00f0ff';
+                const sparkle = highLevel > 0.35 && Math.random() > 0.82;
+                ctx.fillStyle = sparkle ? particleSecondary : particlePrimary;
+                ctx.globalAlpha = Math.min(1, p.baseAlpha + audioLevel * 0.45 + (sparkle ? highLevel * 0.35 : 0));
+                ctx.shadowBlur = (sparkle ? 18 : 10) * (1 + audioLevel);
+                ctx.shadowColor = sparkle ? particleSecondary : particlePrimary;
                 ctx.fill();
             });
+            ctx.globalAlpha = 1;
             ambientAnimationId = requestAnimationFrame(renderAmbient);
         }
 
         renderAmbient();
+    }
+
+    function initAudioFx() {
+        if (!audioFxCanvas || fxAnimationId) return;
+        const context = audioFxCanvas.getContext('2d');
+        const resize = () => {
+            const dpr = Math.min(devicePixelRatio || 1, 1.5);
+            audioFxCanvas.width = Math.round(innerWidth * dpr);
+            audioFxCanvas.height = Math.round(innerHeight * dpr);
+            audioFxCanvas.style.width = `${innerWidth}px`;
+            audioFxCanvas.style.height = `${innerHeight}px`;
+            context.setTransform(dpr, 0, 0, dpr, 0, 0);
+        };
+        resize();
+        window.addEventListener('resize', resize, { passive: true });
+
+        const renderFx = now => {
+            fxAnimationId = requestAnimationFrame(renderFx);
+            if (document.hidden || prefersReducedMotion.matches || audioEl.paused) {
+                context.clearRect(0, 0, innerWidth, innerHeight);
+                return;
+            }
+            context.clearRect(0, 0, innerWidth, innerHeight);
+            const rect = document.querySelector('.hero-cover-stage').getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            const radius = Math.min(rect.width, rect.height) * .52;
+
+            if (document.body.classList.contains('immersive-mode') || document.body.classList.contains('live-stage')) {
+                context.save();
+                context.globalAlpha = .12 + reactiveBass * .12;
+                context.strokeStyle = particlePrimary;
+                for (let depth = 0; depth < 9; depth++) {
+                    const phase = ((now * .00008 * (1 + reactiveBass * 2) + depth / 9) % 1);
+                    const size = 40 + phase * Math.max(innerWidth, innerHeight) * .72;
+                    context.strokeRect(innerWidth / 2 - size, innerHeight / 2 - size * .55, size * 2, size * 1.1);
+                }
+                context.restore();
+            }
+
+            context.save();
+            context.translate(cx, cy);
+            const bars = Math.min(64, dataArray ? dataArray.length : 0);
+            for (let index = 0; index < bars; index++) {
+                const angle = index / bars * Math.PI * 2 - Math.PI / 2;
+                const value = (dataArray[index] || 0) / 255;
+                const length = 4 + value * Math.min(46, rect.width * .13);
+                context.strokeStyle = index < 20 ? particlePrimary : particleSecondary;
+                context.globalAlpha = .22 + value * .7;
+                context.lineWidth = 1 + value * 1.5;
+                context.beginPath();
+                context.moveTo(Math.cos(angle) * radius, Math.sin(angle) * radius);
+                context.lineTo(Math.cos(angle) * (radius + length), Math.sin(angle) * (radius + length));
+                context.stroke();
+            }
+            context.restore();
+
+            if (lightningLife > .02) {
+                context.save();
+                context.strokeStyle = '#eaffff';
+                context.shadowBlur = 16;
+                context.shadowColor = particlePrimary;
+                context.globalAlpha = lightningLife;
+                context.lineWidth = 1.4;
+                context.beginPath();
+                let x = rect.left;
+                context.moveTo(x, rect.top + Math.random() * rect.height);
+                for (let step = 1; step <= 9; step++) {
+                    x = rect.left + rect.width * step / 9;
+                    context.lineTo(x, rect.top + rect.height * step / 9 + (Math.random() - .5) * 34);
+                }
+                context.stroke();
+                context.restore();
+                lightningLife *= .78;
+            }
+        };
+        fxAnimationId = requestAnimationFrame(renderFx);
     }
 
     function initDSP() {
@@ -246,6 +357,8 @@ document.addEventListener('DOMContentLoaded', () => {
         resizeObserver = new ResizeObserver(() => resizeCanvasToDisplaySize(canvas));
         resizeObserver.observe(canvas);
         renderRTA();
+        initAudioFx();
+        renderWaveform(audioEl.getAttribute('src'));
     }
 
     function renderRTA() {
@@ -266,6 +379,42 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             for (let i = 0; i < dataArray.length; i++) dataArray[i] = Math.max(0, dataArray[i] - 6);
+        }
+
+        const averageBand = (start, end) => {
+            let sum = 0;
+            const safeEnd = Math.min(end, dataArray.length);
+            for (let i = start; i < safeEnd; i++) sum += dataArray[i];
+            return sum / (Math.max(1, safeEnd - start) * 255);
+        };
+        const bass = averageBand(0, 8);
+        const mids = averageBand(8, 28);
+        const highs = averageBand(28, 64);
+        const visualLevel = bass * 0.55 + mids * 0.3 + highs * 0.15;
+        reactiveBass = bass;
+        reactiveMids = mids;
+        reactiveHighs = highs;
+        bassAverage = bassAverage * 0.92 + bass * 0.08;
+        const now = performance.now();
+        if (!audioEl.paused && bass > bassAverage * 1.35 && bass > 0.24 && now - lastBeatAt > 180) {
+            document.body.classList.remove('beat-hit');
+            void document.body.offsetWidth;
+            document.body.classList.add('beat-hit');
+            lastBeatAt = now;
+        }
+        if (!audioEl.paused && bass > 0.58 && highs > 0.22 && now - lastSuperHitAt > 650) {
+            lightningLife = 1;
+            document.body.classList.add('super-hit');
+            setTimeout(() => document.body.classList.remove('super-hit'), 180);
+            lastSuperHitAt = now;
+        }
+        if (Math.abs(visualLevel - lastVisualLevel) > 0.012 || visualLevel === 0) {
+            const style = document.body.style;
+            style.setProperty('--audio-level', visualLevel.toFixed(3));
+            style.setProperty('--bass-level', bass.toFixed(3));
+            style.setProperty('--mid-level', mids.toFixed(3));
+            style.setProperty('--high-level', highs.toFixed(3));
+            lastVisualLevel = visualLevel;
         }
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -319,7 +468,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.toggle('audio-active', isActive);
     }
 
-    audioEl.addEventListener('ended', () => setLocalAudioActive(false));
+    audioEl.addEventListener('ended', () => {
+        setLocalAudioActive(false);
+        selectAdjacentTrack(1, true);
+    });
     audioEl.addEventListener('pause', () => {
         if (!spotifyGhostMode) setLocalAudioActive(false);
     });
@@ -350,6 +502,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnRewind.addEventListener('click', () => { audioEl.currentTime = Math.max(0, audioEl.currentTime - 10); });
     btnForward.addEventListener('click', () => { audioEl.currentTime = Math.min(audioEl.duration || 0, audioEl.currentTime + 10); });
+    btnPrevious.addEventListener('click', () => {
+        if (audioEl.currentTime > 3) {
+            audioEl.currentTime = 0;
+            return;
+        }
+        selectAdjacentTrack(-1, !audioEl.paused);
+    });
+    btnNext.addEventListener('click', () => selectAdjacentTrack(1, !audioEl.paused));
 
     progressContainer.addEventListener('click', e => {
         const rect = progressContainer.getBoundingClientRect();
@@ -373,7 +533,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (index === activeIndex) {
                         if (!el.classList.contains('lyrics-line-active')) {
                             el.classList.add('lyrics-line-active');
-                            const targetTop = el.offsetTop - lyricsDisplay.clientHeight / 2 + el.clientHeight / 2;
+                            const centeredTop = el.offsetTop - lyricsDisplay.clientHeight / 2 + el.clientHeight / 2;
+                            const maxTop = Math.max(0, lyricsDisplay.scrollHeight - lyricsDisplay.clientHeight);
+                            const targetTop = Math.min(maxTop, Math.max(0, centeredTop));
                             lyricsDisplay.scrollTo({ top: targetTop, behavior: prefersReducedMotion.matches ? 'auto' : 'smooth' });
                         }
                     } else {
@@ -382,6 +544,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         }
+        drawWaveform();
+        updateDropAnticipation();
         timeCurrent.textContent = formatTime(audioEl.currentTime);
         timeTotal.textContent = formatTime(audioEl.duration);
     });
@@ -450,14 +614,128 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+
+    function drawWaveform() {
+        if (!waveformCanvas || !currentPeaks.length) return;
+        const rect = waveformCanvas.getBoundingClientRect();
+        const dpr = Math.min(devicePixelRatio || 1, 2);
+        waveformCanvas.width = Math.max(1, Math.round(rect.width * dpr));
+        waveformCanvas.height = Math.max(1, Math.round(rect.height * dpr));
+        const context = waveformCanvas.getContext('2d');
+        const progress = Number.isFinite(audioEl.duration) ? audioEl.currentTime / audioEl.duration : 0;
+        const width = waveformCanvas.width / currentPeaks.length;
+        context.clearRect(0, 0, waveformCanvas.width, waveformCanvas.height);
+        currentPeaks.forEach((peak, index) => {
+            const played = index / currentPeaks.length <= progress;
+            const height = Math.max(1, peak * waveformCanvas.height * .88);
+            context.fillStyle = played ? particlePrimary : 'rgba(226,232,240,.28)';
+            context.shadowBlur = played ? 5 : 0;
+            context.shadowColor = particlePrimary;
+            context.fillRect(index * width, (waveformCanvas.height - height) / 2, Math.max(1, width - 1), height);
+        });
+        context.shadowBlur = 0;
+        context.fillStyle = particleSecondary;
+        currentDropMarkers.forEach(index => context.fillRect(index * width, 0, Math.max(1, dpr), waveformCanvas.height * .22));
+        const headX = progress * waveformCanvas.width;
+        context.fillStyle = '#fff';
+        context.shadowBlur = 12;
+        context.shadowColor = particlePrimary;
+        context.beginPath();
+        context.arc(headX, waveformCanvas.height / 2, 2.5 * dpr + reactiveBass * 2, 0, Math.PI * 2);
+        context.fill();
+    }
+
+    function updateDropAnticipation() {
+        if (!currentDropMarkers.length || !Number.isFinite(audioEl.duration)) return;
+        const currentBin = audioEl.currentTime / audioEl.duration * currentPeaks.length;
+        const nextDrop = currentDropMarkers.find(index => index >= currentBin);
+        const binsAhead = nextDrop === undefined ? Infinity : nextDrop - currentBin;
+        const anticipation = binsAhead < 12 ? Math.max(0, 1 - binsAhead / 12) : 0;
+        document.body.style.setProperty('--drop-build', anticipation.toFixed(3));
+        document.body.classList.toggle('drop-imminent', anticipation > .08);
+    }
+
+    async function renderWaveform(audioUrl) {
+        if (!waveformCanvas || !audioCtx) return;
+        const token = audioUrl;
+        let peaks = waveformCache.get(audioUrl);
+        if (!peaks) {
+            try {
+                const response = await fetch(audioUrl);
+                const buffer = await audioCtx.decodeAudioData(await response.arrayBuffer());
+                const channel = buffer.getChannelData(0);
+                const bins = 180;
+                const step = Math.max(1, Math.floor(channel.length / bins));
+                peaks = Array.from({ length: bins }, (_, index) => {
+                    let peak = 0;
+                    for (let i = index * step; i < Math.min(channel.length, (index + 1) * step); i += 16) peak = Math.max(peak, Math.abs(channel[i]));
+                    return peak;
+                });
+                waveformCache.set(audioUrl, peaks);
+            } catch (error) {
+                console.warn('Waveform generation failed.', error);
+                return;
+            }
+        }
+        if (audioEl.getAttribute('src') !== token) return;
+        currentPeaks = peaks;
+        const threshold = peaks.reduce((sum, peak) => sum + peak, 0) / peaks.length * 1.65;
+        currentDropMarkers = peaks.map((peak, index) => peak > threshold && index > 2 && peak > peaks[index - 1] && peak >= (peaks[index + 1] || 0) ? index : -1).filter(index => index >= 0);
+        drawWaveform();
+    }
+
+    function applyTrackPalette(track) {
+        const [primary, secondary] = TRACK_PALETTES[track.epId] || TRACK_PALETTES.ep1;
+        document.body.style.setProperty('--track-accent', primary);
+        document.body.style.setProperty('--track-secondary', secondary);
+        particlePrimary = primary;
+        particleSecondary = secondary;
+    }
+
+    function toggleImmersive(force) {
+        const active = typeof force === 'boolean' ? force : !document.body.classList.contains('immersive-mode');
+        document.body.classList.toggle('immersive-mode', active);
+        btnImmersive.setAttribute('aria-pressed', String(active));
+        btnImmersive.textContent = active ? '× QUITTER IMMERSIF' : '◉ MODE IMMERSIF';
+    }
+
+    async function toggleLiveStage() {
+        const active = !document.body.classList.contains('live-stage');
+        document.body.classList.toggle('live-stage', active);
+        document.body.classList.toggle('immersive-mode', active || document.body.classList.contains('immersive-mode'));
+        btnLiveStage.setAttribute('aria-pressed', String(active));
+        btnLiveStage.textContent = active ? '× QUITTER LIVE' : '◇ LIVE STAGE';
+        if (active && document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen().catch(() => {});
+        if (!active && document.fullscreenElement) await document.exitFullscreen().catch(() => {});
+    }
+
+    function selectAdjacentTrack(offset, autoplay) {
+        const currentIndex = TRACK_ORDER.indexOf(currentTrackId);
+        const nextIndex = (currentIndex + offset + TRACK_ORDER.length) % TRACK_ORDER.length;
+        return loadTrackData(TRACK_ORDER[nextIndex], autoplay);
+    }
+
+    function updateTrackContext(trackId) {
+        const currentIndex = TRACK_ORDER.indexOf(trackId);
+        const followingId = TRACK_ORDER[(currentIndex + 1) % TRACK_ORDER.length];
+        trackPosition.textContent = `Morceau ${currentIndex + 1} / ${TRACK_ORDER.length}`;
+        nextTrackTitle.textContent = TRACKS[followingId].title;
+    }
+
     async function loadTrackData(trackId, autoplay = isInitialized) {
         const track = TRACKS[trackId];
         if (!track) return;
+        currentTrackId = trackId;
+        updateTrackContext(trackId);
+        applyTrackPalette(track);
+        document.body.classList.add('track-changing');
+        setTimeout(() => document.body.classList.remove('track-changing'), 480);
 
         if (autoplay) resetSpotifyEmbed();
         else spotifyGhostMode = false;
         audioEl.src = track.audio;
         audioEl.load();
+        renderWaveform(track.audio);
 
         if (btnExportMp3) {
             btnExportMp3.href = track.audio;
@@ -494,6 +772,30 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isInitialized) initDSP();
         if (audioCtx && audioCtx.state === 'suspended') await audioCtx.resume();
         loadTrackData(item.dataset.track, true);
+    });
+
+    btnImmersive.addEventListener('click', () => toggleImmersive());
+    btnLiveStage.addEventListener('click', toggleLiveStage);
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && document.body.classList.contains('live-stage')) {
+            document.body.classList.remove('live-stage');
+            btnLiveStage.setAttribute('aria-pressed', 'false');
+            btnLiveStage.textContent = '◇ LIVE STAGE';
+        } else if (event.key === 'Escape' && document.body.classList.contains('immersive-mode')) toggleImmersive(false);
+        if (document.body.classList.contains('live-stage') && event.code === 'Space' && !event.repeat) {
+            event.preventDefault();
+            btnPlayPause.click();
+        }
+        if (document.body.classList.contains('live-stage') && event.key === 'ArrowRight') selectAdjacentTrack(1, !audioEl.paused);
+        if (document.body.classList.contains('live-stage') && event.key === 'ArrowLeft') selectAdjacentTrack(-1, !audioEl.paused);
+    });
+
+    document.addEventListener('fullscreenchange', () => {
+        if (!document.fullscreenElement && document.body.classList.contains('live-stage')) {
+            document.body.classList.remove('live-stage');
+            btnLiveStage.setAttribute('aria-pressed', 'false');
+            btnLiveStage.textContent = '◇ LIVE STAGE';
+        }
     });
 
     document.addEventListener('visibilitychange', () => {
