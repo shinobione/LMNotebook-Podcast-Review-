@@ -153,6 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const EP_ENGINES = { ep1: 'WAVE ENGINE', ep2: 'LOVE SIGNAL', ep3: 'HEAVY BASS' };
     let activeTool = '';
     let transitionTimer = 0;
+    let beatAnimationFrameId = null;
     let trackLoadGeneration = 0;
     let trackFetchController = null;
 
@@ -541,8 +542,11 @@ document.addEventListener('DOMContentLoaded', () => {
         bassAverage = bassAverage * 0.92 + bass * 0.08;
         if (!audioEl.paused && bass > bassAverage * 1.35 && bass > 0.24 && now - lastBeatAt > 180) {
             document.body.classList.remove('beat-hit');
-            void document.body.offsetWidth;
-            document.body.classList.add('beat-hit');
+            if (beatAnimationFrameId !== null) cancelAnimationFrame(beatAnimationFrameId);
+            beatAnimationFrameId = requestAnimationFrame(() => {
+                beatAnimationFrameId = null;
+                if (!audioEl.paused && !document.hidden) document.body.classList.add('beat-hit');
+            });
             lastBeatAt = now;
         }
         if (currentVisualTheme === 'ep3' && !audioEl.paused && bass > 0.52 && now - lastSuperHitAt > 420) {
