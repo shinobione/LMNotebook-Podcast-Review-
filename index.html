@@ -12,6 +12,7 @@
   <canvas id="ambient-canvas"></canvas>
   <canvas id="audio-fx-canvas" aria-hidden="true"></canvas>
   <div class="cyber-grid-overlay"></div>
+  <div id="album-transition" class="album-transition" aria-hidden="true"><span id="transition-title"></span></div>
 
   <div class="app-viewport">
     <header class="topbar">
@@ -24,7 +25,7 @@
         <img src="assets/logo.png" srcset="assets/logo.png 1x" sizes="(max-width: 768px) 180px, 250px" alt="SHINOBIWAN" class="header-logo-img" width="250" height="84" decoding="async">
       </div>
       <div class="hosts-zone">
-        <div class="host-pill"><span class="icon-green">⚡</span> DAW ACTIVE</div>
+        <div class="system-readout"><strong id="header-track">BEFORE THE NOISE</strong><span id="header-engine">WAVE ENGINE · LOCAL AUDIO</span></div>
         <div class="host-pill"><span class="icon-cyan">✔</span> VERIFIED</div>
       </div>
     </header>
@@ -84,9 +85,12 @@
               <a href="#" id="btn-export-mp3" class="btn-export" download>
                 <span>[💾] EXPORT MASTER MP3</span>
               </a>
-              <div class="experience-controls">
-                <button type="button" id="btn-immersive" class="btn-immersive btn-live-stage" aria-pressed="false"><span aria-hidden="true">◈</span> LAUNCH LIVE MODE</button>
+              <div class="player-tools" aria-label="Player tools">
+                <button type="button" id="btn-queue" aria-expanded="false">≡ UP NEXT</button>
+                <button type="button" id="btn-share" aria-expanded="false">↗ SHARE</button>
+                <button type="button" id="btn-visuals" aria-expanded="false">✦ VISUALS</button>
               </div>
+              <div id="tool-panel" class="tool-panel" hidden></div>
             </div>
           </div>
         </div>
@@ -110,7 +114,7 @@
           <div class="card-head-compact">
             <h3>◱ Discography & Interactive Engine</h3>
           </div>
-          <div class="ep-grid-3" id="track-list" aria-label="Discographie interactive"></div>
+          <div class="ep-grid-3" id="track-list" aria-label="Interactive discography"></div>
         </div>
 
         <div class="glass-card lyrics-vault-card">
@@ -126,9 +130,10 @@
 
       <section class="dash-col col-right">
         <div class="glass-card embed-card-full">
-           <div class="card-head-compact">
-            <h3><span class="live-pulse green-dot"></span> Spotify Master Player</h3>
+          <div class="card-head-compact">
+            <h3><span class="live-pulse green-dot"></span> Stream on Spotify</h3>
           </div>
+          <a class="spotify-open" href="https://open.spotify.com/artist/6W08IttKpZns5zG7BYTz8e" target="_blank" rel="noopener noreferrer">OPEN FULL PLAYER ↗</a>
           <div class="spotify-wrapper-fixed">
             <iframe 
               id="spotify-iframe"

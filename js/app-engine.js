@@ -23,6 +23,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     btnImmersive.innerHTML = '<span aria-hidden="true">◈</span> LIVE EXPERIENCE';
     const btnExitLive = document.getElementById('btn-exit-live');
+    const headerTrack = document.getElementById('header-track');
+    const headerEngine = document.getElementById('header-engine');
+    const albumTransition = document.getElementById('album-transition');
+    const transitionTitle = document.getElementById('transition-title');
+    const toolPanel = document.getElementById('tool-panel');
+    const toolButtons = {
+        queue: document.getElementById('btn-queue'),
+        share: document.getElementById('btn-share'),
+        visuals: document.getElementById('btn-visuals')
+    };
 
     const currentTrackTitle = document.getElementById('current-track-title');
     const currentTrackSubtitle = document.getElementById('current-track-subtitle');
@@ -127,6 +137,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const TRACK_PALETTES = {
         ep1: ['#00d9ff', '#3478ff'], ep2: ['#ffd166', '#ff4f9a'], ep3: ['#ff203f', '#ff7a18']
     };
+    const EP_ENGINES = { ep1: 'WAVE ENGINE', ep2: 'LOVE SIGNAL', ep3: 'HEAVY BASS' };
+    let activeTool = '';
+    let transitionTimer = 0;
 
     function createResponsiveImage(src, alt, className, isLazy = true) {
         const img = document.createElement('img');
@@ -149,6 +162,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const epCard = document.createElement('article');
             epCard.className = `ep-card${ep.id === 'ep1' ? ' active' : ''}`;
             epCard.dataset.epTarget = ep.id;
+            const [previewPrimary, previewSecondary] = TRACK_PALETTES[ep.id] || TRACK_PALETTES.ep1;
+            epCard.style.setProperty('--preview-primary', previewPrimary);
+            epCard.style.setProperty('--preview-secondary', previewSecondary);
 
             const coverFrame = document.createElement('div');
             coverFrame.className = 'ep-cover-frame';
@@ -351,6 +367,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 context.restore();
             }
+
+            // Small thematic details keep each album alive without masking the UI.
+            const detailCount = live ? 22 : 10;
+            context.save();
+            for (let index = 0; index < detailCount; index++) {
+                const seed = index * 97.31;
+                const drift = (now * (.012 + index % 4 * .003) + seed * 13) % (innerHeight + 80);
+                const x = (seed * 17.7) % innerWidth;
+                const y = currentVisualTheme === 'ep3' ? innerHeight - drift : innerHeight + 30 - drift;
+                if (currentVisualTheme === 'ep1') {
+                    context.beginPath();
+                    context.arc(x + Math.sin(now * .001 + index) * 14, y, 1.5 + index % 4, 0, Math.PI * 2);
+                    context.strokeStyle = particlePrimary;
+                    context.globalAlpha = .08 + reactiveHighs * .2;
+                    context.stroke();
+                } else if (currentVisualTheme === 'ep2') {
+                    context.save();
+                    context.translate(x + Math.sin(now * .0007 + index) * 28, y);
+                    context.rotate(now * .0004 + index);
+                    context.fillStyle = index % 2 ? particlePrimary : particleSecondary;
+                    context.globalAlpha = .07 + reactiveMids * .18;
+                    context.fillRect(-3, -1, 6, 2);
+                    context.restore();
+                } else {
+                    context.fillStyle = index % 2 ? '#ffcf70' : particlePrimary;
+                    context.globalAlpha = .1 + reactiveBass * .38;
+                    context.fillRect(x + Math.sin(index + now * .002) * 18, y, 1.5, 3 + reactiveBass * 5);
+                }
+            }
+            context.restore();
 
             context.save();
             context.translate(cx, cy);
@@ -585,6 +631,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const lineElements = lyricsDisplay.querySelectorAll('.lyrics-line');
                 lineElements.forEach((el, index) => {
+                    el.classList.toggle('lyric-past', index < activeIndex);
+                    el.classList.toggle('lyric-future', index > activeIndex);
+                    el.classList.toggle('lyric-near', Math.abs(index - activeIndex) === 1);
                     if (index === activeIndex) {
                         if (!el.classList.contains('lyrics-line-active')) {
                             el.classList.add('lyrics-line-active');
@@ -787,12 +836,69 @@ document.addEventListener('DOMContentLoaded', () => {
         nextTrackTitle.textContent = TRACKS[followingId].title;
     }
 
+    function triggerAlbumTransition(track) {
+        if (prefersReducedMotion.matches) return;
+        clearTimeout(transitionTimer);
+        transitionTitle.textContent = `ENTERING ${track.epName.toUpperCase()}`;
+        document.body.classList.remove('album-switching');
+        void albumTransition.offsetWidth;
+        document.body.classList.add('album-switching');
+        transitionTimer = setTimeout(() => document.body.classList.remove('album-switching'), 700);
+    }
+
+    function updateHeader(track) {
+        headerTrack.textContent = track.title.toUpperCase();
+        headerEngine.textContent = `${EP_ENGINES[track.epId]} · LOCAL AUDIO`;
+    }
+
+    function getUpcomingTracks() {
+        const index = TRACK_ORDER.indexOf(currentTrackId);
+        return [1, 2, 3].map(offset => TRACKS[TRACK_ORDER[(index + offset) % TRACK_ORDER.length]]);
+    }
+
+    function applyVisualPreferences({ quality = 'balanced', enabled = true } = {}) {
+        document.body.classList.remove('visual-low', 'visual-balanced', 'visual-ultra');
+        document.body.classList.add(`visual-${quality}`);
+        document.body.classList.toggle('visuals-off', !enabled);
+        localStorage.setItem('shinobiwan-visuals', JSON.stringify({ quality, enabled }));
+    }
+
+    function loadVisualPreferences() {
+        try {
+            return JSON.parse(localStorage.getItem('shinobiwan-visuals')) || { quality: 'balanced', enabled: true };
+        } catch {
+            return { quality: 'balanced', enabled: true };
+        }
+    }
+
+    function renderToolPanel(tool) {
+        activeTool = activeTool === tool ? '' : tool;
+        Object.entries(toolButtons).forEach(([name, button]) => button.setAttribute('aria-expanded', String(name === activeTool)));
+        toolPanel.hidden = !activeTool;
+        if (!activeTool) return;
+
+        if (activeTool === 'queue') {
+            toolPanel.innerHTML = `<strong>UP NEXT</strong>${getUpcomingTracks().map((track, index) => `<div class="queue-item"><span>0${index + 1}</span><b>${track.title}</b><button type="button" data-play-next="${track.id}">PLAY</button></div>`).join('')}`;
+        } else if (activeTool === 'share') {
+            toolPanel.innerHTML = `<strong>SHARE ${TRACKS[currentTrackId].title.toUpperCase()}</strong><div class="share-actions"><button type="button" data-share="native">SHARE ↗</button><button type="button" data-share="copy">COPY LINK</button></div>`;
+        } else {
+            const saved = loadVisualPreferences();
+            toolPanel.innerHTML = `<strong>VISUAL PROFILE</strong><label class="visual-setting">Quality<select id="visual-quality"><option value="low">LOW</option><option value="balanced">BALANCED</option><option value="ultra">ULTRA</option></select></label><label class="visual-setting">Audio visuals<input id="visual-enabled" type="checkbox"></label>`;
+            toolPanel.querySelector('#visual-quality').value = saved.quality;
+            toolPanel.querySelector('#visual-enabled').checked = saved.enabled;
+        }
+    }
+
     async function loadTrackData(trackId, autoplay = isInitialized) {
         const track = TRACKS[trackId];
         if (!track) return;
+        const previousEp = TRACKS[currentTrackId]?.epId;
         currentTrackId = trackId;
         updateTrackContext(trackId);
         applyTrackPalette(track);
+        updateHeader(track);
+        if (previousEp && previousEp !== track.epId) triggerAlbumTransition(track);
+        if (activeTool === 'queue') renderToolPanel('');
         document.body.classList.add('track-changing');
         setTimeout(() => document.body.classList.remove('track-changing'), 480);
 
@@ -839,6 +945,39 @@ document.addEventListener('DOMContentLoaded', () => {
         loadTrackData(item.dataset.track, true);
     });
 
+    trackList.addEventListener('pointermove', event => {
+        const card = event.target.closest('.ep-card');
+        if (!card) return;
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty('--preview-x', `${((event.clientX - rect.left) / rect.width) * 100}%`);
+    });
+
+    Object.entries(toolButtons).forEach(([tool, button]) => button.addEventListener('click', () => renderToolPanel(tool)));
+    toolPanel.addEventListener('click', async event => {
+        const playButton = event.target.closest('[data-play-next]');
+        if (playButton) {
+            await loadTrackData(playButton.dataset.playNext, true);
+            return;
+        }
+        const shareButton = event.target.closest('[data-share]');
+        if (!shareButton) return;
+        const track = TRACKS[currentTrackId];
+        const url = `${location.origin}${location.pathname}#${track.id}`;
+        if (shareButton.dataset.share === 'native' && navigator.share) {
+            await navigator.share({ title: `${track.title} — SHINOBIWAN`, text: `Listen to ${track.title} on the SHINOBIWAN launchpad.`, url }).catch(() => {});
+        } else {
+            await navigator.clipboard.writeText(url).catch(() => {});
+            shareButton.textContent = 'COPIED ✓';
+        }
+    });
+    toolPanel.addEventListener('change', event => {
+        if (!event.target.matches('#visual-quality, #visual-enabled')) return;
+        applyVisualPreferences({
+            quality: toolPanel.querySelector('#visual-quality').value,
+            enabled: toolPanel.querySelector('#visual-enabled').checked
+        });
+    });
+
     btnImmersive.addEventListener('click', toggleExperience);
     btnExitLive.addEventListener('click', toggleExperience);
     document.addEventListener('keydown', event => {
@@ -867,8 +1006,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     prefersReducedMotion.addEventListener('change', setMotionState);
+    const savedVisuals = loadVisualPreferences();
+    applyVisualPreferences(savedVisuals);
     setMotionState();
     renderTrackList();
     initAmbientParticles();
-    loadTrackData('before-the-noise', false);
+        const sharedTrackId = decodeURIComponent(location.hash.slice(1));
+        loadTrackData(TRACKS[sharedTrackId] ? sharedTrackId : 'before-the-noise', false);
 });
