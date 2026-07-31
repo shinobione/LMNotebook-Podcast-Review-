@@ -35,6 +35,16 @@ document.addEventListener('DOMContentLoaded', () => {
         share: document.getElementById('btn-share'),
         visuals: document.getElementById('btn-visuals')
     };
+    const playbackIcons = {
+        play: '<svg class="playback-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.25 5.6v12.8L18 12z"/></svg>',
+        pause: '<svg class="playback-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="5.5" width="3.5" height="13" rx="1"/><rect x="13.5" y="5.5" width="3.5" height="13" rx="1"/></svg>'
+    };
+
+    function setPlaybackButton(isPlaying) {
+        btnPlayPause.innerHTML = isPlaying ? playbackIcons.pause : playbackIcons.play;
+        btnPlayPause.classList.toggle('is-playing', isPlaying);
+        btnPlayPause.setAttribute('aria-label', isPlaying ? 'Pause playback' : 'Play selected track');
+    }
 
     const currentTrackTitle = document.getElementById('current-track-title');
     const currentTrackSubtitle = document.getElementById('current-track-subtitle');
@@ -568,9 +578,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function pauseLocalPlayer() {
         if (!audioEl.paused) {
             audioEl.pause();
-            btnPlayPause.textContent = '▶';
-            btnPlayPause.style.background = 'var(--spotify-green)';
-            btnPlayPause.setAttribute('aria-label', 'Play selected track');
+            setPlaybackButton(false);
             setLocalAudioActive(false);
         }
     }
@@ -632,15 +640,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (audioEl.paused) {
             resetSpotifyEmbed();
             await audioEl.play();
-            btnPlayPause.textContent = '⏸';
-            btnPlayPause.style.background = 'var(--accent-cyan)';
-            btnPlayPause.setAttribute('aria-label', 'Pause playback');
+            setPlaybackButton(true);
             setLocalAudioActive(true);
         } else {
             audioEl.pause();
-            btnPlayPause.textContent = '▶';
-            btnPlayPause.style.background = 'var(--spotify-green)';
-            btnPlayPause.setAttribute('aria-label', 'Play selected track');
+            setPlaybackButton(false);
             setLocalAudioActive(false);
         }
     });
@@ -974,14 +978,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (autoplay) {
             await audioEl.play();
-            btnPlayPause.textContent = '⏸';
-            btnPlayPause.style.background = 'var(--accent-cyan)';
-            btnPlayPause.setAttribute('aria-label', 'Pause playback');
+            setPlaybackButton(true);
             setLocalAudioActive(true);
         } else {
-            btnPlayPause.textContent = '▶';
-            btnPlayPause.style.background = 'var(--spotify-green)';
-            btnPlayPause.setAttribute('aria-label', 'Play selected track');
+            setPlaybackButton(false);
             setLocalAudioActive(false);
         }
     }

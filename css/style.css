@@ -996,6 +996,63 @@ body.visual-ultra.audio-active .energy-ring {
 body.visual-ultra.audio-active .ring-two { opacity: calc(.18 + var(--mid-level) * .62); }
 body.visual-ultra.audio-active .cyber-grid-overlay { opacity: calc(.58 + var(--audio-level) * .42); }
 
+/* PLAYER CONTROLS — tactile, legible and consistent across input types */
+.btn-play {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+  color: #021014;
+  background: linear-gradient(145deg, #67fff3, var(--spotify-green));
+  border: 1px solid rgba(255,255,255,.62);
+  box-shadow: 0 0 0 4px rgba(29,185,84,.1), 0 8px 22px rgba(0,0,0,.55), 0 0 22px rgba(29,185,84,.45);
+  overflow: hidden;
+}
+.btn-play::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(255,255,255,.28);
+  border-radius: inherit;
+  pointer-events: none;
+}
+.btn-play.is-playing {
+  color: #001014;
+  background: linear-gradient(145deg, #fff, var(--accent-cyan));
+  box-shadow: 0 0 0 4px rgba(0,240,255,.1), 0 8px 22px rgba(0,0,0,.55), 0 0 25px rgba(0,240,255,.58);
+}
+.playback-icon { width: 22px; height: 22px; fill: currentColor; position: relative; z-index: 1; }
+.btn-play:not(.is-playing) .playback-icon { transform: translateX(1px); }
+.btn-play:hover { transform: translateY(-2px) scale(1.04); }
+.btn-play:active { transform: translateY(1px) scale(.96); }
+
+.btn-seek {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--text-main);
+  background: linear-gradient(145deg, rgba(255,255,255,.11), rgba(3,7,13,.92));
+  border-color: rgba(255,255,255,.2);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,.1), 0 5px 14px rgba(0,0,0,.38);
+}
+.btn-seek svg { width: 25px; height: 25px; fill: none; stroke: currentColor; stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round; }
+.btn-seek .seek-value { position: absolute; display: block; font: 800 .43rem/1 var(--font-mono); letter-spacing: -.04em; }
+.btn-seek:hover { color: var(--accent-cyan); background: rgba(0,240,255,.1); transform: translateY(-1px); }
+.btn-seek:active { transform: scale(.94); }
+
+.hub-pill { gap: 8px; letter-spacing: .02em; overflow: hidden; }
+.hub-pill svg { width: 18px; height: 18px; flex: 0 0 18px; filter: drop-shadow(0 0 6px currentColor); }
+.soundcloud-pill svg { width: 24px; flex-basis: 24px; }
+.hub-pill span { position: relative; z-index: 1; }
+.spotify-pill { background: linear-gradient(135deg, rgba(29,185,84,.2), rgba(4,17,10,.82)); }
+.soundcloud-pill { background: linear-gradient(135deg, rgba(255,85,0,.2), rgba(21,8,2,.82)); }
+.spotify-pill:hover svg, .soundcloud-pill:hover svg { filter: none; }
+
 @media (max-width: 768px) {
   /* Mobile compositing: keep the same glass appearance without asking Chrome
      to re-blur the entire page behind every card on every animation frame. */
@@ -1004,6 +1061,10 @@ body.visual-ultra.audio-active .cyber-grid-overlay { opacity: calc(.58 + var(--a
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
+  .btn-play { width: 54px; height: 54px; flex-basis: 54px; }
+  .playback-icon { width: 25px; height: 25px; }
+  .btn-seek { width: 46px; height: 46px; min-width: 46px; }
+  .btn-secondary.btn-seek .seek-value { display: block; }
   .lyrics-vault-card,
   .embed-card-full,
   .hubs-card {
