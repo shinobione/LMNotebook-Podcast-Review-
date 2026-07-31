@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SHINOBIWAN — Official Artist Launchpad & Sonic Vault</title>
   <meta name="description" content="Official SHINOBIWAN launchpad with an interactive audio player, synchronized lyrics, discography and streaming hubs.">
+  <meta name="theme-color" content="#030508">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
 </head>
@@ -70,11 +72,11 @@
 
             <div class="controls-row">
               <button class="btn-track-nav" id="btn-previous" aria-label="Previous track" title="Previous track">⏮</button>
-              <button class="btn-secondary" id="btn-rewind" aria-label="Rewind 10 seconds">↺ <span>-10s</span></button>
+              <button class="btn-secondary btn-seek" id="btn-rewind" aria-label="Rewind 10 seconds"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4m0 0h5M4 4l3.4 3.4A7 7 0 1 1 5.2 14"/></svg><span class="seek-value">10</span></button>
               <span class="vu-meter vu-left" aria-hidden="true"><i></i><i></i><i></i></span>
-              <button class="btn-play" id="btn-play-pause" aria-label="Play selected track">▶</button>
+              <button class="btn-play" id="btn-play-pause" aria-label="Play selected track"><svg class="playback-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.25 5.6v12.8L18 12z"/></svg></button>
               <span class="vu-meter vu-right" aria-hidden="true"><i></i><i></i><i></i></span>
-              <button class="btn-secondary" id="btn-forward" aria-label="Forward 10 seconds">↻ <span>+10s</span></button>
+              <button class="btn-secondary btn-seek" id="btn-forward" aria-label="Forward 10 seconds"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 9V4m0 0h-5m5-0-3.4 3.4A7 7 0 1 0 18.8 14"/></svg><span class="seek-value">10</span></button>
               <button class="btn-track-nav" id="btn-next" aria-label="Next track" title="Next track">⏭</button>
             </div>
 
@@ -95,24 +97,17 @@
           </div>
         </div>
 
-        <div class="glass-card dsp-card">
-           <div class="card-head-compact flex-between">
-            <h3>RTA Spectrum</h3>
-            <span class="badge-tech green-border">60 FPS</span>
-          </div>
-          <div class="rta-spectrum-container">
-            <canvas id="rta-canvas"></canvas>
-            <div class="rta-labels">
-              <span>20Hz</span><span>250Hz</span><span>2kHz</span><span>8kHz</span><span>20kHz</span>
-            </div>
-          </div>
-        </div>
       </section>
 
       <section class="dash-col col-center">
         <div class="glass-card catalog-showcase-card">
           <div class="card-head-compact">
             <h3>◱ Discography & Interactive Engine</h3>
+          </div>
+          <div class="album-swipe-nav" aria-label="Album carousel controls">
+            <button type="button" id="album-prev" aria-label="Show previous album">‹</button>
+            <span>SWIPE TO EXPLORE</span>
+            <button type="button" id="album-next" aria-label="Show next album">›</button>
           </div>
           <div class="ep-grid-3" id="track-list" aria-label="Interactive discography"></div>
         </div>
@@ -147,13 +142,26 @@
           </div>
         </div>
 
+        <div class="glass-card dsp-card">
+           <div class="card-head-compact flex-between">
+            <h3>RTA Spectrum</h3>
+            <span class="badge-tech green-border">60 FPS</span>
+          </div>
+          <div class="rta-spectrum-container">
+            <canvas id="rta-canvas"></canvas>
+            <div class="rta-labels">
+              <span>20Hz</span><span>250Hz</span><span>2kHz</span><span>8kHz</span><span>20kHz</span>
+            </div>
+          </div>
+        </div>
+
         <div class="glass-card hubs-card">
           <div class="card-head-compact">
             <h3>☍ Hubs</h3>
           </div>
           <div class="hubs-row">
-            <a href="https://open.spotify.com/artist/6W08IttKpZns5zG7BYTz8e" target="_blank" rel="noopener noreferrer" class="hub-pill spotify-pill">Spotify</a>
-            <a href="https://soundcloud.com/shinobiwan-1" target="_blank" rel="noopener noreferrer" class="hub-pill soundcloud-pill">SoundCloud</a>
+            <a href="https://open.spotify.com/artist/6W08IttKpZns5zG7BYTz8e" target="_blank" rel="noopener noreferrer" class="hub-pill spotify-pill"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="currentColor"/><path d="M6.8 9.1c3.6-1 7.8-.7 10.8 1M7.5 12.2c3-.8 6.5-.5 9.2.8M8.1 15.1c2.5-.6 5.3-.4 7.7.7" fill="none" stroke="#06110a" stroke-width="1.7" stroke-linecap="round"/></svg><span>Spotify</span></a>
+            <a href="https://soundcloud.com/shinobiwan-1" target="_blank" rel="noopener noreferrer" class="hub-pill soundcloud-pill"><svg viewBox="0 0 28 18" aria-hidden="true"><path d="M1 12.4h1.2l.7-5.1.8 5.1h1l1-7.4 1 7.4h1L9 3.2l1.1 9.2h1l1.2-10.7 1.2 10.7h1.2a5.2 5.2 0 0 1 9.9-2.2 3.9 3.9 0 1 1-.5 7.8H1a2.8 2.8 0 0 1 0-5.6z" fill="currentColor"/></svg><span>SoundCloud</span></a>
           </div>
         </div>
       </section>
