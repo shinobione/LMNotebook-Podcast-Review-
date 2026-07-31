@@ -692,21 +692,43 @@ document.addEventListener('DOMContentLoaded', () => {
         particleSecondary = secondary;
     }
 
-    function toggleImmersive(force) {
-        const active = typeof force === 'boolean' ? force : !document.body.classList.contains('immersive-mode');
-        document.body.classList.toggle('immersive-mode', active);
-        btnImmersive.setAttribute('aria-pressed', String(active));
-        btnImmersive.textContent = active ? '× QUITTER IMMERSIF' : '◉ MODE IMMERSIF';
+    function setExperienceMode(mode) {
+        const immersive = mode === 'immersive';
+        const live = mode === 'live';
+        document.body.classList.toggle('immersive-mode', immersive);
+        document.body.classList.toggle('live-stage', live);
+        btnImmersive.setAttribute('aria-pressed', String(immersive));
+        btnImmersive.textContent = immersive ? '× QUITTER IMMERSIF' : '◉ MODE IMMERSIF';
+        btnLiveStage.setAttribute('aria-pressed', String(live));
+        btnLiveStage.textContent = live ? '× QUITTER LIVE' : '◇ LIVE STAGE';
+    }
+
+    async function leaveFullscreen() {
+        if (document.fullscreenElement && document.exitFullscreen) {
+            await document.exitFullscreen().catch(() => {});
+        }
+    }
+
+    async function toggleImmersive(force) {
+        const wasLive = document.body.classList.contains('live-stage');
+        const active = typeof force === 'boolean'
+            ? force
+            : wasLive || !document.body.classList.contains('immersive-mode');
+
+        // The two layouts are intentionally exclusive. Switching from Live Stage
+        // to Immersive keeps the visual experience active without stacking modes.
+        setExperienceMode(active ? 'immersive' : 'default');
+        if (wasLive) await leaveFullscreen();
     }
 
     async function toggleLiveStage() {
         const active = !document.body.classList.contains('live-stage');
-        document.body.classList.toggle('live-stage', active);
-        document.body.classList.toggle('immersive-mode', active || document.body.classList.contains('immersive-mode'));
-        btnLiveStage.setAttribute('aria-pressed', String(active));
-        btnLiveStage.textContent = active ? '× QUITTER LIVE' : '◇ LIVE STAGE';
-        if (active && document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen().catch(() => {});
-        if (!active && document.fullscreenElement) await document.exitFullscreen().catch(() => {});
+        setExperienceMode(active ? 'live' : 'default');
+        if (active && document.documentElement.requestFullscreen) {
+            await document.documentElement.requestFullscreen().catch(() => {});
+        } else if (!active) {
+            await leaveFullscreen();
+        }
     }
 
     function selectAdjacentTrack(offset, autoplay) {
@@ -774,15 +796,14 @@ document.addEventListener('DOMContentLoaded', () => {
         loadTrackData(item.dataset.track, true);
     });
 
-    btnImmersive.addEventListener('click', () => toggleImmersive());
+    btnImmersive.addEventListener('click', () => { toggleImmersive(); });
     btnLiveStage.addEventListener('click', toggleLiveStage);
     document.addEventListener('keydown', event => {
         if (event.key === 'Escape' && document.body.classList.contains('live-stage')) {
-            document.body.classList.remove('live-stage');
-            btnLiveStage.setAttribute('aria-pressed', 'false');
-            btnLiveStage.textContent = '◇ LIVE STAGE';
+            setExperienceMode('default');
         } else if (event.key === 'Escape' && document.body.classList.contains('immersive-mode')) toggleImmersive(false);
-        if (document.body.classList.contains('live-stage') && event.code === 'Space' && !event.repeat) {
+        const isInteractiveTarget = event.target.closest('button, a, input, textarea, select');
+        if (document.body.classList.contains('live-stage') && event.code === 'Space' && !event.repeat && !isInteractiveTarget) {
             event.preventDefault();
             btnPlayPause.click();
         }
@@ -792,9 +813,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.addEventListener('fullscreenchange', () => {
         if (!document.fullscreenElement && document.body.classList.contains('live-stage')) {
-            document.body.classList.remove('live-stage');
-            btnLiveStage.setAttribute('aria-pressed', 'false');
-            btnLiveStage.textContent = '◇ LIVE STAGE';
+            setExperienceMode('default');
         }
     });
 

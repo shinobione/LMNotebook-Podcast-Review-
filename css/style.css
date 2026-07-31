@@ -596,19 +596,35 @@ body.drop-imminent::before { opacity: calc(.2 + var(--drop-build) * .65); }
 
 body.live-stage { overflow: hidden; }
 body.live-stage .topbar, body.live-stage .catalog-showcase-card, body.live-stage .dsp-card, body.live-stage .col-right { opacity: 0; pointer-events: none; }
-body.live-stage .app-viewport { padding: 0; max-width: none; }
-body.live-stage .dashboard-grid { display: grid !important; grid-template-columns: minmax(320px, 46vw) minmax(360px, 1fr) !important; place-content: center; gap: clamp(20px, 4vw, 72px); padding: clamp(18px, 4vw, 70px); }
-body.live-stage .col-left, body.live-stage .col-center { width: 100% !important; justify-content: center; }
+body.live-stage .app-viewport { padding: 0; max-width: none; height: 100dvh; }
+body.live-stage .dashboard-grid {
+  display: grid !important;
+  grid-template-columns: minmax(280px, min(42vw, 68vh)) minmax(360px, 760px) !important;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(20px, 4vw, 72px);
+  width: 100%;
+  height: 100dvh;
+  padding: clamp(18px, 3vh, 40px) clamp(18px, 4vw, 70px);
+  overflow: hidden;
+}
+body.live-stage .col-left, body.live-stage .col-center { width: 100% !important; min-width: 0; justify-content: center; }
+body.live-stage .col-left { height: auto; max-height: none; }
 body.live-stage .main-player, body.live-stage .lyrics-vault-card { opacity: 1; filter: none; pointer-events: auto; border-color: color-mix(in srgb, var(--track-accent) 70%, transparent); }
-body.live-stage .hero-cover-stage { width: min(44vw, 62vh, 680px); }
-body.live-stage .lyrics-vault-card { min-height: min(62vh, 620px); }
+body.live-stage .main-player { flex: 0 0 auto; width: 100%; max-height: none; overflow: visible; }
+body.live-stage .hero-cover-stage { width: min(100%, 32vh); flex: 0 0 auto; align-self: center; }
+body.live-stage .lyrics-vault-card { flex: 0 0 auto; height: min(68vh, 680px); min-height: 360px; }
+body.live-stage .lyrics-container { min-height: 0; max-height: none; }
 body.live-stage .lyrics-container { font-size: clamp(.76rem, 1.05vw, 1rem); }
 body.live-stage .glass-card::before { display: none; }
 body.live-stage #audio-fx-canvas { opacity: 1; }
 
 @media (max-width: 768px) {
   .experience-controls { grid-template-columns: 1fr; }
-  body.live-stage .dashboard-grid { display: flex !important; padding: 10px; overflow-y: auto; }
+  body.live-stage { overflow-y: auto; }
+  body.live-stage .app-viewport { height: auto; min-height: 100dvh; }
+  body.live-stage .dashboard-grid { display: flex !important; height: auto; min-height: 100dvh; padding: 10px; overflow: visible; }
+  body.live-stage .col-left { max-height: none; }
   body.live-stage .col-center { display: flex; }
   body.live-stage .lyrics-vault-card { min-height: 48vh; }
   body.live-stage .hero-cover-stage { width: min(78vw, 390px); }
