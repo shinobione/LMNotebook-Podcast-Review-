@@ -153,6 +153,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const EP_ENGINES = { ep1: 'WAVE ENGINE', ep2: 'LOVE SIGNAL', ep3: 'HEAVY BASS' };
     let activeTool = '';
     let transitionTimer = 0;
+    let beatAnimationFrameId = null;
+    let trackLoadGeneration = 0;
+    let trackFetchController = null;
 
     function createResponsiveImage(src, alt, className, isLazy = true) {
         const img = document.createElement('img');
@@ -494,7 +497,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resizeObserver.observe(canvas);
         renderRTA();
         initAudioFx();
-        renderWaveform(audioEl.getAttribute('src'));
+        renderWaveform(audioEl.getAttribute('src'), trackFetchController?.signal, trackLoadGeneration);
     }
 
     function renderRTA() {
@@ -539,8 +542,11 @@ document.addEventListener('DOMContentLoaded', () => {
         bassAverage = bassAverage * 0.92 + bass * 0.08;
         if (!audioEl.paused && bass > bassAverage * 1.35 && bass > 0.24 && now - lastBeatAt > 180) {
             document.body.classList.remove('beat-hit');
-            void document.body.offsetWidth;
-            document.body.classList.add('beat-hit');
+            if (beatAnimationFrameId !== null) cancelAnimationFrame(beatAnimationFrameId);
+            beatAnimationFrameId = requestAnimationFrame(() => {
+                beatAnimationFrameId = null;
+                if (!audioEl.paused && !document.hidden) document.body.classList.add('beat-hit');
+            });
             lastBeatAt = now;
         }
         if (currentVisualTheme === 'ep3' && !audioEl.paused && bass > 0.52 && now - lastSuperHitAt > 420) {
@@ -639,7 +645,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
         if (audioEl.paused) {
             resetSpotifyEmbed();
-            await audioEl.play();
+            try {
+                await audioEl.play();
+            } catch (error) {
+                console.warn('Playback could not start.', error);
+                setPlaybackButton(false);
+                setLocalAudioActive(false);
+                return;
+            }
             setPlaybackButton(true);
             setLocalAudioActive(true);
         } else {
@@ -735,18 +748,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function loadLyrics(track) {
+    async function loadLyrics(track, signal, generation) {
         lyricsDisplay.textContent = 'Loading vault data...';
         try {
-            const res = await fetch(track.lyrics);
+            const res = await fetch(track.lyrics, { signal });
             if (res.ok) {
-                processLyricsText(await res.text());
+                const lyrics = await res.text();
+                if (generation !== trackLoadGeneration) return;
+                processLyricsText(lyrics);
                 return;
             }
         } catch (e) {
+            if (e.name === 'AbortError') return;
             console.warn('Lyrics fetch failed, using fallback copy.', e);
         }
 
+        if (generation !== trackLoadGeneration) return;
         if (FALLBACK_LYRICS[track.id]) {
             processLyricsText(FALLBACK_LYRICS[track.id]);
         } else {
@@ -807,14 +824,16 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.toggle('drop-imminent', anticipation > .08);
     }
 
-    async function renderWaveform(audioUrl) {
+    async function renderWaveform(audioUrl, signal, generation) {
         if (!waveformCanvas || !audioCtx) return;
         const token = audioUrl;
         let peaks = waveformCache.get(audioUrl);
         if (!peaks) {
             try {
-                const response = await fetch(audioUrl);
+                const response = await fetch(audioUrl, { signal });
+                if (!response.ok) throw new Error(`Waveform request failed with status ${response.status}.`);
                 const buffer = await audioCtx.decodeAudioData(await response.arrayBuffer());
+                if (generation !== trackLoadGeneration) return;
                 const channel = buffer.getChannelData(0);
                 const bins = 180;
                 const step = Math.max(1, Math.floor(channel.length / bins));
@@ -825,11 +844,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 waveformCache.set(audioUrl, peaks);
             } catch (error) {
+                if (error.name === 'AbortError') return;
                 console.warn('Waveform generation failed.', error);
                 return;
             }
         }
-        if (audioEl.getAttribute('src') !== token) return;
+        if (generation !== trackLoadGeneration || audioEl.getAttribute('src') !== token) return;
         currentPeaks = peaks;
         const threshold = peaks.reduce((sum, peak) => sum + peak, 0) / peaks.length * 1.65;
         currentDropMarkers = peaks.map((peak, index) => peak > threshold && index > 2 && peak > peaks[index - 1] && peak >= (peaks[index + 1] || 0) ? index : -1).filter(index => index >= 0);
@@ -908,7 +928,11 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.remove('visual-low', 'visual-balanced', 'visual-ultra');
         document.body.classList.add(`visual-${quality}`);
         document.body.classList.toggle('visuals-off', !enabled);
-        localStorage.setItem('shinobiwan-visuals', JSON.stringify({ quality, enabled }));
+        try {
+            localStorage.setItem('shinobiwan-visuals', JSON.stringify({ quality, enabled }));
+        } catch (error) {
+            console.warn('Visual preferences could not be saved.', error);
+        }
     }
 
     function loadVisualPreferences() {
@@ -945,6 +969,10 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadTrackData(trackId, autoplay = isInitialized) {
         const track = TRACKS[trackId];
         if (!track) return;
+        const generation = ++trackLoadGeneration;
+        trackFetchController?.abort();
+        trackFetchController = new AbortController();
+        const { signal } = trackFetchController;
         const previousEp = TRACKS[currentTrackId]?.epId;
         currentTrackId = trackId;
         updateTrackContext(trackId);
@@ -959,7 +987,7 @@ document.addEventListener('DOMContentLoaded', () => {
         else spotifyGhostMode = false;
         audioEl.src = track.audio;
         audioEl.load();
-        renderWaveform(track.audio);
+        renderWaveform(track.audio, signal, generation);
 
         if (btnExportMp3) {
             btnExportMp3.href = track.audio;
@@ -974,10 +1002,19 @@ document.addEventListener('DOMContentLoaded', () => {
         playerCover.alt = `${track.title} cover`;
         playerCover.onerror = function onCoverError() { this.src = track.coverFallback; };
         setActiveTrack(trackId);
-        loadLyrics(track);
+        loadLyrics(track, signal, generation);
 
         if (autoplay) {
-            await audioEl.play();
+            try {
+                await audioEl.play();
+            } catch (error) {
+                if (generation !== trackLoadGeneration || error.name === 'AbortError') return;
+                console.warn('Playback could not start.', error);
+                setPlaybackButton(false);
+                setLocalAudioActive(false);
+                return;
+            }
+            if (generation !== trackLoadGeneration) return;
             setPlaybackButton(true);
             setLocalAudioActive(true);
         } else {
@@ -1096,6 +1133,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setMotionState();
     renderTrackList();
     initAmbientParticles();
-        const sharedTrackId = decodeURIComponent(location.hash.slice(1));
-        loadTrackData(TRACKS[sharedTrackId] ? sharedTrackId : 'before-the-noise', false);
+    const sharedTrackId = decodeURIComponent(location.hash.slice(1));
+    loadTrackData(TRACKS[sharedTrackId] ? sharedTrackId : 'before-the-noise', false);
 });
