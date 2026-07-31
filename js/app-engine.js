@@ -14,7 +14,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnExportMp3 = document.getElementById('btn-export-mp3');
     const trackList = document.getElementById('track-list');
     const waveformCanvas = document.getElementById('waveform-canvas');
-    const btnImmersive = document.getElementById('btn-immersive');
+    const liveEntryButtons = [...document.querySelectorAll('#btn-immersive, .experience-controls button')];
+    const btnImmersive = liveEntryButtons.shift();
+    liveEntryButtons.forEach(button => {
+        const controls = button.closest('.experience-controls');
+        button.remove();
+        if (controls && !controls.children.length) controls.remove();
+    });
+    btnImmersive.innerHTML = '<span aria-hidden="true">◈</span> LIVE EXPERIENCE';
     const btnExitLive = document.getElementById('btn-exit-live');
 
     const currentTrackTitle = document.getElementById('current-track-title');
