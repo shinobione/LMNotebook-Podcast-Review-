@@ -589,12 +589,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 pauseLocalPlayer();
                 if (!isInitialized) initDSP();
                 spotifyGhostMode = true;
+                particlePrimary = '#1ed760';
+                particleSecondary = '#69f0ae';
+                document.body.style.setProperty('--track-accent', particlePrimary);
+                document.body.style.setProperty('--track-secondary', particleSecondary);
+                document.body.classList.add('spotify-active');
+                headerTrack.textContent = 'SPOTIFY STREAM';
+                headerEngine.textContent = 'GHOST ENGINE · SPOTIFY';
             }
         }, 50);
     });
 
     function resetSpotifyEmbed() {
         spotifyGhostMode = false;
+        document.body.classList.remove('spotify-active');
+        applyTrackPalette(TRACKS[currentTrackId]);
+        updateHeader(TRACKS[currentTrackId]);
         if (!spotifyIframe || !spotifyEmbedSrc) return;
 
         clearTimeout(spotifyResetTimer);
@@ -606,6 +616,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function setLocalAudioActive(isActive) {
         document.body.classList.toggle('audio-active', isActive);
+        if (isActive) document.body.classList.remove('spotify-active');
     }
 
     audioEl.addEventListener('ended', () => {
@@ -910,6 +921,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderToolPanel(tool) {
         activeTool = activeTool === tool ? '' : tool;
+        document.body.classList.toggle('tool-open', Boolean(activeTool));
         Object.entries(toolButtons).forEach(([name, button]) => button.setAttribute('aria-expanded', String(name === activeTool)));
         toolPanel.hidden = !activeTool;
         if (!activeTool) return;
