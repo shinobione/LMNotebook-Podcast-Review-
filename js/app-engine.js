@@ -15,6 +15,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const trackList = document.getElementById('track-list');
     const waveformCanvas = document.getElementById('waveform-canvas');
     const btnImmersive = document.getElementById('btn-immersive');
+    const experienceControls = btnImmersive.closest('.experience-controls');
+    const experienceAnchor = document.createComment('live-experience-controls');
+    experienceControls.before(experienceAnchor);
 
     const currentTrackTitle = document.getElementById('current-track-title');
     const currentTrackSubtitle = document.getElementById('current-track-subtitle');
@@ -166,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 item.type = 'button';
                 item.className = `mini-track-item${track.id === 'before-the-noise' ? ' active-track' : ''}`;
                 item.dataset.track = track.id;
-                item.setAttribute('aria-label', `Lire ${track.title}`);
+                item.setAttribute('aria-label', `Play ${track.title}`);
                 item.textContent = `${index + 1}. ${track.title}`;
                 miniTrackList.appendChild(item);
             });
@@ -485,7 +488,7 @@ document.addEventListener('DOMContentLoaded', () => {
             audioEl.pause();
             btnPlayPause.textContent = '▶';
             btnPlayPause.style.background = 'var(--spotify-green)';
-            btnPlayPause.setAttribute('aria-label', 'Lire le morceau sélectionné');
+            btnPlayPause.setAttribute('aria-label', 'Play selected track');
             setLocalAudioActive(false);
         }
     }
@@ -536,13 +539,13 @@ document.addEventListener('DOMContentLoaded', () => {
             await audioEl.play();
             btnPlayPause.textContent = '⏸';
             btnPlayPause.style.background = 'var(--accent-cyan)';
-            btnPlayPause.setAttribute('aria-label', 'Mettre en pause');
+            btnPlayPause.setAttribute('aria-label', 'Pause playback');
             setLocalAudioActive(true);
         } else {
             audioEl.pause();
             btnPlayPause.textContent = '▶';
             btnPlayPause.style.background = 'var(--spotify-green)';
-            btnPlayPause.setAttribute('aria-label', 'Lire le morceau sélectionné');
+            btnPlayPause.setAttribute('aria-label', 'Play selected track');
             setLocalAudioActive(false);
         }
     });
@@ -744,9 +747,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function setExperienceMode(active) {
         const live = Boolean(active);
+        if (live) document.body.appendChild(experienceControls);
+        else experienceAnchor.after(experienceControls);
         document.body.classList.toggle('live-stage', live);
         btnImmersive.setAttribute('aria-pressed', String(live));
-        btnImmersive.textContent = live ? '× QUITTER L’EXPÉRIENCE' : '◇ EXPÉRIENCE LIVE';
+        btnImmersive.textContent = live ? '× EXIT LIVE EXPERIENCE' : '◇ ENTER LIVE EXPERIENCE';
     }
 
     async function leaveFullscreen() {
@@ -774,7 +779,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateTrackContext(trackId) {
         const currentIndex = TRACK_ORDER.indexOf(trackId);
         const followingId = TRACK_ORDER[(currentIndex + 1) % TRACK_ORDER.length];
-        trackPosition.textContent = `Morceau ${currentIndex + 1} / ${TRACK_ORDER.length}`;
+        trackPosition.textContent = `Track ${currentIndex + 1} / ${TRACK_ORDER.length}`;
         nextTrackTitle.textContent = TRACKS[followingId].title;
     }
 
@@ -812,12 +817,12 @@ document.addEventListener('DOMContentLoaded', () => {
             await audioEl.play();
             btnPlayPause.textContent = '⏸';
             btnPlayPause.style.background = 'var(--accent-cyan)';
-            btnPlayPause.setAttribute('aria-label', 'Mettre en pause');
+            btnPlayPause.setAttribute('aria-label', 'Pause playback');
             setLocalAudioActive(true);
         } else {
             btnPlayPause.textContent = '▶';
             btnPlayPause.style.background = 'var(--spotify-green)';
-            btnPlayPause.setAttribute('aria-label', 'Lire le morceau sélectionné');
+            btnPlayPause.setAttribute('aria-label', 'Play selected track');
             setLocalAudioActive(false);
         }
     }

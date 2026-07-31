@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SHINOBIWAN — Official Artist Launchpad & Sonic Vault</title>
-  <meta name="description" content="Launchpad officiel SHINOBIWAN avec lecteur audio, discographie interactive, lyrics synchronisées et hubs streaming.">
+  <meta name="description" content="Official SHINOBIWAN launchpad with an interactive audio player, synchronized lyrics, discography and streaming hubs.">
   <link rel="stylesheet" href="css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
 </head>
@@ -49,8 +49,8 @@
             <h2 id="current-track-title">Before the Noise</h2>
             <div class="subtitle" id="current-track-subtitle">Neon Heartbreaks EP</div>
             <div class="track-context" aria-live="polite">
-              <span id="track-position">Morceau 1 / 9</span>
-              <span class="next-track-label">Suivant : <strong id="next-track-title">Low Bitrate Love</strong></span>
+              <span id="track-position">Track 1 / 9</span>
+              <span class="next-track-label">Up next: <strong id="next-track-title">Low Bitrate Love</strong></span>
             </div>
           </div>
           
@@ -62,19 +62,19 @@
               <span id="time-total">00:00</span>
             </div>
             
-            <div class="progress-container" id="progress-container" aria-label="Position dans le morceau">
+            <div class="progress-container" id="progress-container" aria-label="Track position">
               <canvas id="waveform-canvas" aria-hidden="true"></canvas>
               <div class="progress-bar" id="progress-bar"></div>
             </div>
 
             <div class="controls-row">
-              <button class="btn-track-nav" id="btn-previous" aria-label="Morceau précédent" title="Morceau précédent">⏮</button>
-              <button class="btn-secondary" id="btn-rewind" aria-label="Reculer de 10 secondes">↺ <span>-10s</span></button>
+              <button class="btn-track-nav" id="btn-previous" aria-label="Previous track" title="Previous track">⏮</button>
+              <button class="btn-secondary" id="btn-rewind" aria-label="Rewind 10 seconds">↺ <span>-10s</span></button>
               <span class="vu-meter vu-left" aria-hidden="true"><i></i><i></i><i></i></span>
-              <button class="btn-play" id="btn-play-pause" aria-label="Lire le morceau sélectionné">▶</button>
+              <button class="btn-play" id="btn-play-pause" aria-label="Play selected track">▶</button>
               <span class="vu-meter vu-right" aria-hidden="true"><i></i><i></i><i></i></span>
-              <button class="btn-secondary" id="btn-forward" aria-label="Avancer de 10 secondes">↻ <span>+10s</span></button>
-              <button class="btn-track-nav" id="btn-next" aria-label="Morceau suivant" title="Morceau suivant">⏭</button>
+              <button class="btn-secondary" id="btn-forward" aria-label="Forward 10 seconds">↻ <span>+10s</span></button>
+              <button class="btn-track-nav" id="btn-next" aria-label="Next track" title="Next track">⏭</button>
             </div>
 
             <div class="export-row">
@@ -84,6 +84,9 @@
               <a href="#" id="btn-export-mp3" class="btn-export" download>
                 <span>[💾] EXPORT MASTER MP3</span>
               </a>
+              <div class="experience-controls">
+                <button type="button" id="btn-immersive" class="btn-immersive btn-live-stage" aria-pressed="false">◇ ENTER LIVE EXPERIENCE</button>
+              </div>
             </div>
           </div>
         </div>
