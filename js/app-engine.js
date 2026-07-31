@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const audioFxCanvas = document.getElementById('audio-fx-canvas');
     const btnExportMp3 = document.getElementById('btn-export-mp3');
     const trackList = document.getElementById('track-list');
+    const albumPrev = document.getElementById('album-prev');
+    const albumNext = document.getElementById('album-next');
     const waveformCanvas = document.getElementById('waveform-canvas');
     const liveEntryButtons = [...document.querySelectorAll('#btn-immersive, .experience-controls button')];
     const btnImmersive = liveEntryButtons.shift();
@@ -584,7 +586,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnPlayPause.addEventListener('click', async () => {
         if (!isInitialized) initDSP();
-        if (audioCtx && audioCtx.state === 'suspended') await audioCtx.resume();
+        // Do not await AudioContext.resume() before play(): iOS consumes the short-lived
+        // user-activation token at the first await and would reject media playback.
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
         if (audioEl.paused) {
             resetSpotifyEmbed();
             await audioEl.play();
@@ -843,7 +847,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.remove('album-switching');
         void albumTransition.offsetWidth;
         document.body.classList.add('album-switching');
-        transitionTimer = setTimeout(() => document.body.classList.remove('album-switching'), 700);
+        transitionTimer = setTimeout(() => document.body.classList.remove('album-switching'), 1600);
     }
 
     function updateHeader(track) {
@@ -945,9 +949,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const item = e.target.closest('.mini-track-item');
         if (!item) return;
         if (!isInitialized) initDSP();
-        if (audioCtx && audioCtx.state === 'suspended') await audioCtx.resume();
-        loadTrackData(item.dataset.track, true);
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+        // Keep play() in the original tap call stack for mobile autoplay policies.
+        await loadTrackData(item.dataset.track, true).catch(error => {
+            console.warn('Playback could not start.', error);
+        });
     });
+
+    function scrollAlbum(direction) {
+        const cards = [...trackList.querySelectorAll('.ep-card')];
+        if (!cards.length) return;
+        const gridRect = trackList.getBoundingClientRect();
+        const center = gridRect.left + gridRect.width / 2;
+        const currentIndex = cards.reduce((best, card, index) => {
+            const rect = card.getBoundingClientRect();
+            const distance = Math.abs(rect.left + rect.width / 2 - center);
+            return distance < best.distance ? { index, distance } : best;
+        }, { index: 0, distance: Infinity }).index;
+        const target = cards[Math.max(0, Math.min(cards.length - 1, currentIndex + direction))];
+        target.scrollIntoView({ behavior: prefersReducedMotion.matches ? 'auto' : 'smooth', block: 'nearest', inline: 'center' });
+    }
+
+    albumPrev?.addEventListener('click', () => scrollAlbum(-1));
+    albumNext?.addEventListener('click', () => scrollAlbum(1));
 
     trackList.addEventListener('pointermove', event => {
         const card = event.target.closest('.ep-card');
