@@ -308,20 +308,21 @@ body.audio-active::before {
   transition-duration: 0.001ms !important;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  #ambient-canvas {
-    display: none;
-  }
-
-  .player-cover-img,
-  .ep-img-cover,
-  .glass-card,
-  .btn-play,
-  .btn-secondary,
-  .btn-export,
-  .hub-pill {
-    transition: none !important;
-  }
+.lyrics-line { display: block; margin: 3px 0; transition: 0.2s; }
+.lyrics-line-active {
+  color: var(--accent-cyan) !important;
+  font-size: 0.82rem !important;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.9);
+  background: rgba(0, 240, 255, 0.12);
+  padding: 3px 8px;
+  border-left: 2px solid var(--accent-cyan);
+  border-right: 2px solid var(--accent-cyan);
+  border-radius: 4px;
+  display: inline-block;
+  width: 85%;
+  margin: 4px auto;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
 }
 
 /* EXPERIENCE POLISH: editorial navigation, tools and album transitions */
@@ -646,6 +647,11 @@ body.audio-active .lyrics-line-active::after {
 body.track-changing .hero-cover-frame { animation: track-scan .48s ease; }
 @keyframes track-scan { 0% { opacity: .4; filter: brightness(.4) saturate(.3); transform: scale(.97); } 55% { filter: brightness(1.35) saturate(1.2); } 100% { opacity: 1; transform: scale(1); } }
 
+.btn-immersive { width: 100%; min-height: 30px; margin-bottom: 6px; border: 1px solid rgba(176,38,255,.55); border-radius: 5px; color: #dca8ff; background: rgba(176,38,255,.08); font: 700 .55rem var(--font-mono); letter-spacing: .08em; cursor: pointer; }
+.btn-immersive:hover { background: rgba(176,38,255,.2); box-shadow: 0 0 14px rgba(176,38,255,.35); }
+body.track-changing .hero-cover-frame { animation: track-scan .48s ease; }
+@keyframes track-scan { 0% { opacity: .4; filter: brightness(.4) saturate(.3); transform: scale(.97); } 55% { filter: brightness(1.35) saturate(1.2); } 100% { opacity: 1; transform: scale(1); } }
+
 @media (max-width: 768px) {
   .hero-cover-stage { width: min(82vw, 390px); }
   .hero-cover-frame { width: 100%; }
@@ -793,3 +799,12 @@ body.live-stage #audio-fx-canvas { opacity: 1; }
   .hero-cover-stage::before { animation: none; transform: none; filter: blur(18px); }
   body.drop-imminent .cyber-grid-overlay, body.drop-imminent .energy-ring { transform: none; }
 }
+@media (prefers-reduced-motion: reduce) {
+  #audio-fx-canvas { display: none; }
+  .hero-cover-stage::before { animation: none; transform: none; filter: blur(18px); }
+  body.drop-imminent .cyber-grid-overlay, body.drop-imminent .energy-ring { transform: none; }
+}
+
+.reduced-motion .header-logo-center::before,
+.reduced-motion .header-logo-img,
+.reduced-motion .topbar::after { animation: none; }
