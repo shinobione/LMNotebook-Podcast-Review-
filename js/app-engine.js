@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const audioFxCanvas = document.getElementById('audio-fx-canvas');
     const btnExportMp3 = document.getElementById('btn-export-mp3');
     const trackList = document.getElementById('track-list');
+    const albumPrev = document.getElementById('album-prev');
+    const albumNext = document.getElementById('album-next');
     const waveformCanvas = document.getElementById('waveform-canvas');
     const liveEntryButtons = [...document.querySelectorAll('#btn-immersive, .experience-controls button')];
     const btnImmersive = liveEntryButtons.shift();
@@ -315,12 +317,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const radius = Math.min(rect.width, rect.height) * .52;
 
             const live = document.body.classList.contains('live-stage');
+            const ultra = document.body.classList.contains('visual-ultra');
+            const fxBoost = ultra ? 1.85 : 1;
 
             if (currentVisualTheme === 'ep1') {
                 // Blue album: layered, organic waves that bend with mids and swell with bass.
                 context.save();
                 context.lineCap = 'round';
-                for (let wave = 0; wave < (live ? 7 : 4); wave++) {
+                const waveCount = ultra ? (live ? 12 : 8) : (live ? 7 : 4);
+                for (let wave = 0; wave < waveCount; wave++) {
                     const baseline = innerHeight * (.18 + wave * .12);
                     const amplitude = 18 + wave * 4 + reactiveBass * 70;
                     const phase = now * (.00045 + wave * .000035);
@@ -332,9 +337,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (x < 0) context.moveTo(x, y); else context.lineTo(x, y);
                     }
                     context.strokeStyle = wave % 2 ? particleSecondary : particlePrimary;
-                    context.globalAlpha = .055 + reactiveMids * .12;
-                    context.lineWidth = 1 + reactiveBass * 2.2;
-                    context.shadowBlur = 12 + reactiveBass * 22;
+                    context.globalAlpha = (.055 + reactiveMids * .12) * fxBoost;
+                    context.lineWidth = (1 + reactiveBass * 2.2) * (ultra ? 1.35 : 1);
+                    context.shadowBlur = (12 + reactiveBass * 22) * fxBoost;
                     context.shadowColor = context.strokeStyle;
                     context.stroke();
                 }
@@ -343,7 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Yellow album: a warm orbit of hand-drawn hearts instead of rigid geometry.
                 context.save();
                 context.translate(cx, cy);
-                const heartCount = live ? 12 : 7;
+                const heartCount = ultra ? (live ? 22 : 15) : (live ? 12 : 7);
                 for (let index = 0; index < heartCount; index++) {
                     const angle = now * .00016 + index / heartCount * Math.PI * 2;
                     const orbit = radius * (1.25 + (index % 3) * .22) + reactiveBass * 38;
@@ -358,9 +363,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     context.bezierCurveTo(-size * 1.35, -size * .65, -size * .55, -size * 1.45, 0, -size * .65);
                     context.bezierCurveTo(size * .55, -size * 1.45, size * 1.35, -size * .65, 0, size * .35);
                     context.strokeStyle = index % 2 ? particleSecondary : particlePrimary;
-                    context.globalAlpha = .18 + reactiveMids * .5;
-                    context.lineWidth = 1.2 + reactiveHighs * 1.8;
-                    context.shadowBlur = 12;
+                    context.globalAlpha = Math.min(1, (.18 + reactiveMids * .5) * fxBoost);
+                    context.lineWidth = (1.2 + reactiveHighs * 1.8) * (ultra ? 1.4 : 1);
+                    context.shadowBlur = ultra ? 28 : 12;
                     context.shadowColor = context.strokeStyle;
                     context.stroke();
                     context.restore();
@@ -369,7 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Small thematic details keep each album alive without masking the UI.
-            const detailCount = live ? 22 : 10;
+            const detailCount = ultra ? (live ? 48 : 30) : (live ? 22 : 10);
             context.save();
             for (let index = 0; index < detailCount; index++) {
                 const seed = index * 97.31;
@@ -404,10 +409,10 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let index = 0; index < bars; index++) {
                 const angle = index / bars * Math.PI * 2 - Math.PI / 2;
                 const value = (dataArray[index] || 0) / 255;
-                const length = 4 + value * Math.min(46, rect.width * .13);
+                const length = 4 + value * Math.min(ultra ? 92 : 46, rect.width * (ultra ? .27 : .13));
                 context.strokeStyle = index < 20 ? particlePrimary : particleSecondary;
-                context.globalAlpha = .22 + value * .7;
-                context.lineWidth = 1 + value * 1.5;
+                context.globalAlpha = Math.min(1, (.22 + value * .7) * (ultra ? 1.35 : 1));
+                context.lineWidth = (1 + value * 1.5) * (ultra ? 1.65 : 1);
                 context.beginPath();
                 context.moveTo(Math.cos(angle) * radius, Math.sin(angle) * radius);
                 context.lineTo(Math.cos(angle) * (radius + length), Math.sin(angle) * (radius + length));
@@ -415,14 +420,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             context.restore();
 
-            if (currentVisualTheme === 'ep3' && (lightningLife > .02 || reactiveBass > .48)) {
+            if (currentVisualTheme === 'ep3' && (lightningLife > .02 || reactiveBass > (ultra ? .28 : .48))) {
                 context.save();
                 context.strokeStyle = '#eaffff';
                 context.shadowBlur = 18 + reactiveBass * 28;
                 context.shadowColor = '#ff203f';
                 context.globalAlpha = Math.max(lightningLife, reactiveBass * .5);
                 context.lineWidth = 1.1 + reactiveBass * 2.4;
-                const bolts = lightningLife > .35 ? 4 : 2;
+                const bolts = ultra ? (lightningLife > .35 ? 9 : 5) : (lightningLife > .35 ? 4 : 2);
                 for (let bolt = 0; bolt < bolts; bolt++) {
                     const angle = now * .001 + bolt * Math.PI * .63 + Math.random() * .4;
                     const reach = radius * (1.6 + reactiveBass * 1.7);
@@ -584,7 +589,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnPlayPause.addEventListener('click', async () => {
         if (!isInitialized) initDSP();
-        if (audioCtx && audioCtx.state === 'suspended') await audioCtx.resume();
+        // Do not await AudioContext.resume() before play(): iOS consumes the short-lived
+        // user-activation token at the first await and would reject media playback.
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
         if (audioEl.paused) {
             resetSpotifyEmbed();
             await audioEl.play();
@@ -843,7 +850,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.remove('album-switching');
         void albumTransition.offsetWidth;
         document.body.classList.add('album-switching');
-        transitionTimer = setTimeout(() => document.body.classList.remove('album-switching'), 700);
+        transitionTimer = setTimeout(() => document.body.classList.remove('album-switching'), 1600);
     }
 
     function updateHeader(track) {
@@ -945,9 +952,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const item = e.target.closest('.mini-track-item');
         if (!item) return;
         if (!isInitialized) initDSP();
-        if (audioCtx && audioCtx.state === 'suspended') await audioCtx.resume();
-        loadTrackData(item.dataset.track, true);
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+        // Keep play() in the original tap call stack for mobile autoplay policies.
+        await loadTrackData(item.dataset.track, true).catch(error => {
+            console.warn('Playback could not start.', error);
+        });
     });
+
+    function scrollAlbum(direction) {
+        const cards = [...trackList.querySelectorAll('.ep-card')];
+        if (!cards.length) return;
+        const gridRect = trackList.getBoundingClientRect();
+        const center = gridRect.left + gridRect.width / 2;
+        const currentIndex = cards.reduce((best, card, index) => {
+            const rect = card.getBoundingClientRect();
+            const distance = Math.abs(rect.left + rect.width / 2 - center);
+            return distance < best.distance ? { index, distance } : best;
+        }, { index: 0, distance: Infinity }).index;
+        const target = cards[Math.max(0, Math.min(cards.length - 1, currentIndex + direction))];
+        target.scrollIntoView({ behavior: prefersReducedMotion.matches ? 'auto' : 'smooth', block: 'nearest', inline: 'center' });
+    }
+
+    albumPrev?.addEventListener('click', () => scrollAlbum(-1));
+    albumNext?.addEventListener('click', () => scrollAlbum(1));
 
     trackList.addEventListener('pointermove', event => {
         const card = event.target.closest('.ep-card');
