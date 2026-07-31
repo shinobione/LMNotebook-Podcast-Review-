@@ -48,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const mobileMotion = window.matchMedia('(max-width: 768px)');
+    const mobileFrameInterval = 1000 / 30;
     const spotifyEmbedSrc = spotifyIframe ? spotifyIframe.src : '';
     let spotifyResetTimer = null;
 
@@ -212,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function resizeCanvasToDisplaySize(targetCanvas) {
         if (!targetCanvas) return;
         const rect = targetCanvas.getBoundingClientRect();
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const dpr = mobileMotion.matches ? 1 : Math.min(window.devicePixelRatio || 1, 2);
         const width = Math.max(1, Math.round(rect.width * dpr));
         const height = Math.max(1, Math.round(rect.height * dpr));
         if (targetCanvas.width !== width || targetCanvas.height !== height) {
@@ -226,9 +227,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const ctx = ambientCanvas.getContext('2d');
         let width = 0;
         let height = 0;
+        let lastAmbientFrame = 0;
 
         function resizeAmbientCanvas() {
-            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const dpr = mobileMotion.matches ? 1 : Math.min(window.devicePixelRatio || 1, 2);
             width = ambientCanvas.width = Math.round(window.innerWidth * dpr);
             height = ambientCanvas.height = Math.round(window.innerHeight * dpr);
             ambientCanvas.style.width = `${window.innerWidth}px`;
@@ -248,11 +250,13 @@ document.addEventListener('DOMContentLoaded', () => {
             baseAlpha: Math.random() * 0.5 + 0.2
         }));
 
-        function renderAmbient() {
-            if (document.hidden || prefersReducedMotion.matches) {
-                ambientAnimationId = requestAnimationFrame(renderAmbient);
+        function renderAmbient(now = 0) {
+            ambientAnimationId = requestAnimationFrame(renderAmbient);
+            if (document.hidden || prefersReducedMotion.matches || document.body.classList.contains('visuals-off')) {
                 return;
             }
+            if (mobileMotion.matches && now - lastAmbientFrame < mobileFrameInterval) return;
+            lastAmbientFrame = now;
 
             ctx.clearRect(0, 0, width, height);
 
@@ -284,7 +288,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.fill();
             });
             ctx.globalAlpha = 1;
-            ambientAnimationId = requestAnimationFrame(renderAmbient);
         }
 
         renderAmbient();
@@ -293,25 +296,42 @@ document.addEventListener('DOMContentLoaded', () => {
     function initAudioFx() {
         if (!audioFxCanvas || fxAnimationId) return;
         const context = audioFxCanvas.getContext('2d');
+        const heroCoverStage = document.querySelector('.hero-cover-stage');
+        let heroRect = null;
+        let heroRectDirty = true;
+        let lastFxFrame = 0;
+        let fxCanvasCleared = true;
         const resize = () => {
-            const dpr = Math.min(devicePixelRatio || 1, 1.5);
+            const dpr = mobileMotion.matches ? 1 : Math.min(devicePixelRatio || 1, 1.5);
             audioFxCanvas.width = Math.round(innerWidth * dpr);
             audioFxCanvas.height = Math.round(innerHeight * dpr);
             audioFxCanvas.style.width = `${innerWidth}px`;
             audioFxCanvas.style.height = `${innerHeight}px`;
             context.setTransform(dpr, 0, 0, dpr, 0, 0);
+            heroRectDirty = true;
         };
         resize();
         window.addEventListener('resize', resize, { passive: true });
+        window.addEventListener('scroll', () => { heroRectDirty = true; }, { passive: true });
 
         const renderFx = now => {
             fxAnimationId = requestAnimationFrame(renderFx);
-            if (document.hidden || prefersReducedMotion.matches || audioEl.paused) {
-                context.clearRect(0, 0, innerWidth, innerHeight);
+            if (document.hidden || prefersReducedMotion.matches || audioEl.paused || document.body.classList.contains('visuals-off')) {
+                if (!fxCanvasCleared) {
+                    context.clearRect(0, 0, innerWidth, innerHeight);
+                    fxCanvasCleared = true;
+                }
                 return;
             }
+            if (mobileMotion.matches && now - lastFxFrame < mobileFrameInterval) return;
+            lastFxFrame = now;
             context.clearRect(0, 0, innerWidth, innerHeight);
-            const rect = document.querySelector('.hero-cover-stage').getBoundingClientRect();
+            fxCanvasCleared = false;
+            if (heroRectDirty || !heroRect) {
+                heroRect = heroCoverStage.getBoundingClientRect();
+                heroRectDirty = false;
+            }
+            const rect = heroRect;
             const cx = rect.left + rect.width / 2;
             const cy = rect.top + rect.height / 2;
             const radius = Math.min(rect.width, rect.height) * .52;
@@ -469,6 +489,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderRTA() {
         if (!canvas || !dataArray) return;
+        const now = performance.now();
+        if (mobileMotion.matches && now - renderRTA.lastFrame < mobileFrameInterval) {
+            rtaAnimationId = requestAnimationFrame(renderRTA);
+            return;
+        }
+        renderRTA.lastFrame = now;
         if (document.hidden || prefersReducedMotion.matches) {
             rtaAnimationId = requestAnimationFrame(renderRTA);
             return;
@@ -501,7 +527,6 @@ document.addEventListener('DOMContentLoaded', () => {
         reactiveMids = mids;
         reactiveHighs = highs;
         bassAverage = bassAverage * 0.92 + bass * 0.08;
-        const now = performance.now();
         if (!audioEl.paused && bass > bassAverage * 1.35 && bass > 0.24 && now - lastBeatAt > 180) {
             document.body.classList.remove('beat-hit');
             void document.body.offsetWidth;
@@ -538,6 +563,7 @@ document.addEventListener('DOMContentLoaded', () => {
             x += barWidth;
         }
     }
+    renderRTA.lastFrame = 0;
 
     function pauseLocalPlayer() {
         if (!audioEl.paused) {

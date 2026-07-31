@@ -997,6 +997,20 @@ body.visual-ultra.audio-active .ring-two { opacity: calc(.18 + var(--mid-level) 
 body.visual-ultra.audio-active .cyber-grid-overlay { opacity: calc(.58 + var(--audio-level) * .42); }
 
 @media (max-width: 768px) {
+  /* Mobile compositing: keep the same glass appearance without asking Chrome
+     to re-blur the entire page behind every card on every animation frame. */
+  .glass-card {
+    background: rgba(6, 11, 20, .97);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .lyrics-vault-card,
+  .embed-card-full,
+  .hubs-card {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 320px;
+  }
+
   /* Flatten the dashboard columns so the spectrum can sit directly between
      the local player and album selection in the mobile reading order. */
   body:not(.live-stage) .dashboard-grid > .dash-col {
