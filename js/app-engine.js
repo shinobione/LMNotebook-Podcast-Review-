@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const trackList = document.getElementById('track-list');
     const waveformCanvas = document.getElementById('waveform-canvas');
     const btnImmersive = document.getElementById('btn-immersive');
-    const btnLiveStage = document.getElementById('btn-live-stage');
 
     const currentTrackTitle = document.getElementById('current-track-title');
     const currentTrackSubtitle = document.getElementById('current-track-subtitle');
@@ -113,11 +112,12 @@ document.addEventListener('DOMContentLoaded', () => {
     let reactiveMids = 0;
     let reactiveHighs = 0;
     let lightningLife = 0;
+    let currentVisualTheme = 'ep1';
     const waveformCache = new Map();
     let particlePrimary = '#00f0ff';
     let particleSecondary = '#b026ff';
     const TRACK_PALETTES = {
-        ep1: ['#00f0ff', '#b026ff'], ep2: ['#ffb36b', '#ff4fa3'], ep3: ['#ff3366', '#00d9ff']
+        ep1: ['#00d9ff', '#3478ff'], ep2: ['#ffd166', '#ff4f9a'], ep3: ['#ff203f', '#ff7a18']
     };
 
     function createResponsiveImage(src, alt, className, isLazy = true) {
@@ -290,14 +290,56 @@ document.addEventListener('DOMContentLoaded', () => {
             const cy = rect.top + rect.height / 2;
             const radius = Math.min(rect.width, rect.height) * .52;
 
-            if (document.body.classList.contains('immersive-mode') || document.body.classList.contains('live-stage')) {
+            const live = document.body.classList.contains('live-stage');
+
+            if (currentVisualTheme === 'ep1') {
+                // Blue album: layered, organic waves that bend with mids and swell with bass.
                 context.save();
-                context.globalAlpha = .12 + reactiveBass * .12;
-                context.strokeStyle = particlePrimary;
-                for (let depth = 0; depth < 9; depth++) {
-                    const phase = ((now * .00008 * (1 + reactiveBass * 2) + depth / 9) % 1);
-                    const size = 40 + phase * Math.max(innerWidth, innerHeight) * .72;
-                    context.strokeRect(innerWidth / 2 - size, innerHeight / 2 - size * .55, size * 2, size * 1.1);
+                context.lineCap = 'round';
+                for (let wave = 0; wave < (live ? 7 : 4); wave++) {
+                    const baseline = innerHeight * (.18 + wave * .12);
+                    const amplitude = 18 + wave * 4 + reactiveBass * 70;
+                    const phase = now * (.00045 + wave * .000035);
+                    context.beginPath();
+                    for (let x = -20; x <= innerWidth + 20; x += 14) {
+                        const y = baseline
+                            + Math.sin(x * .009 + phase + wave) * amplitude
+                            + Math.sin(x * .021 - phase * 1.7) * (8 + reactiveMids * 24);
+                        if (x < 0) context.moveTo(x, y); else context.lineTo(x, y);
+                    }
+                    context.strokeStyle = wave % 2 ? particleSecondary : particlePrimary;
+                    context.globalAlpha = .055 + reactiveMids * .12;
+                    context.lineWidth = 1 + reactiveBass * 2.2;
+                    context.shadowBlur = 12 + reactiveBass * 22;
+                    context.shadowColor = context.strokeStyle;
+                    context.stroke();
+                }
+                context.restore();
+            } else if (currentVisualTheme === 'ep2') {
+                // Yellow album: a warm orbit of hand-drawn hearts instead of rigid geometry.
+                context.save();
+                context.translate(cx, cy);
+                const heartCount = live ? 12 : 7;
+                for (let index = 0; index < heartCount; index++) {
+                    const angle = now * .00016 + index / heartCount * Math.PI * 2;
+                    const orbit = radius * (1.25 + (index % 3) * .22) + reactiveBass * 38;
+                    const size = 5 + (index % 4) * 2 + reactiveMids * 9;
+                    const hx = Math.cos(angle) * orbit;
+                    const hy = Math.sin(angle * 1.35) * orbit * .7;
+                    context.save();
+                    context.translate(hx, hy);
+                    context.rotate(angle + Math.PI / 2);
+                    context.beginPath();
+                    context.moveTo(0, size * .35);
+                    context.bezierCurveTo(-size * 1.35, -size * .65, -size * .55, -size * 1.45, 0, -size * .65);
+                    context.bezierCurveTo(size * .55, -size * 1.45, size * 1.35, -size * .65, 0, size * .35);
+                    context.strokeStyle = index % 2 ? particleSecondary : particlePrimary;
+                    context.globalAlpha = .18 + reactiveMids * .5;
+                    context.lineWidth = 1.2 + reactiveHighs * 1.8;
+                    context.shadowBlur = 12;
+                    context.shadowColor = context.strokeStyle;
+                    context.stroke();
+                    context.restore();
                 }
                 context.restore();
             }
@@ -319,23 +361,28 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             context.restore();
 
-            if (lightningLife > .02) {
+            if (currentVisualTheme === 'ep3' && (lightningLife > .02 || reactiveBass > .48)) {
                 context.save();
                 context.strokeStyle = '#eaffff';
-                context.shadowBlur = 16;
-                context.shadowColor = particlePrimary;
-                context.globalAlpha = lightningLife;
-                context.lineWidth = 1.4;
-                context.beginPath();
-                let x = rect.left;
-                context.moveTo(x, rect.top + Math.random() * rect.height);
-                for (let step = 1; step <= 9; step++) {
-                    x = rect.left + rect.width * step / 9;
-                    context.lineTo(x, rect.top + rect.height * step / 9 + (Math.random() - .5) * 34);
+                context.shadowBlur = 18 + reactiveBass * 28;
+                context.shadowColor = '#ff203f';
+                context.globalAlpha = Math.max(lightningLife, reactiveBass * .5);
+                context.lineWidth = 1.1 + reactiveBass * 2.4;
+                const bolts = lightningLife > .35 ? 4 : 2;
+                for (let bolt = 0; bolt < bolts; bolt++) {
+                    const angle = now * .001 + bolt * Math.PI * .63 + Math.random() * .4;
+                    const reach = radius * (1.6 + reactiveBass * 1.7);
+                    context.beginPath();
+                    context.moveTo(cx + Math.cos(angle) * radius * .8, cy + Math.sin(angle) * radius * .8);
+                    for (let step = 1; step <= 8; step++) {
+                        const distance = radius * .8 + reach * step / 8;
+                        const jitter = (Math.random() - .5) * (22 + reactiveBass * 42);
+                        context.lineTo(cx + Math.cos(angle) * distance + Math.sin(angle) * jitter, cy + Math.sin(angle) * distance - Math.cos(angle) * jitter);
+                    }
+                    context.stroke();
                 }
-                context.stroke();
                 context.restore();
-                lightningLife *= .78;
+                lightningLife *= .84;
             }
         };
         fxAnimationId = requestAnimationFrame(renderFx);
@@ -402,7 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.classList.add('beat-hit');
             lastBeatAt = now;
         }
-        if (!audioEl.paused && bass > 0.58 && highs > 0.22 && now - lastSuperHitAt > 650) {
+        if (currentVisualTheme === 'ep3' && !audioEl.paused && bass > 0.52 && now - lastSuperHitAt > 420) {
             lightningLife = 1;
             document.body.classList.add('super-hit');
             setTimeout(() => document.body.classList.remove('super-hit'), 180);
@@ -690,17 +737,16 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.style.setProperty('--track-secondary', secondary);
         particlePrimary = primary;
         particleSecondary = secondary;
+        currentVisualTheme = track.epId;
+        document.body.classList.remove('theme-ep1', 'theme-ep2', 'theme-ep3');
+        document.body.classList.add(`theme-${track.epId}`);
     }
 
-    function setExperienceMode(mode) {
-        const immersive = mode === 'immersive';
-        const live = mode === 'live';
-        document.body.classList.toggle('immersive-mode', immersive);
+    function setExperienceMode(active) {
+        const live = Boolean(active);
         document.body.classList.toggle('live-stage', live);
-        btnImmersive.setAttribute('aria-pressed', String(immersive));
-        btnImmersive.textContent = immersive ? '× QUITTER IMMERSIF' : '◉ MODE IMMERSIF';
-        btnLiveStage.setAttribute('aria-pressed', String(live));
-        btnLiveStage.textContent = live ? '× QUITTER LIVE' : '◇ LIVE STAGE';
+        btnImmersive.setAttribute('aria-pressed', String(live));
+        btnImmersive.textContent = live ? '× QUITTER L’EXPÉRIENCE' : '◇ EXPÉRIENCE LIVE';
     }
 
     async function leaveFullscreen() {
@@ -709,21 +755,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function toggleImmersive(force) {
-        const wasLive = document.body.classList.contains('live-stage');
-        const active = typeof force === 'boolean'
-            ? force
-            : wasLive || !document.body.classList.contains('immersive-mode');
-
-        // The two layouts are intentionally exclusive. Switching from Live Stage
-        // to Immersive keeps the visual experience active without stacking modes.
-        setExperienceMode(active ? 'immersive' : 'default');
-        if (wasLive) await leaveFullscreen();
-    }
-
-    async function toggleLiveStage() {
+    async function toggleExperience() {
         const active = !document.body.classList.contains('live-stage');
-        setExperienceMode(active ? 'live' : 'default');
+        setExperienceMode(active);
         if (active && document.documentElement.requestFullscreen) {
             await document.documentElement.requestFullscreen().catch(() => {});
         } else if (!active) {
@@ -796,12 +830,11 @@ document.addEventListener('DOMContentLoaded', () => {
         loadTrackData(item.dataset.track, true);
     });
 
-    btnImmersive.addEventListener('click', () => { toggleImmersive(); });
-    btnLiveStage.addEventListener('click', toggleLiveStage);
+    btnImmersive.addEventListener('click', toggleExperience);
     document.addEventListener('keydown', event => {
         if (event.key === 'Escape' && document.body.classList.contains('live-stage')) {
-            setExperienceMode('default');
-        } else if (event.key === 'Escape' && document.body.classList.contains('immersive-mode')) toggleImmersive(false);
+            setExperienceMode(false);
+        }
         const isInteractiveTarget = event.target.closest('button, a, input, textarea, select');
         if (document.body.classList.contains('live-stage') && event.code === 'Space' && !event.repeat && !isInteractiveTarget) {
             event.preventDefault();
@@ -813,7 +846,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.addEventListener('fullscreenchange', () => {
         if (!document.fullscreenElement && document.body.classList.contains('live-stage')) {
-            setExperienceMode('default');
+            setExperienceMode(false);
         }
     });
 
