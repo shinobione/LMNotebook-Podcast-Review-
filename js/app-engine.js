@@ -15,9 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const trackList = document.getElementById('track-list');
     const waveformCanvas = document.getElementById('waveform-canvas');
     const btnImmersive = document.getElementById('btn-immersive');
-    const experienceControls = btnImmersive.closest('.experience-controls');
-    const experienceAnchor = document.createComment('live-experience-controls');
-    experienceControls.before(experienceAnchor);
+    const btnExitLive = document.getElementById('btn-exit-live');
 
     const currentTrackTitle = document.getElementById('current-track-title');
     const currentTrackSubtitle = document.getElementById('current-track-subtitle');
@@ -747,11 +745,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function setExperienceMode(active) {
         const live = Boolean(active);
-        if (live) document.body.appendChild(experienceControls);
-        else experienceAnchor.after(experienceControls);
         document.body.classList.toggle('live-stage', live);
         btnImmersive.setAttribute('aria-pressed', String(live));
-        btnImmersive.textContent = live ? '× EXIT LIVE EXPERIENCE' : '◇ ENTER LIVE EXPERIENCE';
+        btnImmersive.hidden = live;
+        btnExitLive.hidden = !live;
     }
 
     async function leaveFullscreen() {
@@ -836,6 +833,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     btnImmersive.addEventListener('click', toggleExperience);
+    btnExitLive.addEventListener('click', toggleExperience);
     document.addEventListener('keydown', event => {
         if (event.key === 'Escape' && document.body.classList.contains('live-stage')) {
             setExperienceMode(false);

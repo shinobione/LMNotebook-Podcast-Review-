@@ -578,11 +578,6 @@ body.audio-active .lyrics-line-active::after {
 body.track-changing .hero-cover-frame { animation: track-scan .48s ease; }
 @keyframes track-scan { 0% { opacity: .4; filter: brightness(.4) saturate(.3); transform: scale(.97); } 55% { filter: brightness(1.35) saturate(1.2); } 100% { opacity: 1; transform: scale(1); } }
 
-.btn-immersive { width: 100%; min-height: 30px; margin-bottom: 6px; border: 1px solid rgba(176,38,255,.55); border-radius: 5px; color: #dca8ff; background: rgba(176,38,255,.08); font: 700 .55rem var(--font-mono); letter-spacing: .08em; cursor: pointer; }
-.btn-immersive:hover { background: rgba(176,38,255,.2); box-shadow: 0 0 14px rgba(176,38,255,.35); }
-body.track-changing .hero-cover-frame { animation: track-scan .48s ease; }
-@keyframes track-scan { 0% { opacity: .4; filter: brightness(.4) saturate(.3); transform: scale(.97); } 55% { filter: brightness(1.35) saturate(1.2); } 100% { opacity: 1; transform: scale(1); } }
-
 @media (max-width: 768px) {
   .hero-cover-stage { width: min(82vw, 390px); }
   .hero-cover-frame { width: 100%; }
@@ -628,9 +623,44 @@ body.drop-imminent .energy-ring { transform: scale(calc(1 - var(--drop-build) * 
 body.drop-imminent::before { opacity: calc(.2 + var(--drop-build) * .65); }
 .cyber-grid-overlay, .energy-ring { transition: opacity .18s linear, transform .18s linear; }
 
-.experience-controls { display: block; width: 100%; margin-top: 6px; }
-.experience-controls .btn-immersive { display: block; width: 100%; margin: 0; }
-.btn-live-stage { color: var(--track-accent); border-color: var(--track-accent); }
+.experience-controls { display: block; width: 100%; margin-top: 7px; }
+.experience-controls .btn-immersive {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100% !important;
+  min-height: 38px;
+  margin: 0;
+  color: var(--track-accent);
+  border-color: color-mix(in srgb, var(--track-accent) 72%, transparent);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--track-accent) 7%, transparent), color-mix(in srgb, var(--track-secondary) 10%, transparent));
+}
+.experience-controls .btn-immersive:hover {
+  color: #fff;
+  border-color: var(--track-accent);
+  background: color-mix(in srgb, var(--track-accent) 18%, #050811);
+}
+.btn-exit-live {
+  position: fixed;
+  top: clamp(12px, 2vw, 24px);
+  right: clamp(12px, 2vw, 24px);
+  z-index: 30;
+  min-height: 40px;
+  padding: 8px 15px;
+  border: 1px solid color-mix(in srgb, var(--track-accent) 78%, white);
+  border-radius: 999px;
+  color: var(--track-accent);
+  background: rgba(3, 7, 13, .88);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--track-accent) 28%, transparent);
+  backdrop-filter: blur(14px);
+  font: 700 .58rem var(--font-mono);
+  letter-spacing: .1em;
+  cursor: pointer;
+}
+.btn-exit-live span { margin-right: 5px; font-size: .9rem; }
+.btn-exit-live:hover { color: #020508; background: var(--track-accent); box-shadow: 0 0 26px color-mix(in srgb, var(--track-accent) 48%, transparent); }
+.btn-exit-live[hidden], .btn-immersive[hidden] { display: none !important; }
 
 body.live-stage { overflow: hidden; }
 body.live-stage .topbar,
@@ -659,24 +689,6 @@ body.live-stage .lyrics-container { min-height: 0; max-height: none; }
 body.live-stage .lyrics-container { font-size: clamp(.76rem, 1.05vw, 1rem); }
 body.live-stage .glass-card::before { display: none; }
 body.live-stage #audio-fx-canvas { opacity: 1; }
-body.live-stage .experience-controls {
-  position: fixed;
-  top: clamp(12px, 2vw, 24px);
-  right: clamp(12px, 2vw, 24px);
-  z-index: 20;
-  width: auto;
-  margin: 0;
-}
-body.live-stage .experience-controls .btn-immersive {
-  width: auto;
-  min-width: 190px;
-  min-height: 40px;
-  padding: 8px 18px;
-  color: #020508;
-  background: var(--track-accent);
-  border-color: color-mix(in srgb, var(--track-accent) 75%, white);
-  box-shadow: 0 0 24px color-mix(in srgb, var(--track-accent) 45%, transparent);
-}
 
 @media (max-width: 768px) {
   body.live-stage { overflow-y: auto; }
@@ -697,8 +709,7 @@ body.live-stage .experience-controls .btn-immersive {
   body.live-stage .lyrics-vault-card { height: clamp(420px, 68svh, 620px); min-height: 0; }
   body.live-stage .lyrics-container { min-height: 0; }
   body.live-stage .hero-cover-stage { width: min(72vw, 320px); }
-  body.live-stage .experience-controls { top: 8px; right: 8px; }
-  body.live-stage .experience-controls .btn-immersive { min-width: 0; min-height: 44px; padding-inline: 12px; font-size: .52rem; }
+  .btn-exit-live { top: 8px; right: 8px; min-height: 44px; padding-inline: 13px; }
 }
 
 @media (max-width: 430px) {
@@ -713,63 +724,6 @@ body.live-stage .experience-controls .btn-immersive {
   #audio-fx-canvas { display: none; }
   .hero-cover-stage::before { animation: none; transform: none; filter: blur(18px); }
   body.drop-imminent .cyber-grid-overlay, body.drop-imminent .energy-ring { transform: none; }
-}
-@keyframes liquid-aura { 0% { border-radius: 38% 62% 54% 46%; } 50% { border-radius: 62% 38% 42% 58%; } 100% { border-radius: 48% 52% 64% 36%; } }
-body.super-hit .hero-cover-frame { animation: chroma-impact .18s steps(2); }
-@keyframes chroma-impact { 35% { filter: saturate(1.8) contrast(1.25) drop-shadow(6px 0 0 var(--track-accent)) drop-shadow(-6px 0 0 var(--track-secondary)); } }
-
-body.drop-imminent .cyber-grid-overlay { opacity: calc(1 - var(--drop-build) * .72); transform: scale(calc(1 - var(--drop-build) * .018)); }
-body.drop-imminent .energy-ring { transform: scale(calc(1 - var(--drop-build) * .07)); opacity: calc(.1 + var(--drop-build) * .65); }
-body.drop-imminent::before { opacity: calc(.2 + var(--drop-build) * .65); }
-.cyber-grid-overlay, .energy-ring { transition: opacity .18s linear, transform .18s linear; }
-
-.experience-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
-.experience-controls .btn-immersive { margin: 0; }
-.btn-live-stage { color: var(--track-accent); border-color: var(--track-accent); }
-
-body.live-stage { overflow: hidden; }
-body.live-stage .topbar, body.live-stage .catalog-showcase-card, body.live-stage .dsp-card, body.live-stage .col-right { opacity: 0; pointer-events: none; }
-body.live-stage .app-viewport { padding: 0; max-width: none; height: 100dvh; }
-body.live-stage .dashboard-grid {
-  display: grid !important;
-  grid-template-columns: minmax(280px, min(42vw, 68vh)) minmax(360px, 760px) !important;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(20px, 4vw, 72px);
-  width: 100%;
-  height: 100dvh;
-  padding: clamp(18px, 3vh, 40px) clamp(18px, 4vw, 70px);
-  overflow: hidden;
-}
-body.live-stage .col-left, body.live-stage .col-center { width: 100% !important; min-width: 0; justify-content: center; }
-body.live-stage .col-left { height: auto; max-height: none; }
-body.live-stage .main-player, body.live-stage .lyrics-vault-card { opacity: 1; filter: none; pointer-events: auto; border-color: color-mix(in srgb, var(--track-accent) 70%, transparent); }
-body.live-stage .main-player { flex: 0 0 auto; width: 100%; max-height: none; overflow: visible; }
-body.live-stage .hero-cover-stage { width: min(100%, 32vh); flex: 0 0 auto; align-self: center; }
-body.live-stage .lyrics-vault-card { flex: 0 0 auto; height: min(68vh, 680px); min-height: 360px; }
-body.live-stage .lyrics-container { min-height: 0; max-height: none; }
-body.live-stage .lyrics-container { font-size: clamp(.76rem, 1.05vw, 1rem); }
-body.live-stage .glass-card::before { display: none; }
-body.live-stage #audio-fx-canvas { opacity: 1; }
-
-@media (max-width: 768px) {
-  .experience-controls { grid-template-columns: 1fr; }
-  body.live-stage { overflow-y: auto; }
-  body.live-stage .app-viewport { height: auto; min-height: 100dvh; }
-  body.live-stage .dashboard-grid { display: flex !important; height: auto; min-height: 100dvh; padding: 10px; overflow: visible; }
-  body.live-stage .col-left { max-height: none; }
-  body.live-stage .col-center { display: flex; }
-  body.live-stage .lyrics-vault-card { min-height: 48vh; }
-  body.live-stage .hero-cover-stage { width: min(78vw, 390px); }
-}
-@media (prefers-reduced-motion: reduce) {
-  #audio-fx-canvas { display: none; }
-  .hero-cover-stage::before { animation: none; transform: none; filter: blur(18px); }
-  body.drop-imminent .cyber-grid-overlay, body.drop-imminent .energy-ring { transform: none; }
-}
-@keyframes header-signal {
-  0%, 100% { opacity: 0.3; transform: scaleX(0.72); }
-  50% { opacity: 0.8; transform: scaleX(1); }
 }
 
 .reduced-motion .header-logo-center::before,
