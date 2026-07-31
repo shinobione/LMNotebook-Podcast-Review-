@@ -23,11 +23,13 @@ document.addEventListener('DOMContentLoaded', () => {
         button.remove();
         if (controls && !controls.children.length) controls.remove();
     });
-    btnImmersive.innerHTML = '<span aria-hidden="true">◈</span> LIVE EXPERIENCE';
+    const immersiveIcon = document.createElement('span');
+    immersiveIcon.setAttribute('aria-hidden', 'true');
+    immersiveIcon.textContent = '◈';
+    btnImmersive.replaceChildren(immersiveIcon, ' LIVE EXPERIENCE');
     const btnExitLive = document.getElementById('btn-exit-live');
     const headerTrack = document.getElementById('header-track');
     const headerEngine = document.getElementById('header-engine');
-    const albumTransition = document.getElementById('album-transition');
     const transitionTitle = document.getElementById('transition-title');
     const toolPanel = document.getElementById('tool-panel');
     const toolButtons = {
@@ -35,13 +37,28 @@ document.addEventListener('DOMContentLoaded', () => {
         share: document.getElementById('btn-share'),
         visuals: document.getElementById('btn-visuals')
     };
-    const playbackIcons = {
-        play: '<svg class="playback-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.25 5.6v12.8L18 12z"/></svg>',
-        pause: '<svg class="playback-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="5.5" width="3.5" height="13" rx="1"/><rect x="13.5" y="5.5" width="3.5" height="13" rx="1"/></svg>'
-    };
+    function createPlaybackIcon(isPlaying) {
+        const svgNamespace = 'http://www.w3.org/2000/svg';
+        const svg = document.createElementNS(svgNamespace, 'svg');
+        svg.classList.add('playback-icon');
+        svg.setAttribute('viewBox', '0 0 24 24');
+        svg.setAttribute('aria-hidden', 'true');
+        if (isPlaying) {
+            [7, 13.5].forEach(x => {
+                const bar = document.createElementNS(svgNamespace, 'rect');
+                Object.entries({ x, y: 5.5, width: 3.5, height: 13, rx: 1 }).forEach(([name, value]) => bar.setAttribute(name, String(value)));
+                svg.appendChild(bar);
+            });
+        } else {
+            const triangle = document.createElementNS(svgNamespace, 'path');
+            triangle.setAttribute('d', 'M8.25 5.6v12.8L18 12z');
+            svg.appendChild(triangle);
+        }
+        return svg;
+    }
 
     function setPlaybackButton(isPlaying) {
-        btnPlayPause.innerHTML = isPlaying ? playbackIcons.pause : playbackIcons.play;
+        btnPlayPause.replaceChildren(createPlaybackIcon(isPlaying));
         btnPlayPause.classList.toggle('is-playing', isPlaying);
         btnPlayPause.setAttribute('aria-label', isPlaying ? 'Pause playback' : 'Play selected track');
     }
@@ -153,6 +170,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const EP_ENGINES = { ep1: 'WAVE ENGINE', ep2: 'LOVE SIGNAL', ep3: 'HEAVY BASS' };
     let activeTool = '';
     let transitionTimer = 0;
+    let transitionAnimationFrameId = null;
+    let beatAnimationFrameId = null;
+    let trackLoadGeneration = 0;
+    let trackFetchController = null;
 
     function createResponsiveImage(src, alt, className, isLazy = true) {
         const img = document.createElement('img');
@@ -168,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderTrackList() {
         if (!trackList) return;
-        trackList.innerHTML = '';
+        trackList.replaceChildren();
         const fragment = document.createDocumentFragment();
 
         EPS.forEach(ep => {
@@ -494,7 +515,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resizeObserver.observe(canvas);
         renderRTA();
         initAudioFx();
-        renderWaveform(audioEl.getAttribute('src'));
+        renderWaveform(audioEl.getAttribute('src'), trackFetchController?.signal, trackLoadGeneration);
     }
 
     function renderRTA() {
@@ -539,8 +560,11 @@ document.addEventListener('DOMContentLoaded', () => {
         bassAverage = bassAverage * 0.92 + bass * 0.08;
         if (!audioEl.paused && bass > bassAverage * 1.35 && bass > 0.24 && now - lastBeatAt > 180) {
             document.body.classList.remove('beat-hit');
-            void document.body.offsetWidth;
-            document.body.classList.add('beat-hit');
+            if (beatAnimationFrameId !== null) cancelAnimationFrame(beatAnimationFrameId);
+            beatAnimationFrameId = requestAnimationFrame(() => {
+                beatAnimationFrameId = null;
+                if (!audioEl.paused && !document.hidden) document.body.classList.add('beat-hit');
+            });
             lastBeatAt = now;
         }
         if (currentVisualTheme === 'ep3' && !audioEl.paused && bass > 0.52 && now - lastSuperHitAt > 420) {
@@ -639,7 +663,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
         if (audioEl.paused) {
             resetSpotifyEmbed();
-            await audioEl.play();
+            try {
+                await audioEl.play();
+            } catch (error) {
+                console.warn('Playback could not start.', error);
+                setPlaybackButton(false);
+                setLocalAudioActive(false);
+                return;
+            }
             setPlaybackButton(true);
             setLocalAudioActive(true);
         } else {
@@ -704,7 +735,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function processLyricsText(rawText) {
         parsedLyrics = [];
-        lyricsDisplay.innerHTML = '';
+        lyricsDisplay.replaceChildren();
         const lines = rawText.split('\n');
         const fragment = document.createDocumentFragment();
 
@@ -735,18 +766,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function loadLyrics(track) {
+    async function loadLyrics(track, signal, generation) {
         lyricsDisplay.textContent = 'Loading vault data...';
         try {
-            const res = await fetch(track.lyrics);
+            const res = await fetch(track.lyrics, { signal });
             if (res.ok) {
-                processLyricsText(await res.text());
+                const lyrics = await res.text();
+                if (generation !== trackLoadGeneration) return;
+                processLyricsText(lyrics);
                 return;
             }
         } catch (e) {
+            if (e.name === 'AbortError') return;
             console.warn('Lyrics fetch failed, using fallback copy.', e);
         }
 
+        if (generation !== trackLoadGeneration) return;
         if (FALLBACK_LYRICS[track.id]) {
             processLyricsText(FALLBACK_LYRICS[track.id]);
         } else {
@@ -807,14 +842,16 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.toggle('drop-imminent', anticipation > .08);
     }
 
-    async function renderWaveform(audioUrl) {
+    async function renderWaveform(audioUrl, signal, generation) {
         if (!waveformCanvas || !audioCtx) return;
         const token = audioUrl;
         let peaks = waveformCache.get(audioUrl);
         if (!peaks) {
             try {
-                const response = await fetch(audioUrl);
+                const response = await fetch(audioUrl, { signal });
+                if (!response.ok) throw new Error(`Waveform request failed with status ${response.status}.`);
                 const buffer = await audioCtx.decodeAudioData(await response.arrayBuffer());
+                if (generation !== trackLoadGeneration) return;
                 const channel = buffer.getChannelData(0);
                 const bins = 180;
                 const step = Math.max(1, Math.floor(channel.length / bins));
@@ -825,11 +862,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 waveformCache.set(audioUrl, peaks);
             } catch (error) {
+                if (error.name === 'AbortError') return;
                 console.warn('Waveform generation failed.', error);
                 return;
             }
         }
-        if (audioEl.getAttribute('src') !== token) return;
+        if (generation !== trackLoadGeneration || audioEl.getAttribute('src') !== token) return;
         currentPeaks = peaks;
         const threshold = peaks.reduce((sum, peak) => sum + peak, 0) / peaks.length * 1.65;
         currentDropMarkers = peaks.map((peak, index) => peak > threshold && index > 2 && peak > peaks[index - 1] && peak >= (peaks[index + 1] || 0) ? index : -1).filter(index => index >= 0);
@@ -887,11 +925,14 @@ document.addEventListener('DOMContentLoaded', () => {
     function triggerAlbumTransition(track) {
         if (prefersReducedMotion.matches) return;
         clearTimeout(transitionTimer);
+        if (transitionAnimationFrameId !== null) cancelAnimationFrame(transitionAnimationFrameId);
         transitionTitle.textContent = `ENTERING ${track.epName.toUpperCase()}`;
         document.body.classList.remove('album-switching');
-        void albumTransition.offsetWidth;
-        document.body.classList.add('album-switching');
-        transitionTimer = setTimeout(() => document.body.classList.remove('album-switching'), 1600);
+        transitionAnimationFrameId = requestAnimationFrame(() => {
+            transitionAnimationFrameId = null;
+            document.body.classList.add('album-switching');
+            transitionTimer = setTimeout(() => document.body.classList.remove('album-switching'), 1600);
+        });
     }
 
     function updateHeader(track) {
@@ -904,11 +945,109 @@ document.addEventListener('DOMContentLoaded', () => {
         return [1, 2, 3].map(offset => TRACKS[TRACK_ORDER[(index + offset) % TRACK_ORDER.length]]);
     }
 
+    function createToolButton(text, dataAttribute, value) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.dataset[dataAttribute] = value;
+        button.textContent = text;
+        return button;
+    }
+
+    function renderQueuePanel() {
+        const heading = document.createElement('strong');
+        heading.textContent = 'UP NEXT';
+        const fragment = document.createDocumentFragment();
+        fragment.appendChild(heading);
+
+        getUpcomingTracks().forEach((track, index) => {
+            const item = document.createElement('div');
+            item.className = 'queue-item';
+            const position = document.createElement('span');
+            position.textContent = `0${index + 1}`;
+            const title = document.createElement('b');
+            title.textContent = track.title;
+            item.append(position, title, createToolButton('PLAY', 'playNext', track.id));
+            fragment.appendChild(item);
+        });
+
+        toolPanel.replaceChildren(fragment);
+    }
+
+    function renderSharePanel() {
+        const heading = document.createElement('strong');
+        heading.textContent = `SHARE ${TRACKS[currentTrackId].title.toUpperCase()}`;
+        const actions = document.createElement('div');
+        actions.className = 'share-actions';
+        actions.append(
+            createToolButton('SHARE ↗', 'share', 'native'),
+            createToolButton('COPY LINK', 'share', 'copy')
+        );
+        toolPanel.replaceChildren(heading, actions);
+    }
+
+    function renderVisualPanel(saved) {
+        const heading = document.createElement('div');
+        heading.className = 'visual-panel-head';
+        const headingCopy = document.createElement('div');
+        const title = document.createElement('strong');
+        title.textContent = 'VISUAL ENGINE';
+        const subtitle = document.createElement('small');
+        subtitle.textContent = 'Performance profile';
+        headingCopy.append(title, subtitle);
+        const closeButton = createToolButton('×', 'closeTool', '');
+        closeButton.setAttribute('aria-label', 'Close visual settings');
+        heading.append(headingCopy, closeButton);
+
+        const profiles = document.createElement('div');
+        profiles.className = 'visual-profiles';
+        profiles.setAttribute('role', 'radiogroup');
+        profiles.setAttribute('aria-label', 'Visual quality');
+        [
+            ['low', '◌', 'LOW', 'Battery'],
+            ['balanced', '◉', 'BALANCED', 'Default'],
+            ['ultra', '✦', 'ULTRA', 'Maximum']
+        ].forEach(([quality, icon, label, detail]) => {
+            const button = createToolButton('', 'quality', quality);
+            button.setAttribute('role', 'radio');
+            button.setAttribute('aria-checked', String(quality === saved.quality));
+            button.classList.toggle('selected', quality === saved.quality);
+            const iconNode = document.createElement('span');
+            iconNode.textContent = icon;
+            const labelNode = document.createElement('b');
+            labelNode.textContent = label;
+            const detailNode = document.createElement('small');
+            detailNode.textContent = detail;
+            button.append(iconNode, labelNode, detailNode);
+            profiles.appendChild(button);
+        });
+
+        const toggle = document.createElement('label');
+        toggle.className = 'visual-toggle';
+        const toggleCopy = document.createElement('span');
+        const toggleTitle = document.createElement('b');
+        toggleTitle.textContent = 'AUDIO REACTIVE FX';
+        const toggleDetail = document.createElement('small');
+        toggleDetail.textContent = 'Canvas, aura and particles';
+        toggleCopy.append(toggleTitle, toggleDetail);
+        const checkbox = document.createElement('input');
+        checkbox.id = 'visual-enabled';
+        checkbox.type = 'checkbox';
+        checkbox.checked = saved.enabled;
+        const indicator = document.createElement('i');
+        indicator.setAttribute('aria-hidden', 'true');
+        toggle.append(toggleCopy, checkbox, indicator);
+        toolPanel.replaceChildren(heading, profiles, toggle);
+    }
+
     function applyVisualPreferences({ quality = 'balanced', enabled = true } = {}) {
         document.body.classList.remove('visual-low', 'visual-balanced', 'visual-ultra');
         document.body.classList.add(`visual-${quality}`);
         document.body.classList.toggle('visuals-off', !enabled);
-        localStorage.setItem('shinobiwan-visuals', JSON.stringify({ quality, enabled }));
+        try {
+            localStorage.setItem('shinobiwan-visuals', JSON.stringify({ quality, enabled }));
+        } catch (error) {
+            console.warn('Visual preferences could not be saved.', error);
+        }
     }
 
     function loadVisualPreferences() {
@@ -927,24 +1066,21 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!activeTool) return;
 
         if (activeTool === 'queue') {
-            toolPanel.innerHTML = `<strong>UP NEXT</strong>${getUpcomingTracks().map((track, index) => `<div class="queue-item"><span>0${index + 1}</span><b>${track.title}</b><button type="button" data-play-next="${track.id}">PLAY</button></div>`).join('')}`;
+            renderQueuePanel();
         } else if (activeTool === 'share') {
-            toolPanel.innerHTML = `<strong>SHARE ${TRACKS[currentTrackId].title.toUpperCase()}</strong><div class="share-actions"><button type="button" data-share="native">SHARE ↗</button><button type="button" data-share="copy">COPY LINK</button></div>`;
+            renderSharePanel();
         } else {
-            const saved = loadVisualPreferences();
-            toolPanel.innerHTML = `<div class="visual-panel-head"><div><strong>VISUAL ENGINE</strong><small>Performance profile</small></div><button type="button" data-close-tool aria-label="Close visual settings">×</button></div><div class="visual-profiles" role="radiogroup" aria-label="Visual quality"><button type="button" data-quality="low" role="radio"><span>◌</span><b>LOW</b><small>Battery</small></button><button type="button" data-quality="balanced" role="radio"><span>◉</span><b>BALANCED</b><small>Default</small></button><button type="button" data-quality="ultra" role="radio"><span>✦</span><b>ULTRA</b><small>Maximum</small></button></div><label class="visual-toggle"><span><b>AUDIO REACTIVE FX</b><small>Canvas, aura and particles</small></span><input id="visual-enabled" type="checkbox"><i aria-hidden="true"></i></label>`;
-            toolPanel.querySelectorAll('[data-quality]').forEach(button => {
-                const selected = button.dataset.quality === saved.quality;
-                button.classList.toggle('selected', selected);
-                button.setAttribute('aria-checked', String(selected));
-            });
-            toolPanel.querySelector('#visual-enabled').checked = saved.enabled;
+            renderVisualPanel(loadVisualPreferences());
         }
     }
 
     async function loadTrackData(trackId, autoplay = isInitialized) {
         const track = TRACKS[trackId];
         if (!track) return;
+        const generation = ++trackLoadGeneration;
+        trackFetchController?.abort();
+        trackFetchController = new AbortController();
+        const { signal } = trackFetchController;
         const previousEp = TRACKS[currentTrackId]?.epId;
         currentTrackId = trackId;
         updateTrackContext(trackId);
@@ -959,7 +1095,7 @@ document.addEventListener('DOMContentLoaded', () => {
         else spotifyGhostMode = false;
         audioEl.src = track.audio;
         audioEl.load();
-        renderWaveform(track.audio);
+        renderWaveform(track.audio, signal, generation);
 
         if (btnExportMp3) {
             btnExportMp3.href = track.audio;
@@ -974,10 +1110,19 @@ document.addEventListener('DOMContentLoaded', () => {
         playerCover.alt = `${track.title} cover`;
         playerCover.onerror = function onCoverError() { this.src = track.coverFallback; };
         setActiveTrack(trackId);
-        loadLyrics(track);
+        loadLyrics(track, signal, generation);
 
         if (autoplay) {
-            await audioEl.play();
+            try {
+                await audioEl.play();
+            } catch (error) {
+                if (generation !== trackLoadGeneration || error.name === 'AbortError') return;
+                console.warn('Playback could not start.', error);
+                setPlaybackButton(false);
+                setLocalAudioActive(false);
+                return;
+            }
+            if (generation !== trackLoadGeneration) return;
             setPlaybackButton(true);
             setLocalAudioActive(true);
         } else {
@@ -1096,6 +1241,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setMotionState();
     renderTrackList();
     initAmbientParticles();
-        const sharedTrackId = decodeURIComponent(location.hash.slice(1));
-        loadTrackData(TRACKS[sharedTrackId] ? sharedTrackId : 'before-the-noise', false);
+    const sharedTrackId = decodeURIComponent(location.hash.slice(1));
+    loadTrackData(TRACKS[sharedTrackId] ? sharedTrackId : 'before-the-noise', false);
 });
