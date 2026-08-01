@@ -697,6 +697,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!Number.isNaN(audioEl.duration)) audioEl.currentTime = pos * audioEl.duration;
     });
 
+    progressContainer.addEventListener('keydown', event => {
+        if (!Number.isFinite(audioEl.duration)) return;
+        const seekBy = event.shiftKey ? 10 : 5;
+        if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') audioEl.currentTime = Math.max(0, audioEl.currentTime - seekBy);
+        else if (event.key === 'ArrowRight' || event.key === 'ArrowUp') audioEl.currentTime = Math.min(audioEl.duration, audioEl.currentTime + seekBy);
+        else if (event.key === 'Home') audioEl.currentTime = 0;
+        else if (event.key === 'End') audioEl.currentTime = audioEl.duration;
+        else return;
+        event.preventDefault();
+    });
+
     audioEl.addEventListener('timeupdate', () => {
         if (!Number.isNaN(audioEl.duration)) {
             progressBar.style.width = `${(audioEl.currentTime / audioEl.duration) * 100}%`;
@@ -731,6 +742,11 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDropAnticipation();
         timeCurrent.textContent = formatTime(audioEl.currentTime);
         timeTotal.textContent = formatTime(audioEl.duration);
+        const duration = Number.isFinite(audioEl.duration) ? audioEl.duration : 0;
+        const currentTime = Math.min(audioEl.currentTime, duration);
+        progressContainer.setAttribute('aria-valuemax', String(Math.round(duration)));
+        progressContainer.setAttribute('aria-valuenow', String(Math.round(currentTime)));
+        progressContainer.setAttribute('aria-valuetext', `${formatTime(currentTime)} of ${formatTime(duration)}`);
     });
 
     function processLyricsText(rawText) {
